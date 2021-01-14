@@ -3,10 +3,13 @@ package com.app.momagictest;
 import android.app.Application;
 import android.util.Log;
 
-import com.momagic.DATAB;
+import com.momagic.DATB;
 import com.momagic.NotificationHelperListener;
 import com.momagic.Payload;
 import com.momagic.TokenReceivedListener;
+
+import java.util.ArrayList;
+import java.util.List;
 
 public class AppController extends Application implements TokenReceivedListener,NotificationHelperListener
 
@@ -16,7 +19,7 @@ public class AppController extends Application implements TokenReceivedListener,
     public void onCreate() {
         super.onCreate();
 
-        DATAB.initialize(this)
+        DATB.initialize(this)
                 .setNotificationReceiveListener(this)
                 .setTokenReceivedListener(this)
 

@@ -131,7 +131,7 @@ public class Util {
 
     public static String getSDKVersion() {
         try {
-            PackageInfo pInfo = DATAB.appContext.getPackageManager().getPackageInfo(DATAB.appContext.getPackageName(), 0);
+            PackageInfo pInfo = DATB.appContext.getPackageManager().getPackageInfo(DATB.appContext.getPackageName(), 0);
             return pInfo.versionName;
         } catch (PackageManager.NameNotFoundException e) {
             e.printStackTrace();
@@ -203,9 +203,9 @@ public class Util {
         //return Locale.getDefault().getDisplayLanguage();
         Locale locale;
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.N) {
-            locale = DATAB.appContext.getResources().getConfiguration().getLocales().get(0);
+            locale = DATB.appContext.getResources().getConfiguration().getLocales().get(0);
         } else {
-            locale = DATAB.appContext.getResources().getConfiguration().locale;
+            locale = DATB.appContext.getResources().getConfiguration().locale;
         }
         // Log.e("lanuguage",locale.getCountry());
         return locale.getDisplayLanguage();
@@ -218,7 +218,7 @@ public class Util {
     }
     public static boolean checkNotificationEnable()
     {
-        return NotificationManagerCompat.from(DATAB.appContext).areNotificationsEnabled();
+        return NotificationManagerCompat.from(DATB.appContext).areNotificationsEnabled();
 
     }
     public static String getPackageName(Context context) {

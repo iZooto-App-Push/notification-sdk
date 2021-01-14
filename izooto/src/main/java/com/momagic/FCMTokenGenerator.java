@@ -66,7 +66,7 @@ public class FCMTokenGenerator implements TokenGenerator {
                             .setApiKey(getAPI_KEY()) //Application Key
                             .setProjectId(get_Project_ID()) //Project ID
                             .build();
-            firebaseApp = FirebaseApp.initializeApp(DATAB.appContext, firebaseOptions, AppConstant.SDKNAME);
+            firebaseApp = FirebaseApp.initializeApp(DATB.appContext, firebaseOptions, AppConstant.SDKNAME);
             Lg.d(AppConstant.FCMNAME, firebaseApp.getName());
         }
         else
@@ -77,7 +77,7 @@ public class FCMTokenGenerator implements TokenGenerator {
     private static String  getAPI_KEY()
     {
         try {
-            String apiKey = FirebaseOptions.fromResource(DATAB.appContext).getApiKey();
+            String apiKey = FirebaseOptions.fromResource(DATB.appContext).getApiKey();
             if (apiKey != null)
                 return apiKey;
             //return new String(Base64.decode(FCM_DEFAULT_API_KEY_BASE64, Base64.DEFAULT));
@@ -93,7 +93,7 @@ public class FCMTokenGenerator implements TokenGenerator {
     }
     private  static String get_App_ID() {
         try {
-            String application_id = FirebaseOptions.fromResource(DATAB.appContext).getApplicationId();
+            String application_id = FirebaseOptions.fromResource(DATB.appContext).getApplicationId();
             if (application_id!=null)
                 return application_id;
         }
@@ -108,7 +108,7 @@ public class FCMTokenGenerator implements TokenGenerator {
     private  static String get_Project_ID()
     {
         try {
-            String project_id = FirebaseOptions.fromResource(DATAB.appContext).getProjectId();
+            String project_id = FirebaseOptions.fromResource(DATB.appContext).getProjectId();
             if(project_id!=null)
                 return project_id;
         }

@@ -48,13 +48,11 @@ public class DATBMessagingService extends FirebaseMessagingService {
         try {
             if (remoteMessage.getData().size() > 0) {
                 Map<String, String> data = remoteMessage.getData();
-                Log.d(AppConstant.APP_NAME_TAG, AppConstant.PAYLOAD + remoteMessage.getData());
                 handleNow(data);
 
             }
             if (remoteMessage.getNotification() != null) {
                 sendNotification(remoteMessage);
-                Log.d(AppConstant.APP_NAME_TAG, AppConstant.PAYLOAD + remoteMessage.getNotification().getBody());
             }
         }
         catch (Exception ex)
@@ -215,13 +213,13 @@ public class DATBMessagingService extends FirebaseMessagingService {
             }
 
 
-            if (DATAB.appContext == null)
-                DATAB.appContext = this;
+            if (DATB.appContext == null)
+                DATB.appContext = this;
             Handler mainHandler = new Handler(Looper.getMainLooper());
             Runnable myRunnable = new Runnable() {
                 @Override
                 public void run() {
-                    DATAB.processNotificationReceived(payload);
+                    DATB.processNotificationReceived(payload);
 
                 } // This is your code
             };

@@ -13,10 +13,10 @@ public class GooglePlayServiceUtil {
 
     public static boolean checkForPlayServices() {
         GoogleApiAvailability apiAvailability = GoogleApiAvailability.getInstance();
-        int resultCode = apiAvailability.isGooglePlayServicesAvailable(DATAB.appContext);
+        int resultCode = apiAvailability.isGooglePlayServicesAvailable(DATB.appContext);
         if (resultCode != ConnectionResult.SUCCESS) {
             if (apiAvailability.isUserResolvableError(resultCode)) {
-                Toast.makeText(DATAB.appContext, "Play services not available or may be not updated.", Toast.LENGTH_SHORT);
+                Toast.makeText(DATB.appContext, "Play services not available or may be not updated.", Toast.LENGTH_SHORT);
             } else {
                 Log.i(AppConstant.APP_NAME_TAG, "This device is not supported.");
             }

@@ -3,7 +3,7 @@ package com.momagic;
 
 public interface AppConstant {
    // String APP_NAME_TAG = "iZooto";
-    String APP_NAME_TAG = "DataB";
+    String APP_NAME_TAG = "DATB";
 
     String FCM_DEVICE_TOKEN = "deviceToken";
     String IZOOTO_SENDER_ID_KEY = "izooto_sender_id";

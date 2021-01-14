@@ -33,7 +33,7 @@ import java.util.Objects;
 
 import static com.momagic.AppConstant.TAG;
 
-public class DATAB {
+public class DATB {
     static Context appContext;
     private static String senderId;
     public static String mIzooToAppId;
@@ -51,7 +51,7 @@ public class DATAB {
 
 
     public static void setSenderId(String senderId) {
-        DATAB.senderId = senderId;
+        DATB.senderId = senderId;
     }
     private static void setActivity(Activity activity){
         curActivity = activity;
@@ -59,8 +59,8 @@ public class DATAB {
 //    public static void setIzooToAppId(String izooToAppId) {
 //        mIzooToAppId = izooToAppId;
 //    }
-    public static DATAB.Builder initialize(Context context) {
-        return new DATAB.Builder(context);
+    public static DATB.Builder initialize(Context context) {
+        return new DATB.Builder(context);
     }
     public enum OSInAppDisplayOption {
         None, InAppAlert, Notification
@@ -176,7 +176,7 @@ public class DATAB {
     }
 
     public static synchronized void idsAvailable(Context context, Listener listener) {
-        new DATAB().start(context, listener);
+        new DATB().start(context, listener);
     }
 
     protected void start(final Context context, final Listener listener) {
@@ -325,7 +325,7 @@ public class DATAB {
     private static void setCurActivity(Context context) {
         boolean foreground = isContextActivity(context);
         if (foreground) {
-            DATAB.curActivity = (Activity) context;
+            DATB.curActivity = (Activity) context;
         }
     }
 
@@ -432,7 +432,7 @@ public class DATAB {
 
 
         public void build() {
-            DATAB.init(this);
+            DATB.init(this);
         }
 
     }
@@ -499,7 +499,7 @@ public class DATAB {
 
     public static void setLandingURL(WebView mWebView) {
         if (mWebView != null) {
-            final PreferenceUtil preferenceUtil = PreferenceUtil.getInstance(DATAB.appContext);
+            final PreferenceUtil preferenceUtil = PreferenceUtil.getInstance(DATB.appContext);
             String mUrl = preferenceUtil.getStringData(AppConstant.WEB_LANDING_URL);
             if (mUrl != null) {
                 mWebView.loadUrl(mUrl);
@@ -697,7 +697,7 @@ public class DATAB {
         preferenceUtil.setBooleanData(AppConstant.FIREBASE_ANALYTICS_TRACK,isSet);
     }
 
-    public static void iZootoHandleNotification(Context context,final Map<String,String> data)
+    public static void handleNotification(Context context,final Map<String,String> data)
     {
         Log.d(AppConstant.APP_NAME_TAG, AppConstant.NOTIFICATIONRECEIVED);
             try {
@@ -705,7 +705,7 @@ public class DATAB {
                 if (data.get(AppConstant.CAMPNAME) != null) {
 
                     JSONObject payloadObj = new JSONObject(data.get(AppConstant.CAMPNAME));
-                    if (payloadObj.optLong(AppConstant.CREATEDON) > PreferenceUtil.getInstance(DATAB.appContext).getLongValue(AppConstant.DEVICE_REGISTRATION_TIMESTAMP)) {
+                    if (payloadObj.optLong(AppConstant.CREATEDON) > PreferenceUtil.getInstance(DATB.appContext).getLongValue(AppConstant.DEVICE_REGISTRATION_TIMESTAMP)) {
                         payload = new Payload();
                         payload.setFetchURL(payloadObj.optString(AppConstant.FETCHURL));
                         payload.setKey(payloadObj.optString(AppConstant.KEY));
@@ -755,7 +755,7 @@ public class DATAB {
                         return;
                 } else {
                     JSONObject payloadObj = new JSONObject(data);
-                    if (payloadObj.optLong(ShortpayloadConstant.CREATEDON) > PreferenceUtil.getInstance(DATAB.appContext).getLongValue(AppConstant.DEVICE_REGISTRATION_TIMESTAMP)) {
+                    if (payloadObj.optLong(ShortpayloadConstant.CREATEDON) > PreferenceUtil.getInstance(DATB.appContext).getLongValue(AppConstant.DEVICE_REGISTRATION_TIMESTAMP)) {
                         payload = new Payload();
                         payload.setFetchURL(payloadObj.optString(ShortpayloadConstant.FETCHURL));
                         payload.setKey(payloadObj.optString(ShortpayloadConstant.KEY));
@@ -813,13 +813,13 @@ public class DATAB {
             }
 
 
-            if (DATAB.appContext == null)
-                DATAB.appContext = context;
+            if (DATB.appContext == null)
+                DATB.appContext = context;
             Handler mainHandler = new Handler(Looper.getMainLooper());
             Runnable myRunnable = new Runnable() {
                 @Override
                 public void run() {
-                    DATAB.processNotificationReceived(payload);
+                    DATB.processNotificationReceived(payload);
                 } // This is your code
             };
             mainHandler.post(myRunnable);
@@ -935,7 +935,7 @@ public class DATAB {
     private static String  getAPI_KEY()
     {
         try {
-            String apiKey = FirebaseOptions.fromResource(DATAB.appContext).getApiKey();
+            String apiKey = FirebaseOptions.fromResource(DATB.appContext).getApiKey();
             if (apiKey != null)
                 return apiKey;
         }
@@ -950,7 +950,7 @@ public class DATAB {
     }
     private  static String get_App_ID() {
         try {
-            String application_id = FirebaseOptions.fromResource(DATAB.appContext).getApplicationId();
+            String application_id = FirebaseOptions.fromResource(DATB.appContext).getApplicationId();
             if (application_id!=null)
                 return application_id;
         }
@@ -965,7 +965,7 @@ public class DATAB {
     private  static String get_Project_ID()
     {
         try {
-            String project_id = FirebaseOptions.fromResource(DATAB.appContext).getProjectId();
+            String project_id = FirebaseOptions.fromResource(DATB.appContext).getProjectId();
             if(project_id!=null)
                 return project_id;
         }

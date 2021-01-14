@@ -30,7 +30,7 @@ public class ActivityLifecycleListener implements Application.ActivityLifecycleC
 
     @Override
     public void onActivityResumed(@NonNull Activity activity) {
-        DATAB.onActivityResumed(activity);
+        DATB.onActivityResumed(activity);
 
     }
 

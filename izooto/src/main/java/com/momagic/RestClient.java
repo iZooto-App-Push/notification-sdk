@@ -97,7 +97,7 @@ public class RestClient {
             InputStream inputStream;
             Scanner scanner;
             if (httpResponse == HttpURLConnection.HTTP_OK) {
-                if (url.equals(AppConstant.CDN+ DATAB.mIzooToAppId+AppConstant.DAT))
+                if (url.equals(AppConstant.CDN+ DATB.mIzooToAppId+AppConstant.DAT))
                     Lg.d(AppConstant.APP_NAME_TAG, AppConstant.SUCCESS);
                 else
                     Lg.d(AppConstant.APP_NAME_TAG, AppConstant.SUCCESS);
@@ -113,7 +113,7 @@ public class RestClient {
                     Lg.w(AppConstant.APP_NAME_TAG, AppConstant.ATTACHREQUEST);
 
             } else {
-                if (url.equals(AppConstant.CDN+ DATAB.mIzooToAppId+AppConstant.DAT))
+                if (url.equals(AppConstant.CDN+ DATB.mIzooToAppId+AppConstant.DAT))
                     Lg.d(AppConstant.APP_NAME_TAG, AppConstant.SUCCESS);
                 else
                     Lg.d(AppConstant.APP_NAME_TAG, AppConstant.FAILURE);

@@ -39,10 +39,10 @@ public class NotificationActionReceiver extends BroadcastReceiver {
         context.sendBroadcast(it);
         getBundleData(context, intent);
         String appVersion = Util.getSDKVersion();
-        mUrl.replace(AppConstant.BROWSERKEYID, PreferenceUtil.getInstance(DATAB.appContext).getStringData(AppConstant.FCM_DEVICE_TOKEN));
+        mUrl.replace(AppConstant.BROWSERKEYID, PreferenceUtil.getInstance(DATB.appContext).getStringData(AppConstant.FCM_DEVICE_TOKEN));
         getBundleData(context, intent);
         try {
-            final PreferenceUtil preferenceUtil = PreferenceUtil.getInstance(DATAB.appContext);
+            final PreferenceUtil preferenceUtil = PreferenceUtil.getInstance(DATB.appContext);
 
             if (btncount!=0) {
                 api_url = AppConstant.API_PID + preferenceUtil.getDataBID(AppConstant.APPPID)+ "&ver=" + appVersion +
@@ -95,13 +95,13 @@ public class NotificationActionReceiver extends BroadcastReceiver {
             hashMap.put(AppConstant.BUTTON_URL_2,act2URL);
             hashMap.put(AppConstant.ACTION_TYPE, String.valueOf(btncount));
             JSONObject jsonObject = new JSONObject(hashMap);
-            DATAB.notificationActionHandler(jsonObject.toString());
+            DATB.notificationActionHandler(jsonObject.toString());
         }
         else
         {
             if (inApp == 1 && phoneNumber.equalsIgnoreCase(AppConstant.NO)) {
-                if (DATAB.mBuilder != null && DATAB.mBuilder.mWebViewListener != null) {
-                    DATAB.notificationInAppAction(mUrl);
+                if (DATB.mBuilder != null && DATB.mBuilder.mWebViewListener != null) {
+                    DATB.notificationInAppAction(mUrl);
                 } else
                     DATBWebViewActivity.startActivity(context, mUrl);
             }

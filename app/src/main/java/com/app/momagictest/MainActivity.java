@@ -9,6 +9,12 @@ import androidx.appcompat.widget.Toolbar;
 import android.view.Menu;
 import android.view.MenuItem;
 
+import com.momagic.DATB;
+
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.List;
+
 
 public class MainActivity extends AppCompatActivity
 {
@@ -19,6 +25,10 @@ public class MainActivity extends AppCompatActivity
         setContentView(R.layout.activity_main);
         Toolbar toolbar =  findViewById(R.id.toolbar);
         setSupportActionBar(toolbar);
+        HashMap<String,Object> data =new HashMap<>();
+        data.put("Cricket","Dhoni");
+       // DATB.addUserProperty(data);
+
 
 
     }

@@ -221,10 +221,10 @@ public class NotificationEventManager {
             receivedNotification(payload);
         }else {
 
-            if (isAppInForeground(DATAB.appContext)){
-                if (DATAB.inAppOption==null || DATAB.inAppOption.equalsIgnoreCase(AppConstant.NOTIFICATION_)){
+            if (isAppInForeground(DATB.appContext)){
+                if (DATB.inAppOption==null || DATB.inAppOption.equalsIgnoreCase(AppConstant.NOTIFICATION_)){
                     receivedNotification(payload);
-                }else if (DATAB.inAppOption.equalsIgnoreCase(AppConstant.INAPPALERT)){
+                }else if (DATB.inAppOption.equalsIgnoreCase(AppConstant.INAPPALERT)){
                     showAlert(payload);
                 }
             }else {
@@ -257,14 +257,14 @@ public class NotificationEventManager {
                 badgeCountUpdate(payload.getBadgeCount());
 
 
-                String channelId = DATAB.appContext.getString(R.string.default_notification_channel_id);
+                String channelId = DATB.appContext.getString(R.string.default_notification_channel_id);
                 NotificationCompat.Builder notificationBuilder = null;
                 Notification summaryNotification = null;
                 int SUMMARY_ID = 0;
                 Intent intent = null;
-                if (DATAB.icon!=0)
+                if (DATB.icon!=0)
                 {
-                    icon= DATAB.icon;
+                    icon= DATB.icon;
                 }
                 else
                 {
@@ -273,15 +273,15 @@ public class NotificationEventManager {
                     }else {
 
                         if (isInt(payload.getBadgeicon())){
-                            icon = DATAB.appContext.getApplicationInfo().icon;
+                            icon = DATB.appContext.getApplicationInfo().icon;
                         }else {
-                            int checkExistence = DATAB.appContext.getResources().getIdentifier(payload.getBadgeicon(), "drawable", DATAB.appContext.getPackageName());
+                            int checkExistence = DATB.appContext.getResources().getIdentifier(payload.getBadgeicon(), "drawable", DATB.appContext.getPackageName());
                             if ( checkExistence != 0 ) {  // the resource exists...
                                 icon = checkExistence;
 
                             }
                             else {  // checkExistence == 0  // the resource does NOT exist!!
-                                int checkExistenceMipmap = DATAB.appContext.getResources().getIdentifier(payload.getBadgeicon(), "mipmap", DATAB.appContext.getPackageName());
+                                int checkExistenceMipmap = DATB.appContext.getResources().getIdentifier(payload.getBadgeicon(), "mipmap", DATB.appContext.getPackageName());
                                 if ( checkExistenceMipmap != 0 ) {  // the resource exists...
                                     icon = checkExistenceMipmap;
 
@@ -326,10 +326,10 @@ public class NotificationEventManager {
                 intent = notificationClick(payload, payload.getLink(),payload.getAct1link(),payload.getAct2link(),AppConstant.NO,clickIndex,100,0);
                 Uri defaultSoundUri = RingtoneManager.getDefaultUri(RingtoneManager.TYPE_NOTIFICATION);
 
-                PendingIntent pendingIntent = PendingIntent.getBroadcast(DATAB.appContext, new Random().nextInt(100) /* Request code */, intent,
+                PendingIntent pendingIntent = PendingIntent.getBroadcast(DATB.appContext, new Random().nextInt(100) /* Request code */, intent,
                         PendingIntent.FLAG_ONE_SHOT);
 
-                notificationBuilder = new NotificationCompat.Builder(DATAB.appContext, channelId)
+                notificationBuilder = new NotificationCompat.Builder(DATB.appContext, channelId)
                         .setContentTitle(payload.getTitle())
                         .setSmallIcon(icon)
                         .setContentText(payload.getMessage())
@@ -356,7 +356,7 @@ public class NotificationEventManager {
                         notificationBuilder.setGroup(payload.getGroupKey());
 
                         summaryNotification =
-                                new NotificationCompat.Builder(DATAB.appContext, channelId)
+                                new NotificationCompat.Builder(DATB.appContext, channelId)
                                         .setContentTitle(payload.getTitle())
                                         .setContentText(payload.getMessage())
                                         .setSmallIcon(icon)
@@ -398,16 +398,16 @@ public class NotificationEventManager {
                 }
 
                 NotificationManager notificationManager =
-                        (NotificationManager) DATAB.appContext.getSystemService(Context.NOTIFICATION_SERVICE);
+                        (NotificationManager) DATB.appContext.getSystemService(Context.NOTIFICATION_SERVICE);
                 int notificaitionId = (int) System.currentTimeMillis();
                 if (payload.getAct1name() != null && !payload
                         .getAct1name().isEmpty()) {
                     String phone = getPhone(payload.getAct1link());
                     Intent btn1 = notificationClick(payload,payload.getAct1link(),payload.getLink(),payload.getAct2link(),phone,clickIndex,notificaitionId,1);
-                    PendingIntent pendingIntent1 = PendingIntent.getBroadcast(DATAB.appContext, new Random().nextInt(100), btn1, PendingIntent.FLAG_UPDATE_CURRENT);
+                    PendingIntent pendingIntent1 = PendingIntent.getBroadcast(DATB.appContext, new Random().nextInt(100), btn1, PendingIntent.FLAG_UPDATE_CURRENT);
                     NotificationCompat.Action action1 =
                             new NotificationCompat.Action.Builder(
-                                    0,  HtmlCompat.fromHtml("<font color=\"" + ContextCompat.getColor(DATAB.appContext, R.color.gray) + "\">" + payload.getAct1name() + "</font>", HtmlCompat.FROM_HTML_MODE_LEGACY),
+                                    0,  HtmlCompat.fromHtml("<font color=\"" + ContextCompat.getColor(DATB.appContext, R.color.gray) + "\">" + payload.getAct1name() + "</font>", HtmlCompat.FROM_HTML_MODE_LEGACY),
                                     pendingIntent1).build();
                     notificationBuilder.addAction(action1);
 
@@ -419,10 +419,10 @@ public class NotificationEventManager {
 //                    btn2.setAction(AppConstant.ACTION_BTN_TWO);
                     String phone = getPhone(payload.getAct2link());
                     Intent btn2 = notificationClick(payload,payload.getAct2link(),payload.getLink(),payload.getAct1link(),phone,clickIndex,notificaitionId,2);
-                    PendingIntent pendingIntent2 = PendingIntent.getBroadcast(DATAB.appContext, new Random().nextInt(100), btn2, PendingIntent.FLAG_UPDATE_CURRENT);
+                    PendingIntent pendingIntent2 = PendingIntent.getBroadcast(DATB.appContext, new Random().nextInt(100), btn2, PendingIntent.FLAG_UPDATE_CURRENT);
                     NotificationCompat.Action action2 =
                             new NotificationCompat.Action.Builder(
-                                    0, HtmlCompat.fromHtml("<font color=\"" + ContextCompat.getColor(DATAB.appContext, R.color.gray) + "\">" + payload.getAct2name() + "</font>", HtmlCompat.FROM_HTML_MODE_LEGACY),
+                                    0, HtmlCompat.fromHtml("<font color=\"" + ContextCompat.getColor(DATB.appContext, R.color.gray) + "\">" + payload.getAct2name() + "</font>", HtmlCompat.FROM_HTML_MODE_LEGACY),
                                     pendingIntent2).build();
                     notificationBuilder.addAction(action2);
                 }
@@ -451,7 +451,7 @@ public class NotificationEventManager {
                     if(impressionIndex.equalsIgnoreCase("1")) {
                         viewNotificationApi(payload);
                     }
-                    DATAB.notificationView(payload);
+                    DATB.notificationView(payload);
 
                 } catch (Exception e) {
                     e.printStackTrace();
@@ -518,7 +518,7 @@ public class NotificationEventManager {
                 .appendQueryParameter(AppConstant.URL_ID, payload.getId())
                 .appendQueryParameter(AppConstant.URL_CLIENT, payload.getKey())
                 .appendQueryParameter(AppConstant.URL_RID, payload.getRid())
-                .appendQueryParameter(AppConstant.URL_BKEY_, PreferenceUtil.getInstance(DATAB.appContext).getStringData(AppConstant.FCM_DEVICE_TOKEN))
+                .appendQueryParameter(AppConstant.URL_BKEY_, PreferenceUtil.getInstance(DATB.appContext).getStringData(AppConstant.FCM_DEVICE_TOKEN))
                 .appendQueryParameter(AppConstant.URL_FRWD___, encodedLink)
                 .build();
         return builtUri.toString();
@@ -564,7 +564,7 @@ public class NotificationEventManager {
     }
 
     private static void badgeCountUpdate(int count){
-        final PreferenceUtil preferenceUtil = PreferenceUtil.getInstance(DATAB.appContext);
+        final PreferenceUtil preferenceUtil = PreferenceUtil.getInstance(DATB.appContext);
         try {
             if (count > 0) {
                 if (preferenceUtil.getIntData(AppConstant.NOTIFICATION_COUNT)>=1){
@@ -573,7 +573,7 @@ public class NotificationEventManager {
                     preferenceUtil.setIntData(AppConstant.NOTIFICATION_COUNT,1);
                 }
             }
-            ShortcutBadger.applyCountOrThrow(DATAB.appContext,preferenceUtil.getIntData(AppConstant.NOTIFICATION_COUNT));
+            ShortcutBadger.applyCountOrThrow(DATB.appContext,preferenceUtil.getIntData(AppConstant.NOTIFICATION_COUNT));
 
         } catch (Exception e) {
             e.printStackTrace();
@@ -596,7 +596,7 @@ public class NotificationEventManager {
     }
 
     private static void showAlert(final Payload payload){
-        final Activity activity = DATAB.curActivity;
+        final Activity activity = DATB.curActivity;
         if (activity!=null) {
             activity.runOnUiThread(new Runnable() {
                 @Override
@@ -605,8 +605,8 @@ public class NotificationEventManager {
                     mBuilder.setTitle(payload.getTitle());
                     mBuilder.setMessage(payload.getMessage());
 
-                    if (Util.getApplicationIcon(DATAB.appContext)!=null){
-                        mBuilder.setIcon(Util.getApplicationIcon(DATAB.appContext));
+                    if (Util.getApplicationIcon(DATB.appContext)!=null){
+                        mBuilder.setIcon(Util.getApplicationIcon(DATB.appContext));
                     }
 
                     String clickIndex = "0";
@@ -651,7 +651,7 @@ public class NotificationEventManager {
                         if(impressionIndex.equalsIgnoreCase("1")) {
                             viewNotificationApi(payload);
                         }
-                        DATAB.notificationView(payload);
+                        DATB.notificationView(payload);
 
                     } catch (Exception e) {
                         e.printStackTrace();
@@ -669,17 +669,17 @@ public class NotificationEventManager {
         String link2 = getLink2;
         if (payload.getFetchURL() == null || payload.getFetchURL().isEmpty()) {
             if (link.contains(AppConstant.BROWSERKEYID))
-                link = link.replace(AppConstant.BROWSERKEYID, PreferenceUtil.getInstance(DATAB.appContext).getStringData(AppConstant.FCM_DEVICE_TOKEN));
+                link = link.replace(AppConstant.BROWSERKEYID, PreferenceUtil.getInstance(DATB.appContext).getStringData(AppConstant.FCM_DEVICE_TOKEN));
             if (link1.contains(AppConstant.BROWSERKEYID))
-                link1 = link1.replace(AppConstant.BROWSERKEYID, PreferenceUtil.getInstance(DATAB.appContext).getStringData(AppConstant.FCM_DEVICE_TOKEN));
+                link1 = link1.replace(AppConstant.BROWSERKEYID, PreferenceUtil.getInstance(DATB.appContext).getStringData(AppConstant.FCM_DEVICE_TOKEN));
             if (link2.contains(AppConstant.BROWSERKEYID))
-                link2 = link2.replace(AppConstant.BROWSERKEYID, PreferenceUtil.getInstance(DATAB.appContext).getStringData(AppConstant.FCM_DEVICE_TOKEN));
+                link2 = link2.replace(AppConstant.BROWSERKEYID, PreferenceUtil.getInstance(DATB.appContext).getStringData(AppConstant.FCM_DEVICE_TOKEN));
         } else {
             String notificationLink = payload.getLink();
             notificationLink = getFinalUrl(payload);
         }
 
-        Intent intent = new Intent(DATAB.appContext, NotificationActionReceiver.class);
+        Intent intent = new Intent(DATB.appContext, NotificationActionReceiver.class);
         intent.putExtra(AppConstant.KEY_WEB_URL, link);
         intent.putExtra(AppConstant.KEY_NOTIFICITON_ID, notificationId);
         intent.putExtra(AppConstant.KEY_IN_APP, payload.getInapp());
@@ -703,7 +703,7 @@ public class NotificationEventManager {
 
     private static void viewNotificationApi(final Payload payload){
 
-        final PreferenceUtil preferenceUtil = PreferenceUtil.getInstance(DATAB.appContext);
+        final PreferenceUtil preferenceUtil = PreferenceUtil.getInstance(DATB.appContext);
 
         String api_url = AppConstant.API_PID +  preferenceUtil.getDataBID(AppConstant.APPPID) +
                 AppConstant.CID_ + payload.getId() + AppConstant.TOKEN + preferenceUtil.getStringData(AppConstant.FCM_DEVICE_TOKEN) + AppConstant.RID_ + payload.getRid() + "&op=view";
