@@ -1,0 +1,83 @@
+{
+  "project_info": {
+    "project_number": "542173124256",
+    "firebase_url": "https://notificationdemo-1652e.firebaseio.com",
+    "project_id": "notificationdemo-1652e",
+    "storage_bucket": "notificationdemo-1652e.appspot.com"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:542173124256:android:37b2857d0d384429a1dbc5",
+        "android_client_info": {
+          "package_name": "com.app.momagictest"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "542173124256-q09av1sssdungdbhk2o9k0iv98bp1cqo.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyBRqQ6qXirWRtYy1KLZhR3mjF46k4L4R18"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": [
+            {
+              "client_id": "542173124256-q09av1sssdungdbhk2o9k0iv98bp1cqo.apps.googleusercontent.com",
+              "client_type": 3
+            },
+            {
+              "client_id": "542173124256-m22rbukqacb04c28ujf2a2c237r7evga.apps.googleusercontent.com",
+              "client_type": 2,
+              "ios_info": {
+                "bundle_id": "com-izooto.NotificationDemo"
+              }
+            }
+          ]
+        }
+      }
+    },
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:542173124256:android:9cf75718aa3e0c5aa1dbc5",
+        "android_client_info": {
+          "package_name": "com.momagic_test"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "542173124256-q09av1sssdungdbhk2o9k0iv98bp1cqo.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyBRqQ6qXirWRtYy1KLZhR3mjF46k4L4R18"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": [
+            {
+              "client_id": "542173124256-q09av1sssdungdbhk2o9k0iv98bp1cqo.apps.googleusercontent.com",
+              "client_type": 3
+            },
+            {
+              "client_id": "542173124256-m22rbukqacb04c28ujf2a2c237r7evga.apps.googleusercontent.com",
+              "client_type": 2,
+              "ios_info": {
+                "bundle_id": "com-izooto.NotificationDemo"
+              }
+            }
+          ]
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}

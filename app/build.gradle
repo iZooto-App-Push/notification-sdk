@@ -1,0 +1,40 @@
+apply plugin: 'com.android.application'
+
+android {
+
+    compileSdkVersion 29
+    defaultConfig {
+        applicationId "com.app.momagictest"
+        minSdkVersion 16
+        targetSdkVersion 29
+        versionCode 1
+        versionName "1.0.0"
+        testInstrumentationRunner "androidx.test.runner.AndroidJUnitRunner"
+        manifestPlaceholders = [
+                momagic_app_id: "09f06385e06cc10d0fc7a5e1c002cd9338a2c94f"// "561db654d15610905f253c77d03ba350809dc7e9"
+        ]
+    }
+
+    buildTypes {
+        release {
+            minifyEnabled true
+            proguardFiles getDefaultProguardFile('proguard-android.txt'), 'proguard-rules.pro'
+        }
+    }
+
+    dependencies {
+        implementation fileTree(dir: 'libs', include: ['*.jar'])
+        //noinspection GradleCompatible
+
+        implementation 'com.android.support:appcompat-v7:28.0.0'
+        //noinspection GradleCompatible
+        implementation 'com.android.support:design:28.0.0'
+//        implementation 'com.izooto:notification-sdk:1.0.1'
+    }
+}
+dependencies {
+    implementation project(path: ':izooto')
+    implementation 'androidx.appcompat:appcompat:1.2.0'
+    implementation 'androidx.constraintlayout:constraintlayout:2.0.4'
+}
+apply plugin: 'com.google.gms.google-services'
