@@ -36,7 +36,7 @@ import static com.momagic.AppConstant.TAG;
 public class DATB {
     static Context appContext;
     private static String senderId;
-    public static String mIzooToAppId;
+    public static String mAppId;
     public static Builder mBuilder;
     public static int icon;
     private static Payload payload;
@@ -57,7 +57,7 @@ public class DATB {
         curActivity = activity;
     }
 //    public static void setIzooToAppId(String izooToAppId) {
-//        mIzooToAppId = izooToAppId;
+//        mAppId = izooToAppId;
 //    }
     public static DATB.Builder initialize(Context context) {
         return new DATB.Builder(context);
@@ -76,16 +76,16 @@ public class DATB {
             Bundle bundle = appInfo.metaData;
             if (bundle != null) {
                 if (bundle.containsKey(AppConstant.DATAB_APP_ID)) {
-                    mIzooToAppId = bundle.getString(AppConstant.DATAB_APP_ID);
-                    preferenceUtil.setStringData(AppConstant.ENCRYPTED_PID,mIzooToAppId);
+                    mAppId = bundle.getString(AppConstant.DATAB_APP_ID);
+                    preferenceUtil.setStringData(AppConstant.ENCRYPTED_PID,mAppId);
                 }
-                if (mIzooToAppId =="") {
+                if (mAppId =="") {
                     Lg.e(AppConstant.APP_NAME_TAG, AppConstant.MISSINGID);
                 }
                 else {
-                    Lg.i(AppConstant.APP_NAME_TAG, mIzooToAppId + "");
+                    Lg.i(AppConstant.APP_NAME_TAG, mAppId + "");
 
-                    RestClient.get(AppConstant.GOOGLE_JSON_URL + mIzooToAppId +".dat", new RestClient.ResponseHandler() {
+                    RestClient.get(AppConstant.GOOGLE_JSON_URL + mAppId +".dat", new RestClient.ResponseHandler() {
                         @Override
                         void onFailure(int statusCode, String response, Throwable throwable) {
                             super.onFailure(statusCode, response, throwable);
@@ -98,11 +98,12 @@ public class DATB {
                             try {
                                 final PreferenceUtil preferenceUtil = PreferenceUtil.getInstance(appContext);
                                 JSONObject jsonObject = new JSONObject(Objects.requireNonNull(Util.decrypt(AppConstant.SECRETKEY, response)));
+                               Log.e("JSONObject",jsonObject.toString());
                                 senderId =jsonObject.getString(AppConstant.SENDERID);
                                 String appId = jsonObject.getString(AppConstant.APPID);
                                 String apiKey = jsonObject.getString(AppConstant.APIKEY);
-                                mIzooToAppId = jsonObject.getString(AppConstant.APPPID);
-                                preferenceUtil.setDataBID(AppConstant.APPPID,mIzooToAppId);
+                                mAppId = jsonObject.getString(AppConstant.APPPID);
+                                preferenceUtil.setDataBID(AppConstant.APPPID,mAppId);
                                 if (senderId != null && !senderId.isEmpty()) {
                                     init(context, apiKey, appId);
                                 } else {
@@ -255,7 +256,7 @@ public class DATB {
     private static void registerToken() {
         final PreferenceUtil preferenceUtil = PreferenceUtil.getInstance(appContext);
         if (!preferenceUtil.getBoolean(AppConstant.IS_TOKEN_UPDATED)) {
-            String api_url = AppConstant.ADDURL + AppConstant.STYPE + AppConstant.PID + mIzooToAppId + AppConstant.BTYPE_ + AppConstant.BTYPE + AppConstant.DTYPE_ + AppConstant.DTYPE + AppConstant.TIMEZONE + System.currentTimeMillis() + AppConstant.APPVERSION + Util.getSDKVersion() +
+            String api_url = AppConstant.ADDURL + AppConstant.STYPE + AppConstant.PID + mAppId + AppConstant.BTYPE_ + AppConstant.BTYPE + AppConstant.DTYPE_ + AppConstant.DTYPE + AppConstant.TIMEZONE + System.currentTimeMillis() + AppConstant.APPVERSION + Util.getSDKVersion() +
                     AppConstant.OS + AppConstant.SDKOS + AppConstant.ALLOWED_ + AppConstant.ALLOWED + AppConstant.TOKEN + preferenceUtil.getStringData(AppConstant.FCM_DEVICE_TOKEN) + AppConstant.CHECKSDKVERSION +Util.getSDKVersion()+AppConstant.LANGUAGE+Util.getDeviceLanguage();
 
             try {
