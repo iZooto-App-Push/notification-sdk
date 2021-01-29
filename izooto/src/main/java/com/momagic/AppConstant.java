@@ -2,14 +2,10 @@ package com.momagic;
 
 
 public interface AppConstant {
-   // String APP_NAME_TAG = "iZooto";
     String APP_NAME_TAG = "DATB";
 
     String FCM_DEVICE_TOKEN = "deviceToken";
-    String IZOOTO_SENDER_ID_KEY = "izooto_sender_id";
     String GOOGLE_JSON_URL = "https://cdn.izooto.com/app/app_";  //old
-    //String GOOGLE_JSON_URL = "https://cdn.izooto.com/app/"; // new
-   // String SDKNAME = "IZOOTO";
     String SDKNAME = "MOMAGIC";
     String DEVICETOKEN="DEVICE TOKEN   ->  ";
     String UTF="UTF-8";
@@ -106,9 +102,6 @@ public interface AppConstant {
     int GE = 1;
 
 
-    String UPDATE_DEVICE_TOKEN = "https://aevents.izooto.com/izooto/api.php";
-    String IZOOTO_ENCRYPTION_KEY = "izooto_enc_key";
-   // String IZOOTO_APP_ID = "izooto_app_id";
     String DATAB_APP_ID = "momagic_app_id";
 
     String ACTION_BTN_ONE = "actionBtnOne";
@@ -119,7 +112,6 @@ public interface AppConstant {
     String IS_TOKEN_UPDATED = "isTokenUpdated";
     String DEVICE_REGISTRATION_TIMESTAMP = "deviceRegistrationTimeStamp";
     String KEY_IN_APP = "keyInApp";
-    String EVENT_URL="https://et.izooto.com/";
     String  KEY_IN_CID = "cid";
     String KEY_IN_RID = "rid";
     String KEY_IN_BUTOON="btn";
@@ -133,16 +125,15 @@ public interface AppConstant {
     int ALLOWED = 1;
     int STYPE = 2;
     String SECRETKEY = "b07dfa9d56fc64df";
-    String MESSAGE = "It seems you forgot to configure izooto_app id or izooto_sender_id property in your app level build.gradle";
+    String MESSAGE = "It seems you forgot to configure momagic_app id or momagic_sender_id property in your app level build.gradle";
     String FCMERROR = "Unable to generate FCM token, there may be something wrong with sender id";
     String SUCCESS = " Request Successful: ";
     String FAILURE = " Request Failed: ";
 
-    String ATTACHREQUEST = "IZooTo RestClient: ResponseHandler is not attached for the Request: ";
+    String ATTACHREQUEST = "MoMagic RestClient: ResponseHandler is not attached for the Request: ";
     String EXCEPTIONERROR = "Thrown Error";
     String UNEXCEPTION ="unsupported encoding exception";
     String CDN = "https://cdn.izooto.com/app/app_";
-    //String CDN = "https://cdn.izooto.com/app/";
 
     String MISSINGID="App Id is missing.";
     // Register String
@@ -219,7 +210,7 @@ public interface AppConstant {
     String BADGE_COUNT = "badgeCount";
     String ADVERTISEMENT_ID = "advertisementID";
     String ISINSTALL="isInstall";
-    String CHANNEL_NAME="iZooto Notification";
+    String CHANNEL_NAME="MoMagic Notification";
     String DIALOG_DISMISS="Dismiss";
     String DIALOG_OK="Take me there";
     String URL_FWD="&frwd";

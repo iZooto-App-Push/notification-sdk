@@ -60,9 +60,7 @@ public class DATB {
     private static void setActivity(Activity activity){
         curActivity = activity;
     }
-//    public static void setIzooToAppId(String izooToAppId) {
-//        mAppId = izooToAppId;
-//    }
+
     public static DATB.Builder initialize(Context context) {
         return new DATB.Builder(context);
     }

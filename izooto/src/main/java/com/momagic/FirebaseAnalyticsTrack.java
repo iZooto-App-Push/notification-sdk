@@ -128,12 +128,6 @@ public class FirebaseAnalyticsTrack {
 
     }
 
-    private String iZootoCampaignName(Payload receivedPayload){
-        if (receivedPayload != null){
-            return receivedPayload.getTitle().substring(0, Math.min(receivedPayload.getTitle().length(), 15));
-        }
-        return "";
-    }
 
     private Bundle getDataFromPayload(Payload mPayload){
 

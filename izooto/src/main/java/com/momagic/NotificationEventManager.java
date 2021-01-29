@@ -407,7 +407,7 @@ public class NotificationEventManager {
                     PendingIntent pendingIntent1 = PendingIntent.getBroadcast(DATB.appContext, new Random().nextInt(100), btn1, PendingIntent.FLAG_UPDATE_CURRENT);
                     NotificationCompat.Action action1 =
                             new NotificationCompat.Action.Builder(
-                                    0,  HtmlCompat.fromHtml("<font color=\"" + ContextCompat.getColor(DATB.appContext, R.color.gray) + "\">" + payload.getAct1name() + "</font>", HtmlCompat.FROM_HTML_MODE_LEGACY),
+                                    0,    payload.getAct1name() ,
                                     pendingIntent1).build();
                     notificationBuilder.addAction(action1);
 
@@ -422,7 +422,7 @@ public class NotificationEventManager {
                     PendingIntent pendingIntent2 = PendingIntent.getBroadcast(DATB.appContext, new Random().nextInt(100), btn2, PendingIntent.FLAG_UPDATE_CURRENT);
                     NotificationCompat.Action action2 =
                             new NotificationCompat.Action.Builder(
-                                    0, HtmlCompat.fromHtml("<font color=\"" + ContextCompat.getColor(DATB.appContext, R.color.gray) + "\">" + payload.getAct2name() + "</font>", HtmlCompat.FROM_HTML_MODE_LEGACY),
+                                    0, payload.getAct2name(),
                                     pendingIntent2).build();
                     notificationBuilder.addAction(action2);
                 }
