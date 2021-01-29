@@ -4,8 +4,10 @@ import android.annotation.SuppressLint;
 import android.app.Activity;
 import android.app.Application;
 import android.content.Context;
+import android.content.IntentFilter;
 import android.content.pm.ApplicationInfo;
 import android.content.pm.PackageManager;
+import android.net.ConnectivityManager;
 import android.os.Build;
 import android.os.Bundle;
 import android.os.Handler;
@@ -47,6 +49,8 @@ public class DATB {
     public static String inAppOption;
     @SuppressLint("StaticFieldLeak")
     static Activity curActivity;
+    private static DATBBackgroundReceiver datbBackgroundReceiver;
+
     public static Class<?>  getWebActivity;
 
 
@@ -98,12 +102,12 @@ public class DATB {
                             try {
                                 final PreferenceUtil preferenceUtil = PreferenceUtil.getInstance(appContext);
                                 JSONObject jsonObject = new JSONObject(Objects.requireNonNull(Util.decrypt(AppConstant.SECRETKEY, response)));
-                               Log.e("JSONObject",jsonObject.toString());
                                 senderId =jsonObject.getString(AppConstant.SENDERID);
                                 String appId = jsonObject.getString(AppConstant.APPID);
                                 String apiKey = jsonObject.getString(AppConstant.APIKEY);
                                 mAppId = jsonObject.getString(AppConstant.APPPID);
                                 preferenceUtil.setDataBID(AppConstant.APPPID,mAppId);
+                                trackAdvertisingId();
                                 if (senderId != null && !senderId.isEmpty()) {
                                     init(context, apiKey, appId);
                                 } else {
@@ -141,8 +145,8 @@ public class DATB {
                     ActivityLifecycleListener.registerActivity((Application)appContext);
                     setCurActivity(context);
                     areNotificationsEnabledForSubscribedState(appContext);
-                    trackAdvertisingId();
-
+                    datbBackgroundReceiver = new DATBBackgroundReceiver();
+                    DATBJobIntentService.enqueueWork(context);
                     if (FirebaseAnalyticsTrack.canFirebaseAnalyticsTrack())
                         firebaseAnalyticsTrack = new FirebaseAnalyticsTrack(appContext);
 
@@ -238,26 +242,14 @@ public class DATB {
 
 
 
-    private static void initFireBaseApp(final String senderId, final String apiKey, final String appId) {
 
-        FirebaseOptions firebaseOptions = new FirebaseOptions.Builder().setGcmSenderId(senderId).setApplicationId(appId).setApiKey(apiKey).build();
-
-        try {
-            FirebaseApp firebaseApp = FirebaseApp.getInstance(AppConstant.FCMDEFAULT);
-            if (firebaseApp == null) {
-                FirebaseApp.initializeApp(appContext, firebaseOptions, AppConstant.FCMDEFAULT);
-            }
-        } catch (IllegalStateException ex) {
-            // FirebaseApp.initializeApp(appContext, firebaseOptions, AppConstant.FCMDEFAULT);
-
-        }
-    }
 
     private static void registerToken() {
         final PreferenceUtil preferenceUtil = PreferenceUtil.getInstance(appContext);
         if (!preferenceUtil.getBoolean(AppConstant.IS_TOKEN_UPDATED)) {
             String api_url = AppConstant.ADDURL + AppConstant.STYPE + AppConstant.PID + mAppId + AppConstant.BTYPE_ + AppConstant.BTYPE + AppConstant.DTYPE_ + AppConstant.DTYPE + AppConstant.TIMEZONE + System.currentTimeMillis() + AppConstant.APPVERSION + Util.getSDKVersion() +
-                    AppConstant.OS + AppConstant.SDKOS + AppConstant.ALLOWED_ + AppConstant.ALLOWED + AppConstant.TOKEN + preferenceUtil.getStringData(AppConstant.FCM_DEVICE_TOKEN) + AppConstant.CHECKSDKVERSION +Util.getSDKVersion()+AppConstant.LANGUAGE+Util.getDeviceLanguage();
+                    AppConstant.OS + AppConstant.SDKOS + AppConstant.ALLOWED_ + AppConstant.ALLOWED + AppConstant.TOKEN + preferenceUtil.getStringData(AppConstant.FCM_DEVICE_TOKEN) + AppConstant.CHECKSDKVERSION +Util.getSDKVersion()+AppConstant.LANGUAGE+Util.getDeviceLanguage()
+                    +AppConstant.ADVERTISEMENTID+preferenceUtil.getStringData(AppConstant.ADVERTISING_ID);
 
             try {
                 String deviceName = URLEncoder.encode(Util.getDeviceName(), AppConstant.UTF);
@@ -266,7 +258,6 @@ public class DATB {
             } catch (UnsupportedEncodingException e) {
                 Lg.e(AppConstant.APP_NAME_TAG, AppConstant.UNEXCEPTION);
             }
-
 
             RestClient.get(api_url, new RestClient.ResponseHandler() {
                 @Override
@@ -321,7 +312,9 @@ public class DATB {
         } catch (Exception e) {
             e.printStackTrace();
         }
-
+        IntentFilter intentFilter = new IntentFilter();
+        intentFilter.addAction(ConnectivityManager.CONNECTIVITY_ACTION);
+        activity.registerReceiver(datbBackgroundReceiver, intentFilter);
     }
     private static void setCurActivity(Context context) {
         boolean foreground = isContextActivity(context);
@@ -494,19 +487,7 @@ public class DATB {
         inAppOption = displayOption.toString();
     }
 
-    public static void setWebViewActivity(Class<?>  setActivity){
-        getWebActivity = setActivity;
-    }
 
-    public static void setLandingURL(WebView mWebView) {
-        if (mWebView != null) {
-            final PreferenceUtil preferenceUtil = PreferenceUtil.getInstance(DATB.appContext);
-            String mUrl = preferenceUtil.getStringData(AppConstant.WEB_LANDING_URL);
-            if (mUrl != null) {
-                mWebView.loadUrl(mUrl);
-            }
-        }
-    }
 
     // send events  with event name and event data
     public static void addEvent(String eventName, HashMap<String,Object> data) {

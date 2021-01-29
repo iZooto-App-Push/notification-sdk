@@ -249,6 +249,7 @@ public interface AppConstant {
     String REMOVE_TOPIC ="remove_topic";
     String TOPIC ="topic";
     String ANDROID_ID="&bKey=";
+    String ADVERTISEMENTID="&adid=";
 
 }
 

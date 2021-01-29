@@ -445,7 +445,12 @@ public class NotificationEventManager {
                         notificationManager.notify(SUMMARY_ID, summaryNotification);
                     }
                 }
-                notificationManager.notify(notificaitionId, notificationBuilder.build());
+
+                if (payload.getCollapseId()!=null && !payload.getCollapseId().isEmpty()){
+                    int notifyId = Util.convertStringToDecimal(payload.getCollapseId());
+                    notificationManager.notify(notifyId, notificationBuilder.build());
+                }else
+                    notificationManager.notify(notificaitionId, notificationBuilder.build());
                 try {
 
                     if(impressionIndex.equalsIgnoreCase("1")) {
