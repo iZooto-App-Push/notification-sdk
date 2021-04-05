@@ -36,6 +36,8 @@ import org.json.JSONObject;
 import org.json.JSONTokener;
 
 import java.io.UnsupportedEncodingException;
+import java.net.URLEncoder;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Random;
 public class NotificationEventManager {
@@ -44,6 +46,8 @@ public class NotificationEventManager {
     private static  int badgeColor;
     private static int priority,lockScreenVisibility;
     private static boolean addCheck;
+    private static String lastView_Click="0";
+
 
     public static void manageNotification(Payload payload) {
         if (payload.getFetchURL() == null || payload.getFetchURL().isEmpty())
@@ -247,11 +251,15 @@ public class NotificationEventManager {
                 if(data!=null && !data.isEmpty()) {
                     clickIndex = String.valueOf(data.charAt(data.length() - 2));
                     impressionIndex = String.valueOf(data.charAt(data.length() - 1));
+                    lastView_Click = String.valueOf(data.charAt(data.length() - 3));
+
                 }
                 else
                 {
                     clickIndex = "0";
                     impressionIndex="0";
+                    lastView_Click = "0";
+
                 }
 
                 badgeCountUpdate(payload.getBadgeCount());
@@ -287,7 +295,7 @@ public class NotificationEventManager {
 
                                 }else {
 
-                                    icon =R.drawable.ic_notifications_black_24dp;// iZooto.appContext.getApplicationInfo().logo;
+                                    icon =R.drawable.ic_notifications_black_24dp;
                                 }
 
                             }
@@ -323,7 +331,7 @@ public class NotificationEventManager {
 
                 lockScreenVisibility = setLockScreenVisibility(payload.getLockScreenVisibility());
 
-                intent = notificationClick(payload, payload.getLink(),payload.getAct1link(),payload.getAct2link(),AppConstant.NO,clickIndex,100,0);
+                intent = notificationClick(payload, payload.getLink(),payload.getAct1link(),payload.getAct2link(),AppConstant.NO,clickIndex,lastView_Click,100,0);
                 Uri defaultSoundUri = RingtoneManager.getDefaultUri(RingtoneManager.TYPE_NOTIFICATION);
 
                 PendingIntent pendingIntent = PendingIntent.getBroadcast(DATB.appContext, new Random().nextInt(100) /* Request code */, intent,
@@ -403,7 +411,7 @@ public class NotificationEventManager {
                 if (payload.getAct1name() != null && !payload
                         .getAct1name().isEmpty()) {
                     String phone = getPhone(payload.getAct1link());
-                    Intent btn1 = notificationClick(payload,payload.getAct1link(),payload.getLink(),payload.getAct2link(),phone,clickIndex,notificaitionId,1);
+                    Intent btn1 = notificationClick(payload,payload.getAct1link(),payload.getLink(),payload.getAct2link(),phone,clickIndex,lastView_Click,notificaitionId,1);
                     PendingIntent pendingIntent1 = PendingIntent.getBroadcast(DATB.appContext, new Random().nextInt(100), btn1, PendingIntent.FLAG_UPDATE_CURRENT);
                     NotificationCompat.Action action1 =
                             new NotificationCompat.Action.Builder(
@@ -418,7 +426,7 @@ public class NotificationEventManager {
                 if (payload.getAct2name() != null && !payload.getAct2name().isEmpty()) {
 //                    btn2.setAction(AppConstant.ACTION_BTN_TWO);
                     String phone = getPhone(payload.getAct2link());
-                    Intent btn2 = notificationClick(payload,payload.getAct2link(),payload.getLink(),payload.getAct1link(),phone,clickIndex,notificaitionId,2);
+                    Intent btn2 = notificationClick(payload,payload.getAct2link(),payload.getLink(),payload.getAct1link(),phone,clickIndex,lastView_Click,notificaitionId,2);
                     PendingIntent pendingIntent2 = PendingIntent.getBroadcast(DATB.appContext, new Random().nextInt(100), btn2, PendingIntent.FLAG_UPDATE_CURRENT);
                     NotificationCompat.Action action2 =
                             new NotificationCompat.Action.Builder(
@@ -455,6 +463,9 @@ public class NotificationEventManager {
 
                     if(impressionIndex.equalsIgnoreCase("1")) {
                         viewNotificationApi(payload);
+                    }
+                    if (lastView_Click.equalsIgnoreCase("1")){
+                        lastViewNotificationApi();
                     }
                     DATB.notificationView(payload);
 
@@ -621,11 +632,13 @@ public class NotificationEventManager {
                     if(data!=null && !data.isEmpty()) {
                         clickIndex = String.valueOf(data.charAt(data.length() - 2));
                         impressionIndex = String.valueOf(data.charAt(data.length() - 1));
+                        lastView_Click=String.valueOf(data.charAt(data.length() - 3));
                     }
                     else
                     {
                         clickIndex = "0";
                         impressionIndex="0";
+                        lastView_Click="0";
                     }
 
                     mBuilder.setNeutralButton(AppConstant.DIALOG_DISMISS, new DialogInterface.OnClickListener() {
@@ -641,7 +654,7 @@ public class NotificationEventManager {
                                 public void onClick(DialogInterface dialog, int which) {
 
                                     dialog.dismiss();
-                                    Intent intent = notificationClick(payload, payload.getLink(), payload.getAct1link(), payload.getAct2link(), AppConstant.NO, finalClickIndex1, 100, 0);
+                                    Intent intent = notificationClick(payload, payload.getLink(), payload.getAct1link(), payload.getAct2link(), AppConstant.NO, finalClickIndex1, lastView_Click, 100, 0);
                                     activity.sendBroadcast(intent);
                                 }
                             });
@@ -656,6 +669,9 @@ public class NotificationEventManager {
                         if(impressionIndex.equalsIgnoreCase("1")) {
                             viewNotificationApi(payload);
                         }
+                        if (lastView_Click.equalsIgnoreCase("1")){
+                            lastViewNotificationApi();
+                        }
                         DATB.notificationView(payload);
 
                     } catch (Exception e) {
@@ -668,7 +684,7 @@ public class NotificationEventManager {
 
     }
 
-    private static Intent notificationClick(Payload payload, String getLink ,String getLink1, String getLink2, String phone, String finalClickIndex, int notificationId, int button){
+    private static Intent notificationClick(Payload payload, String getLink ,String getLink1, String getLink2, String phone, String finalClickIndex, String lastClick, int notificationId, int button){
         String link = getLink;
         String link1 = getLink1;
         String link2 = getLink2;
@@ -701,6 +717,7 @@ public class NotificationEventManager {
         intent.putExtra(AppConstant.ACT1URL, payload.getAct1link());
         intent.putExtra(AppConstant.ACT2URL, payload.getAct2link());
         intent.putExtra(AppConstant.CLICKINDEX, finalClickIndex);
+        intent.putExtra(AppConstant.LASTCLICKINDEX, lastClick);
 
 
         return intent;
@@ -741,4 +758,35 @@ public class NotificationEventManager {
             phone = AppConstant.NO;
         return phone;
     }
+    private static void lastViewNotificationApi(){
+        final PreferenceUtil preferenceUtil = PreferenceUtil.getInstance(DATB.appContext);
+        String encodeData = "";
+        try {
+            HashMap<String, Object> data = new HashMap<>();
+            data.put(AppConstant.LAST_NOTIFICAION_VIEWED, true);
+            JSONObject jsonObject = new JSONObject(data);
+            encodeData = URLEncoder.encode(jsonObject.toString(), AppConstant.UTF);
+        } catch (Exception ex) {
+            ex.printStackTrace();
+        }
+        String api_url = AppConstant.API_PID +preferenceUtil.getDataBID(AppConstant.APPPID) + AppConstant.VER_ + Util.getSDKVersion() +
+                AppConstant.ANDROID_ID + Util.getAndroidId(DATB.appContext) + AppConstant.VAL + encodeData + AppConstant.ACT + "add" + AppConstant.ISID_ + "1" + AppConstant.ET_ + "userp";
+
+        RestClient.postRequest(RestClient.LASTNOTIFICATIONVIEWURL + api_url, new RestClient.ResponseHandler() {
+
+
+            @Override
+            void onFailure(int statusCode, String response, Throwable throwable) {
+                super.onFailure(statusCode, response, throwable);
+            }
+
+            @Override
+            void onSuccess(String response) {
+                super.onSuccess(response);
+                Log.e(" lastView","call");
+
+            }
+        });
+    }
+
 }

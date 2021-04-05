@@ -14,6 +14,7 @@ import android.os.Build;
 import android.provider.Settings;
 import android.util.Log;
 
+import androidx.annotation.RequiresApi;
 import androidx.core.app.NotificationManagerCompat;
 
 
@@ -257,5 +258,19 @@ public class Util {
             decimal = decimal * 10;
         }
         return intValue;
+    }
+    @RequiresApi(api = Build.VERSION_CODES.LOLLIPOP)
+    public static String getDeviceLanguageTag()
+    {
+        //return Locale.getDefault().getDisplayLanguage();
+        Locale locale;
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.N) {
+            locale = DATB.appContext.getResources().getConfiguration().getLocales().get(0);
+        } else {
+            locale = DATB.appContext.getResources().getConfiguration().locale;
+        }
+        // Log.e("lanuguage",locale.getCountry());
+        return locale.getDefault().toLanguageTag();
+
     }
 }

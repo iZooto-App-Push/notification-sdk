@@ -100,63 +100,12 @@ public class DATBMessagingService extends FirebaseMessagingService {
 
         Log.d(AppConstant.APP_NAME_TAG, AppConstant.NOTIFICATIONRECEIVED);
 
-
+      Log.e("Data",data.toString());
 
             try {
 
                 // JSONObject payloadObj = new JSONObject(data);
-                if (data.get(AppConstant.CAMPNAME) != null) {
 
-                    JSONObject payloadObj = new JSONObject(data.get(AppConstant.CAMPNAME));
-                    if (payloadObj.optLong(AppConstant.CREATEDON) > PreferenceUtil.getInstance(this).getLongValue(AppConstant.DEVICE_REGISTRATION_TIMESTAMP)) {
-                        payload = new Payload();
-                        payload.setFetchURL(payloadObj.optString(AppConstant.FETCHURL));
-                        payload.setKey(payloadObj.optString(AppConstant.KEY));
-                        payload.setId(payloadObj.optString(AppConstant.ID));
-                        payload.setRid(payloadObj.optString(AppConstant.RID));
-                        payload.setLink(payloadObj.optString(AppConstant.LINK));
-                        payload.setTitle(payloadObj.optString(AppConstant.TITLE));
-                        payload.setMessage(payloadObj.optString(AppConstant.NMESSAGE));
-                        payload.setIcon(payloadObj.optString(AppConstant.ICON));
-                        payload.setReqInt(payloadObj.optInt(AppConstant.REQINT));
-                        payload.setTag(payloadObj.optString(AppConstant.TAG));
-                        payload.setBanner(payloadObj.optString(AppConstant.BANNER));
-                        payload.setAct_num(payloadObj.optInt(AppConstant.ACTNUM));
-                        payload.setBadgeicon(payloadObj.optString(AppConstant.BADGE_ICON));
-                        payload.setBadgecolor(payloadObj.optString(AppConstant.BADGE_COLOR));
-                        payload.setSubTitle(payloadObj.optString(AppConstant.SUBTITLE));
-                        payload.setGroup(payloadObj.optInt(AppConstant.GROUP));
-                        payload.setBadgeCount(payloadObj.optInt(AppConstant.BADGE_COUNT));
-
-                        // Button 1
-                        payload.setAct1name(payloadObj.optString(AppConstant.ACT1NAME));
-                        payload.setAct1link(payloadObj.optString(AppConstant.ACT1LINK));
-                        payload.setAct1icon(payloadObj.optString(AppConstant.ACT1ICON));
-                        payload.setAct1ID(payloadObj.optString(AppConstant.ACT1ID));
-                        // Button 2
-                        payload.setAct2name(payloadObj.optString(AppConstant.ACT2NAME));
-                        payload.setAct2link(payloadObj.optString(AppConstant.ACT2LINK));
-                        payload.setAct2icon(payloadObj.optString(AppConstant.ACT2ICON));
-                        payload.setAct2ID(payloadObj.optString(AppConstant.ACT2ID));
-
-                        payload.setInapp(payloadObj.optInt(AppConstant.INAPP));
-                        payload.setTrayicon(payloadObj.optString(AppConstant.TARYICON));
-                        payload.setSmallIconAccentColor(payloadObj.optString(AppConstant.ICONCOLOR));
-                        payload.setSound(payloadObj.optString(AppConstant.SOUND));
-                        payload.setLedColor(payloadObj.optString(AppConstant.LEDCOLOR));
-                        payload.setLockScreenVisibility(payloadObj.optInt(AppConstant.VISIBILITY));
-                        payload.setGroupKey(payloadObj.optString(AppConstant.GKEY));
-                        payload.setGroupMessage(payloadObj.optString(AppConstant.GMESSAGE));
-                        payload.setFromProjectNumber(payloadObj.optString(AppConstant.PROJECTNUMBER));
-                        payload.setCollapseId(payloadObj.optString(AppConstant.COLLAPSEID));
-                        payload.setPriority(payloadObj.optInt(AppConstant.PRIORITY));
-                        payload.setRawPayload(payloadObj.optString(AppConstant.RAWDATA));
-                        payload.setAp(payloadObj.optString(AppConstant.ADDITIONALPARAM));
-                        payload.setCfg(payloadObj.optInt(AppConstant.CFG));
-
-                    } else
-                        return;
-                } else {
                     JSONObject payloadObj = new JSONObject(data);
                     if (payloadObj.optLong(ShortpayloadConstant.CREATEDON) > PreferenceUtil.getInstance(this).getLongValue(AppConstant.DEVICE_REGISTRATION_TIMESTAMP)) {
                         payload = new Payload();
@@ -205,7 +154,7 @@ public class DATBMessagingService extends FirebaseMessagingService {
 
                     } else
                         return;
-                }
+
             } catch (Exception e) {
 
                 e.printStackTrace();

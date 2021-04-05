@@ -27,7 +27,9 @@ import org.json.JSONObject;
 
 import java.io.UnsupportedEncodingException;
 import java.net.URLEncoder;
+import java.text.SimpleDateFormat;
 import java.util.ArrayList;
+import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -49,7 +51,6 @@ public class DATB {
     public static String inAppOption;
     @SuppressLint("StaticFieldLeak")
     static Activity curActivity;
-    private static DATBBackgroundReceiver datbBackgroundReceiver;
 
     public static Class<?>  getWebActivity;
 
@@ -140,11 +141,11 @@ public class DATB {
                 if (util.isInitializationValid()) {
                     Lg.i(AppConstant.APP_NAME_TAG, AppConstant.DEVICETOKEN  + preferenceUtil.getStringData(AppConstant.FCM_DEVICE_TOKEN));
                    registerToken();
+                    lastVisitApi(context);
                     ActivityLifecycleListener.registerActivity((Application)appContext);
                     setCurActivity(context);
                     areNotificationsEnabledForSubscribedState(appContext);
-                    datbBackgroundReceiver = new DATBBackgroundReceiver();
-                    DATBJobIntentService.enqueueWork(context);
+
                     if (FirebaseAnalyticsTrack.canFirebaseAnalyticsTrack())
                         firebaseAnalyticsTrack = new FirebaseAnalyticsTrack(appContext);
 
@@ -310,9 +311,7 @@ public class DATB {
         } catch (Exception e) {
             e.printStackTrace();
         }
-        IntentFilter intentFilter = new IntentFilter();
-        intentFilter.addAction(ConnectivityManager.CONNECTIVITY_ACTION);
-        activity.registerReceiver(datbBackgroundReceiver, intentFilter);
+
     }
     private static void setCurActivity(Context context) {
         boolean foreground = isContextActivity(context);
@@ -957,5 +956,43 @@ public class DATB {
         return "";
 
     }
+    @RequiresApi(api = Build.VERSION_CODES.LOLLIPOP)
+    private static void lastVisitApi(Context context){
+        final PreferenceUtil preferenceUtil = PreferenceUtil.getInstance(appContext);
+        String time = preferenceUtil.getStringData(AppConstant.CURRENT_DATE);
+        if (!time.equalsIgnoreCase(getTime())){
+            preferenceUtil.setStringData(AppConstant.CURRENT_DATE,getTime());
+            String encodeData = "";
+            try {
+                HashMap<String, Object> data = new HashMap<>();
+                data.put(AppConstant.LAST_WEBSITE_VISIT, true);
+                data.put(AppConstant.LANG_, Util.getDeviceLanguageTag());
+                JSONObject jsonObject = new JSONObject(data);
+                encodeData = URLEncoder.encode(jsonObject.toString(), AppConstant.UTF);
+            } catch (Exception ex) {
+                ex.printStackTrace();
+            }
 
+            String api_url = AppConstant.API_PID +preferenceUtil.getDataBID(AppConstant.APPPID) + AppConstant.ANDROID_ID +
+                    Util.getAndroidId(context) + AppConstant.VAL + encodeData + AppConstant.ACT + "add" + AppConstant.ISID_ + "1" + AppConstant.ET_ + "userp";
+            RestClient.postRequest(RestClient.LASTVISITURL + api_url, new RestClient.ResponseHandler() {
+                @Override
+                void onFailure(int statusCode, String response, Throwable throwable) {
+                    super.onFailure(statusCode, response, throwable);
+                }
+
+                @Override
+                void onSuccess(String response) {
+                    super.onSuccess(response);
+                    Log.e(" lastVisit","call");
+
+                }
+            });
+        }
+    }
+    private static String getTime() {
+        SimpleDateFormat sdf = new SimpleDateFormat("yyyy.MM.dd");
+        String currentDate = sdf.format(new Date());
+        return currentDate;
+    }
 }
