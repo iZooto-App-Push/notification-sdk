@@ -16,6 +16,7 @@
 
 package com.momagic;
 
+import android.annotation.SuppressLint;
 import android.app.NotificationChannel;
 import android.app.NotificationManager;
 import android.app.PendingIntent;
@@ -37,6 +38,7 @@ import org.json.JSONObject;
 
 import java.util.Map;
 
+@SuppressLint("MissingFirebaseInstanceTokenRefresh")
 public class DATBMessagingService extends FirebaseMessagingService {
 
     private  Payload payload = null;
@@ -99,13 +101,19 @@ public class DATBMessagingService extends FirebaseMessagingService {
     public   void handleNow(final Map<String, String> data) {
 
         Log.d(AppConstant.APP_NAME_TAG, AppConstant.NOTIFICATIONRECEIVED);
+        PreferenceUtil preferenceUtil =PreferenceUtil.getInstance(DATB.appContext);
 
-      Log.e("Data",data.toString());
 
             try {
+                if(data.get("an") !=null && data.get("g")!=null)
+                {
+                    AdMediation.getAdJsonData(data);
 
-                // JSONObject payloadObj = new JSONObject(data);
+                    preferenceUtil.setBooleanData("Mediation",true);
 
+                }
+                else {
+                    preferenceUtil.setBooleanData("Mediation", false);
                     JSONObject payloadObj = new JSONObject(data);
                     if (payloadObj.optLong(ShortpayloadConstant.CREATEDON) > PreferenceUtil.getInstance(this).getLongValue(AppConstant.DEVICE_REGISTRATION_TIMESTAMP)) {
                         payload = new Payload();
@@ -154,7 +162,7 @@ public class DATBMessagingService extends FirebaseMessagingService {
 
                     } else
                         return;
-
+                }
             } catch (Exception e) {
 
                 e.printStackTrace();

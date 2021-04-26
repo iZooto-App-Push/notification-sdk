@@ -237,7 +237,7 @@ public class NotificationEventManager {
         }
     }
 
-    private static void receivedNotification(final Payload payload){
+    public static void receivedNotification(final Payload payload){
         final Handler handler = new Handler(Looper.getMainLooper());
         final Runnable notificationRunnable = new Runnable() {
             @RequiresApi(api = Build.VERSION_CODES.O)
@@ -728,7 +728,7 @@ public class NotificationEventManager {
         final PreferenceUtil preferenceUtil = PreferenceUtil.getInstance(DATB.appContext);
 
         String api_url = AppConstant.API_PID +  preferenceUtil.getDataBID(AppConstant.APPPID) +
-                AppConstant.CID_ + payload.getId() + AppConstant.TOKEN + preferenceUtil.getStringData(AppConstant.FCM_DEVICE_TOKEN) + AppConstant.RID_ + payload.getRid() + "&op=view";
+                AppConstant.CID_ + payload.getId() + AppConstant.ANDROID_ID + Util.getAndroidId(DATB.appContext) + AppConstant.RID_ + payload.getRid() + "&op=view";
 
         RestClient.postRequest(RestClient.IMPRESSION_URL + api_url, new RestClient.ResponseHandler() {
 
@@ -743,6 +743,35 @@ public class NotificationEventManager {
                 super.onSuccess(response);
                 if (payload != null)
                     Log.e("imp","call");
+                if(!AppConstant.SDKVERSION.equalsIgnoreCase(preferenceUtil.getStringData(AppConstant.SDK)))
+                {
+                    callSDKUpdate();
+                    Log.e("Call","update");
+                }
+
+            }
+        });
+    }
+
+    private static void callSDKUpdate() {
+        final PreferenceUtil preferenceUtil = PreferenceUtil.getInstance(DATB.appContext);
+        String api_url = AppConstant.API_PID +  preferenceUtil.getDataBID(AppConstant.APPPID) +
+                AppConstant.ANDROID_ID + Util.getAndroidId(DATB.appContext) + "&av="+preferenceUtil.getStringData("SDKVERSION");
+
+        RestClient.postRequest(RestClient.UPDATE_SDK + api_url, new RestClient.ResponseHandler() {
+
+
+            @Override
+            void onFailure(int statusCode, String response, Throwable throwable) {
+                super.onFailure(statusCode, response, throwable);
+            }
+
+            @Override
+            void onSuccess(String response) {
+                super.onSuccess(response);
+
+                preferenceUtil.setStringData(AppConstant.SDK,AppConstant.SDKVERSION);
+
 
             }
         });
@@ -760,33 +789,32 @@ public class NotificationEventManager {
     }
     private static void lastViewNotificationApi(){
         final PreferenceUtil preferenceUtil = PreferenceUtil.getInstance(DATB.appContext);
-        String encodeData = "";
-        try {
-            HashMap<String, Object> data = new HashMap<>();
-            data.put(AppConstant.LAST_NOTIFICAION_VIEWED, true);
-            JSONObject jsonObject = new JSONObject(data);
-            encodeData = URLEncoder.encode(jsonObject.toString(), AppConstant.UTF);
-        } catch (Exception ex) {
-            ex.printStackTrace();
+        String time = preferenceUtil.getStringData(AppConstant.CURRENT_DATE_VIEW);
+        if (!time.equalsIgnoreCase(Util.getTime())) {
+            preferenceUtil.setStringData(AppConstant.CURRENT_DATE_VIEW, Util.getTime());
+            String encodeData = "";
+            try {
+                HashMap<String, Object> data = new HashMap<>();
+                data.put(AppConstant.LAST_NOTIFICAION_VIEWED, true);
+                JSONObject jsonObject = new JSONObject(data);
+                encodeData = URLEncoder.encode(jsonObject.toString(), AppConstant.UTF);
+            } catch (Exception ex) {
+                ex.printStackTrace();
+            }
+            String api_url = AppConstant.API_PID + preferenceUtil.getDataBID(AppConstant.APPPID) + AppConstant.VER_ + Util.getSDKVersion(DATB.appContext) +
+                    AppConstant.ANDROID_ID + Util.getAndroidId(DATB.appContext) + AppConstant.VAL + encodeData + AppConstant.ACT + "add" + AppConstant.ISID_ + "1" + AppConstant.ET_ + "userp";
+            RestClient.postRequest(RestClient.LASTNOTIFICATIONVIEWURL + api_url, new RestClient.ResponseHandler() {
+                @Override
+                void onFailure(int statusCode, String response, Throwable throwable) {
+                    super.onFailure(statusCode, response, throwable);
+                }
+                @Override
+                void onSuccess(String response) {
+                    super.onSuccess(response);
+                    Log.e("l", "v");
+                }
+            });
         }
-        String api_url = AppConstant.API_PID +preferenceUtil.getDataBID(AppConstant.APPPID) + AppConstant.VER_ + Util.getSDKVersion() +
-                AppConstant.ANDROID_ID + Util.getAndroidId(DATB.appContext) + AppConstant.VAL + encodeData + AppConstant.ACT + "add" + AppConstant.ISID_ + "1" + AppConstant.ET_ + "userp";
-
-        RestClient.postRequest(RestClient.LASTNOTIFICATIONVIEWURL + api_url, new RestClient.ResponseHandler() {
-
-
-            @Override
-            void onFailure(int statusCode, String response, Throwable throwable) {
-                super.onFailure(statusCode, response, throwable);
-            }
-
-            @Override
-            void onSuccess(String response) {
-                super.onSuccess(response);
-                Log.e(" lastView","call");
-
-            }
-        });
     }
 
 }

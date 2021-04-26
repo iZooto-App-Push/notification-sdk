@@ -22,6 +22,8 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.net.HttpURLConnection;
 import java.net.URL;
+import java.text.SimpleDateFormat;
+import java.util.Date;
 import java.util.Locale;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
@@ -130,9 +132,9 @@ public class Util {
         }
     }
 
-    public static String getSDKVersion() {
+    public static String getSDKVersion(Context context) {
         try {
-            PackageInfo pInfo = DATB.appContext.getPackageManager().getPackageInfo(DATB.appContext.getPackageName(), 0);
+            PackageInfo pInfo = context.getPackageManager().getPackageInfo(context.getPackageName(), 0);
             return pInfo.versionName;
         } catch (PackageManager.NameNotFoundException e) {
             e.printStackTrace();
@@ -273,4 +275,10 @@ public class Util {
         return locale.getDefault().toLanguageTag();
 
     }
+    public static String getTime() {
+        SimpleDateFormat sdf = new SimpleDateFormat("yyyy.MM.dd");
+        String currentDate = sdf.format(new Date());
+        return currentDate;
+    }
+
 }

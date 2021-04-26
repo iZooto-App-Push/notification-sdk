@@ -134,6 +134,7 @@ public interface AppConstant {
     String EXCEPTIONERROR = "Thrown Error";
     String UNEXCEPTION ="unsupported encoding exception";
     String CDN = "https://cdn.izooto.com/app/app_";
+    String TIMEOUTEXCEPTION = "Time out Exception";
 
     String MISSINGID="App Id is missing.";
     // Register String
@@ -250,6 +251,16 @@ public interface AppConstant {
     String IS_LAUNCH_FIRST_TIME= "isLaunchFirstTime";
     String VER_= "&ver=";
     String ISID_= "&isid=";
+    String CURRENT_DATE_VIEW = "currentDateView";
+    String CURRENT_DATE_CLICK = "currentDateClick";
+    String AD_NETWORK="an";
+    String GLOBAL="g";
+    String AD_TYPE="tp";
+    String NOTIFICATION_MESSAGE="Send Notification";
+    String YES="yes";
+    String SDKVERSION="1.0.3";
+    String QSDK_VERSION="&av=";
+    String SDK="SDKVERSION";
 
 }
 

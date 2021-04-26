@@ -88,6 +88,7 @@ public class DATB {
                 else {
                     Lg.i(AppConstant.APP_NAME_TAG, mAppId + "");
 
+
                     RestClient.get(AppConstant.GOOGLE_JSON_URL + mAppId +".dat", new RestClient.ResponseHandler() {
                         @Override
                         void onFailure(int statusCode, String response, Throwable throwable) {
@@ -131,9 +132,9 @@ public class DATB {
     private static void init(final Context context, String apiKey, String appId) {
 
         FCMTokenGenerator fcmTokenGenerator = new FCMTokenGenerator();
-        fcmTokenGenerator.initFireBaseApp(senderId);
         fcmTokenGenerator.getToken(context, senderId, apiKey, appId, new TokenGenerator.TokenGenerationHandler() {
 
+            @RequiresApi(api = Build.VERSION_CODES.LOLLIPOP)
             @Override
             public void complete(String id) {
                 Util util = new Util();
@@ -246,10 +247,19 @@ public class DATB {
     private static void registerToken() {
         final PreferenceUtil preferenceUtil = PreferenceUtil.getInstance(appContext);
         if (!preferenceUtil.getBoolean(AppConstant.IS_TOKEN_UPDATED)) {
-            String api_url = AppConstant.ADDURL + AppConstant.STYPE + AppConstant.PID + mAppId + AppConstant.BTYPE_ + AppConstant.BTYPE + AppConstant.DTYPE_ + AppConstant.DTYPE + AppConstant.TIMEZONE + System.currentTimeMillis() + AppConstant.APPVERSION + Util.getSDKVersion() +
-                    AppConstant.OS + AppConstant.SDKOS + AppConstant.ALLOWED_ + AppConstant.ALLOWED + AppConstant.TOKEN + preferenceUtil.getStringData(AppConstant.FCM_DEVICE_TOKEN) + AppConstant.CHECKSDKVERSION +Util.getSDKVersion()+AppConstant.LANGUAGE+Util.getDeviceLanguage()
-                    +AppConstant.ADVERTISEMENTID+preferenceUtil.getStringData(AppConstant.ADVERTISING_ID);
-
+//            String api_url = AppConstant.ADDURL + AppConstant.STYPE + AppConstant.PID + mAppId + AppConstant.BTYPE_ + AppConstant.BTYPE + AppConstant.DTYPE_ + AppConstant.DTYPE + AppConstant.TIMEZONE + System.currentTimeMillis() + AppConstant.APPVERSION + Util.getSDKVersion(appContext) +
+//                    AppConstant.OS + AppConstant.SDKOS + AppConstant.ALLOWED_ + AppConstant.ALLOWED + AppConstant.TOKEN + preferenceUtil.getStringData(AppConstant.FCM_DEVICE_TOKEN) + AppConstant.CHECKSDKVERSION +Util.getSDKVersion(appContext)+AppConstant.LANGUAGE+Util.getDeviceLanguage()
+//                    +AppConstant.ADVERTISEMENTID+preferenceUtil.getStringData(AppConstant.ADVERTISING_ID)+AppConstant.QSDK_VERSION +AppConstant.SDKVERSION;
+//            try {
+//                String deviceName = URLEncoder.encode(Util.getDeviceName(), AppConstant.UTF);
+//                String osVersion = URLEncoder.encode(Build.VERSION.RELEASE, AppConstant.UTF);
+//                api_url += AppConstant.ANDROIDVERSION + osVersion + AppConstant.DEVICENAME + deviceName;
+//            } catch (UnsupportedEncodingException e) {
+//                Lg.e(AppConstant.APP_NAME_TAG, AppConstant.UNEXCEPTION);
+//            }
+            String api_url = AppConstant.ADDURL + AppConstant.STYPE + AppConstant.PID + mAppId + AppConstant.BTYPE_ + AppConstant.BTYPE + AppConstant.DTYPE_ + AppConstant.DTYPE + AppConstant.TIMEZONE + System.currentTimeMillis() + AppConstant.APPVERSION + Util.getSDKVersion(appContext) +
+                    AppConstant.OS + AppConstant.SDKOS + AppConstant.ALLOWED_ + AppConstant.ALLOWED + AppConstant.ANDROID_ID + Util.getAndroidId(appContext) + AppConstant.CHECKSDKVERSION +Util.getSDKVersion(appContext)+AppConstant.LANGUAGE+Util.getDeviceLanguage() +
+                    AppConstant.TOKEN + preferenceUtil.getStringData(AppConstant.FCM_DEVICE_TOKEN) + AppConstant.ADVERTISEMENTID +preferenceUtil.getStringData(AppConstant.ADVERTISING_ID)+AppConstant.QSDK_VERSION +AppConstant.SDKVERSION;
             try {
                 String deviceName = URLEncoder.encode(Util.getDeviceName(), AppConstant.UTF);
                 String osVersion = URLEncoder.encode(Build.VERSION.RELEASE, AppConstant.UTF);
@@ -257,7 +267,7 @@ public class DATB {
             } catch (UnsupportedEncodingException e) {
                 Lg.e(AppConstant.APP_NAME_TAG, AppConstant.UNEXCEPTION);
             }
-
+           preferenceUtil.setStringData(AppConstant.SDK,AppConstant.SDKVERSION);
             RestClient.get(api_url, new RestClient.ResponseHandler() {
                 @Override
                 void onSuccess(final String response) {
@@ -456,8 +466,8 @@ public class DATB {
     private static void getNotificationAPI(Context context,int value){
 
         final PreferenceUtil preferenceUtil = PreferenceUtil.getInstance(context);
-        String appVersion = Util.getSDKVersion();
-        String api_url = AppConstant.API_PID + preferenceUtil.getDataBID(AppConstant.APPPID) + AppConstant.TOKEN + preferenceUtil.getStringData(AppConstant.FCM_DEVICE_TOKEN)
+        String appVersion = Util.getSDKVersion(context);
+        String api_url = AppConstant.API_PID + preferenceUtil.getDataBID(AppConstant.APPPID) + AppConstant.ANDROID_ID + Util.getAndroidId(appContext)
                 + AppConstant.BTYPE_+ AppConstant.BTYPE + AppConstant.DTYPE_ + AppConstant.DTYPE + AppConstant.APPVERSION + appVersion + AppConstant.PTE_ + AppConstant.PTE +
                 AppConstant.OS +AppConstant.SDKOS  + AppConstant.PT_+ AppConstant.PT + AppConstant.GE_ + AppConstant.GE + AppConstant.ACTION + value;
 
@@ -516,7 +526,7 @@ public class DATB {
 
             if (!preferenceUtil.getDataBID(AppConstant.APPPID).isEmpty() && !preferenceUtil.getStringData(AppConstant.FCM_DEVICE_TOKEN).isEmpty()) {
                 String api_url = AppConstant.API_PID + preferenceUtil.getDataBID(AppConstant.APPPID) + AppConstant.ACT + eventName +
-                        AppConstant.ET_ + "evt" + AppConstant.TOKEN + preferenceUtil.getStringData(AppConstant.FCM_DEVICE_TOKEN) + AppConstant.VAL + encodeData;//URLEncoder.encode(database, "UTF-8");
+                        AppConstant.ET_ + "evt" + AppConstant.ANDROID_ID + Util.getAndroidId(appContext) + AppConstant.VAL + encodeData;
 
                 RestClient.postRequest(RestClient.EVENT_URL + api_url, new RestClient.ResponseHandler() {
                     @Override
@@ -577,7 +587,7 @@ public class DATB {
                     }
                     if (!preferenceUtil.getDataBID(AppConstant.APPPID).isEmpty() && !preferenceUtil.getStringData(AppConstant.FCM_DEVICE_TOKEN).isEmpty()) {
                         String api_url = AppConstant.API_PID + preferenceUtil.getDataBID(AppConstant.APPPID) + AppConstant.ACT + "add" +
-                                AppConstant.ET_ + "userp" + AppConstant.TOKEN + preferenceUtil.getStringData(AppConstant.FCM_DEVICE_TOKEN) + AppConstant.VAL + encodeData;//URLEncoder.encode(database, "UTF-8");
+                                AppConstant.ET_ + "userp" + AppConstant.ANDROID_ID + Util.getAndroidId(appContext) + AppConstant.VAL + encodeData;
 
                         RestClient.postRequest(RestClient.PROPERTIES_URL + api_url, new RestClient.ResponseHandler() {
                             @Override
@@ -647,9 +657,9 @@ public class DATB {
             if (enable) {
                 value = 0;
             }
-            String api_url = AppConstant.API_PID + preferenceUtil.getDataBID(AppConstant.APPPID) + AppConstant.TOKEN + preferenceUtil.getStringData(AppConstant.FCM_DEVICE_TOKEN)
-                    + AppConstant.BTYPE_ + AppConstant.BTYPE +AppConstant.DTYPE_ + AppConstant.DTYPE  +AppConstant.APPVERSION + Util.getSDKVersion() + AppConstant.PTE_ + AppConstant.PTE +
-                    AppConstant.OS + AppConstant.SDKOS + AppConstant.PT_+ AppConstant.PT + AppConstant.GE_ + AppConstant.GE + AppConstant.ACTION + value;
+            String api_url = AppConstant.API_PID + preferenceUtil.getDataBID(AppConstant.APPPID) + AppConstant.ANDROID_ID + Util.getAndroidId(DATB.appContext)
+                    + AppConstant.BTYPE_ + AppConstant.BTYPE + AppConstant.DTYPE_ + AppConstant.DTYPE + AppConstant.APPVERSION + Util.getSDKVersion(appContext) + AppConstant.PTE_ + AppConstant.PTE +
+                    AppConstant.OS + AppConstant.SDKOS + AppConstant.PT_ + AppConstant.PT + AppConstant.GE_ + AppConstant.GE + AppConstant.ACTION + value;
 
             RestClient.postRequest(RestClient.SUBSCRIPTION_API + api_url, new RestClient.ResponseHandler() {
                 @Override
@@ -897,7 +907,8 @@ public class DATB {
                 }
 
                 String api_url = AppConstant.API_PID + preferenceUtil.getDataBID(AppConstant.APPPID) + AppConstant.ACT + action +
-                        AppConstant.ET_ + "userp" + AppConstant.ANDROID_ID + preferenceUtil.getStringData(AppConstant.FCM_DEVICE_TOKEN) + AppConstant.VAL + encodeData;
+                        AppConstant.ET_ + "userp" + AppConstant.ANDROID_ID + Util.getAndroidId(appContext) + AppConstant.VAL + encodeData +
+                        AppConstant.TOKEN + preferenceUtil.getStringData(AppConstant.FCM_DEVICE_TOKEN) + AppConstant.BTYPE_ + AppConstant.BTYPE;
                 RestClient.postRequest(RestClient.PROPERTIES_URL + api_url, new RestClient.ResponseHandler() {
                     @Override
                     void onFailure(int statusCode, String response, Throwable throwable) {
