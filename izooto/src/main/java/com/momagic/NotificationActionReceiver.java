@@ -33,6 +33,8 @@ public class NotificationActionReceiver extends BroadcastReceiver {
     private String clickIndex = "0";
     private String lastClickIndex = "0";
     public  static  String medClick="";
+    private String pushType;
+
 
 
     @Override
@@ -46,20 +48,15 @@ public class NotificationActionReceiver extends BroadcastReceiver {
         getBundleData(context, intent);
         try {
             final PreferenceUtil preferenceUtil = PreferenceUtil.getInstance(DATB.appContext);
-            if(!AppConstant.SDKVERSION.equalsIgnoreCase(preferenceUtil.getStringData(AppConstant.SDK)))
-            {
-                callSDKUpdate();
-                Log.e("Call","update");
-            }
+
             if (btncount!=0) {
                 api_url = AppConstant.API_PID + preferenceUtil.getDataBID(AppConstant.APPPID)+ "&ver=" + appVersion +
-                        AppConstant.CID_ + cid + AppConstant.TOKEN + preferenceUtil.getStringData(AppConstant.FCM_DEVICE_TOKEN) + AppConstant.RID_ + rid + AppConstant.NOTIFICATION_OP + "click&btn=" + btncount;
+                        AppConstant.CID_ + cid + AppConstant.ANDROID_ID + Util.getAndroidId(context) + AppConstant.RID_ + rid + AppConstant.NOTIFICATION_OP + "click&btn=" + btncount+AppConstant.PUSH_TYPE+pushType;
             }
             else
             {
                 api_url = AppConstant.API_PID +preferenceUtil.getDataBID(AppConstant.APPPID) + "&ver=" + appVersion +
-                        AppConstant.CID_  + cid + AppConstant.TOKEN + preferenceUtil.getStringData(AppConstant.FCM_DEVICE_TOKEN) + AppConstant.RID_ + rid + AppConstant.NOTIFICATION_OP + "click";
-
+                        AppConstant.CID_  + cid + AppConstant.ANDROID_ID + Util.getAndroidId(context) + AppConstant.RID_ + rid + AppConstant.NOTIFICATION_OP + "click"+AppConstant.PUSH_TYPE+pushType;
             }
 
             if(clickIndex.equalsIgnoreCase("1")) {
@@ -74,13 +71,14 @@ public class NotificationActionReceiver extends BroadcastReceiver {
                     @Override
                     void onSuccess(String response) {
                         super.onSuccess(response);
-                         Log.e("Click","call");
+                         Log.v("c","c");
                     }
                 });
             }
             if (lastClickIndex.equalsIgnoreCase("1")) {
+                String dayDiff = Util.dayDifference(Util.getTime(), preferenceUtil.getStringData(AppConstant.CURRENT_DATE_CLICK));
                 String time = preferenceUtil.getStringData(AppConstant.CURRENT_DATE_CLICK);
-                if (!time.equalsIgnoreCase(Util.getTime())) {
+                if (time.isEmpty() || Integer.parseInt(dayDiff) >= 7) {
                     preferenceUtil.setStringData(AppConstant.CURRENT_DATE_CLICK, Util.getTime());
                     String encodeData = "";
                     try {
@@ -91,18 +89,17 @@ public class NotificationActionReceiver extends BroadcastReceiver {
                     } catch (Exception ex) {
                         ex.printStackTrace();
                     }
-                    String lastClickAPIUrl = AppConstant.API_PID + preferenceUtil.getDataBID(AppConstant.APPPID) + AppConstant.VER_ + appVersion +
+                    String lastClickAPIUrl = AppConstant.API_PID + preferenceUtil.getDataBID(AppConstant.APPPID) + AppConstant.VER_ + AppConstant.SDKVERSION +
                             AppConstant.ANDROID_ID + Util.getAndroidId(context) + AppConstant.VAL + encodeData + AppConstant.ACT + "add" + AppConstant.ISID_ + "1" + AppConstant.ET_ + "userp";
                     RestClient.postRequest(RestClient.LASTNOTIFICATIONCLICKURL + lastClickAPIUrl, new RestClient.ResponseHandler() {
                         @Override
                         void onFailure(int statusCode, String response, Throwable throwable) {
                             super.onFailure(statusCode, response, throwable);
                         }
-
                         @Override
                         void onSuccess(String response) {
                             super.onSuccess(response);
-                            Log.e("L","c");
+                            Log.v(" l", "c");
                         }
                     });
                 }
@@ -111,11 +108,10 @@ public class NotificationActionReceiver extends BroadcastReceiver {
             e.printStackTrace();
         }
         final PreferenceUtil preferenceUtil = PreferenceUtil.getInstance(DATB.appContext);
-        if(preferenceUtil.getBoolean("Mediation")) {
+        if(preferenceUtil.getBoolean(AppConstant.MEDIATION)) {
             if (AdMediation.clicksData.size() > 0) {
                 for (int i = 0; i < AdMediation.clicksData.size(); i++) {
                     if (i == AdMediation.clicksData.size()) {
-                        Log.e("Abc", "No call");
                     }
                     callRandomClick(AdMediation.clicksData.get(i));
                 }
@@ -178,26 +174,6 @@ public class NotificationActionReceiver extends BroadcastReceiver {
         }
 
     }
-    private static void callSDKUpdate() {
-        final PreferenceUtil preferenceUtil = PreferenceUtil.getInstance(DATB.appContext);
-        String api_url = AppConstant.API_PID +  preferenceUtil.getDataBID(AppConstant.APPPID) +
-                AppConstant.ANDROID_ID + Util.getAndroidId(DATB.appContext) + "&av="+preferenceUtil.getStringData(AppConstant.SDK);
-        RestClient.postRequest(RestClient.UPDATE_SDK + api_url, new RestClient.ResponseHandler() {
-            @Override
-            void onFailure(int statusCode, String response, Throwable throwable) {
-                super.onFailure(statusCode, response, throwable);
-            }
-
-            @Override
-            void onSuccess(String response) {
-                super.onSuccess(response);
-
-                preferenceUtil.setStringData(AppConstant.SDK,AppConstant.SDKVERSION);
-
-
-            }
-        });
-    }
 
     private void getBundleData(Context context, Intent intent) {
         Bundle tempBundle = intent.getExtras();
@@ -234,6 +210,8 @@ public class NotificationActionReceiver extends BroadcastReceiver {
                 clickIndex=tempBundle.getString(AppConstant.CLICKINDEX);
             if(tempBundle.containsKey(AppConstant.LASTCLICKINDEX))
                 lastClickIndex=tempBundle.getString(AppConstant.LASTCLICKINDEX);
+            if(tempBundle.containsKey(AppConstant.PUSH))
+                pushType=tempBundle.getString(AppConstant.PUSH);
 
 
 
@@ -246,50 +224,43 @@ public class NotificationActionReceiver extends BroadcastReceiver {
     }
     private void callMediationClicks(final String medClick) {
         try {
-            Log.e("Testing Medc URL",RestClient.MEDIATION_CLICKS);
+            if(!medClick.isEmpty()) {
+                JSONObject jsonObject = new JSONObject(medClick);
+                RestClient.postRequest1(RestClient.MEDIATION_CLICKS, jsonObject, new RestClient.ResponseHandler() {
+                    @Override
+                    void onSuccess(String response) {
+                        super.onSuccess(response);
+                        NotificationActionReceiver.medClick = "";
+                    }
 
-            Log.e("Testing Medc Params",medClick);
-            JSONObject jsonObject=new JSONObject(medClick);
-            RestClient.postRequest1(RestClient.MEDIATION_CLICKS, jsonObject, new RestClient.ResponseHandler() {
+                    @Override
+                    void onFailure(int statusCode, String response, Throwable throwable) {
+                        super.onFailure(statusCode, response, throwable);
+
+                    }
+                });
+            }
+        }
+        catch (Exception ex)
+        {
+            Log.v("exception ",ex.toString());
+        }
+    }
+    private static void callRandomClick(String rv) {
+        if(!rv.isEmpty()) {
+            RestClient.get(rv, new RestClient.ResponseHandler() {
                 @Override
                 void onSuccess(String response) {
                     super.onSuccess(response);
-                    Log.e("Testing Medc ", "Success");
-                    NotificationActionReceiver.medClick="";
-
-
                 }
 
                 @Override
                 void onFailure(int statusCode, String response, Throwable throwable) {
                     super.onFailure(statusCode, response, throwable);
-                    Log.e("Failure", "" + statusCode);
 
                 }
             });
         }
-        catch (Exception ex)
-        {
-            Log.e("exception ",ex.toString());
-        }
-    }
-    private static void callRandomClick(String rv) {
-        RestClient.get(rv, new RestClient.ResponseHandler() {
-            @Override
-            void onSuccess(String response) {
-                super.onSuccess(response);
-
-                Log.e("Testing","click");
-
-            }
-
-            @Override
-            void onFailure(int statusCode, String response, Throwable throwable) {
-                super.onFailure(statusCode, response, throwable);
-                Log.e("Failure",""+statusCode);
-
-            }
-        });
     }
 
 }

@@ -43,10 +43,6 @@ public class MainActivity extends AppCompatActivity
                 Log.e("Token",token);
             }
         });
-
-
-
-
     }
 
 

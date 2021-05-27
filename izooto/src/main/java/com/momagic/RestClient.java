@@ -30,7 +30,6 @@ public class RestClient {
     public static final String LASTVISITURL="https://lvi.izooto.com/lvi";
     public static final String MEDIATION_IMPRESSION="https://med.izooto.com/medi";
     public static final String MEDIATION_CLICKS="https://med.izooto.com/medc";
-    public static final String UPDATE_SDK=" https://vr.izooto.com/vr";
     private static int getThreadTimeout(int timeout) {
         return timeout + 5000;
     }
@@ -211,7 +210,7 @@ public class RestClient {
         }
 
         void onFailure(int statusCode, String response, Throwable throwable) {
-            Lg.e(AppConstant.APP_NAME_TAG, AppConstant.APIFAILURE  + response);
+            Lg.v(AppConstant.APP_NAME_TAG, AppConstant.APIFAILURE  + response);
         }
     }
 }

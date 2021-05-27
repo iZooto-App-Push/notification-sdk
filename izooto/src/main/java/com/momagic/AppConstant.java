@@ -14,7 +14,7 @@ public interface AppConstant {
     String PTE="2";
     String ANDROIDVERSION = "&osVersion=";
     String DEVICENAME ="&deviceName=";
-    String TOKEN="&bKey=";
+    String TOKEN="&at=";
     String ADDURL="app.php?s=";
     String  PID="&pid=";
     String BTYPE_="&btype=";
@@ -261,6 +261,33 @@ public interface AppConstant {
     String SDKVERSION="1.0.3";
     String QSDK_VERSION="&av=";
     String SDK="SDKVERSION";
+    String PACKAGE_NAME="&mpn=";
+    String SDKTYPE="&sn=";
+    String MEDIATION="Mediation";
+    String CHECK_CREATED_ON="CT";
+    String CHECK_RID="RID";
+    String CHECK_TTL="TTL";
+    String NOTIFICATION_DUPLICATE="Add";
+    String PUSH_TYPE="&ct=";
+    String PUSH="push_type";
+    String CHECK_XIAOMI="Check";
+    String HMS_TOKEN = "hms_token";
+    String IS_UPDATED_HMS_TOKEN = "hms_token";
+    String KEY_HMS="&ht=";
+    String HMS_APP_ID="hms_app_id";
+    String HMS="Huawei";
+    String PUSH_HMS="hms";
+    String PUSH_FCM="fcm";
+    String PUSH_XIAOMI="xiomi";
+    String Check_Notification="CheckData";
+    String Check_YES="true";
+    String Check_NO="false";
+    String XIAOMITOKEN = "&mt=";
+    String XiaomiToken = "xiaomi_token";
+    String MIAPIKEY = "Mi_api_key";
+    String MIAPPID="Mi_app_id";
+    String CHECK_PAYLOAD="Title";
+    String CLOUD_PUSH="Counter";
 
 }
 

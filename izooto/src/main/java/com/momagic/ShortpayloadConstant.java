@@ -57,5 +57,7 @@ public interface ShortpayloadConstant {
     String FAll_BACK_PATH="fbu";
     String TIME_OUT="to";
     String AD_TIME_OUT="to";
+    String TIME_TO_LIVE="tl";
+
 
 }

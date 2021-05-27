@@ -22,11 +22,8 @@ public class AppController extends Application implements TokenReceivedListener,
         DATB.initialize(this)
                 .setNotificationReceiveListener(this)
                 .setTokenReceivedListener(this)
-
                 .build();
-List<String> data =new ArrayList<>();
-data.add("Pusher");
-DATB.addTag(data);
+
 
 
     }

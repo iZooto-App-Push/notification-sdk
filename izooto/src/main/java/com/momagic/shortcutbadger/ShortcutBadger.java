@@ -90,14 +90,14 @@ public class ShortcutBadger {
             boolean launcherReady = initBadger(context);
 
             if (!launcherReady)
-                Log.e("ShortcutBadger"," default launcher available");
+                Log.d("ShortcutBadger"," default launcher available");
                // throw new ShortcutBadgerException("No default launcher available");
         }
 
         try {
             sShortcutBadger.executeBadge(context, sComponentName, badgeCount);
         } catch (Exception e) {
-            Log.e("Handle Exception","ShortcutBadger");
+            Log.d("Handle Exception","ShortcutBadger");
            // throw new ShortcutBadgerException("Unable to execute badge", e);
         }
     }

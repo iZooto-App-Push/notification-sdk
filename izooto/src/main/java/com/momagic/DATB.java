@@ -35,6 +35,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.Objects;
 
+import static com.momagic.AppConstant.DAT;
 import static com.momagic.AppConstant.TAG;
 
 public class DATB {
@@ -51,6 +52,8 @@ public class DATB {
     public static String inAppOption;
     @SuppressLint("StaticFieldLeak")
     static Activity curActivity;
+    public static String SDKDEF ="momagic-sdk";
+
 
     public static Class<?>  getWebActivity;
 
@@ -105,9 +108,22 @@ public class DATB {
                                 senderId =jsonObject.getString(AppConstant.SENDERID);
                                 String appId = jsonObject.getString(AppConstant.APPID);
                                 String apiKey = jsonObject.getString(AppConstant.APIKEY);
+                                String mKey=jsonObject.optString(AppConstant.MIAPIKEY);
+                                String mId=jsonObject.optString(AppConstant.MIAPPID);
+                                String hms_appId=jsonObject.optString(AppConstant.HMS_APP_ID);
                                 mAppId = jsonObject.getString(AppConstant.APPPID);
                                 preferenceUtil.setDataBID(AppConstant.APPPID,mAppId);
+                                Log.e("JSON",jsonObject.toString());
                                 trackAdvertisingId();
+                                if(!mKey.isEmpty() && !mId.isEmpty())
+                                {
+                                    XiaomiSDKHandler xiaomiSDKHandler =new XiaomiSDKHandler(DATB.appContext,mId,mKey);
+                                    xiaomiSDKHandler.onMIToken();
+                                }
+                                if (!hms_appId.isEmpty()) {
+                                      initHmsService(appContext);
+                                }
+
                                 if (senderId != null && !senderId.isEmpty()) {
                                     init(context, apiKey, appId);
                                 } else {
@@ -245,21 +261,13 @@ public class DATB {
 
 
     private static void registerToken() {
+        Util.sleepTime(10000);
         final PreferenceUtil preferenceUtil = PreferenceUtil.getInstance(appContext);
         if (!preferenceUtil.getBoolean(AppConstant.IS_TOKEN_UPDATED)) {
-//            String api_url = AppConstant.ADDURL + AppConstant.STYPE + AppConstant.PID + mAppId + AppConstant.BTYPE_ + AppConstant.BTYPE + AppConstant.DTYPE_ + AppConstant.DTYPE + AppConstant.TIMEZONE + System.currentTimeMillis() + AppConstant.APPVERSION + Util.getSDKVersion(appContext) +
-//                    AppConstant.OS + AppConstant.SDKOS + AppConstant.ALLOWED_ + AppConstant.ALLOWED + AppConstant.TOKEN + preferenceUtil.getStringData(AppConstant.FCM_DEVICE_TOKEN) + AppConstant.CHECKSDKVERSION +Util.getSDKVersion(appContext)+AppConstant.LANGUAGE+Util.getDeviceLanguage()
-//                    +AppConstant.ADVERTISEMENTID+preferenceUtil.getStringData(AppConstant.ADVERTISING_ID)+AppConstant.QSDK_VERSION +AppConstant.SDKVERSION;
-//            try {
-//                String deviceName = URLEncoder.encode(Util.getDeviceName(), AppConstant.UTF);
-//                String osVersion = URLEncoder.encode(Build.VERSION.RELEASE, AppConstant.UTF);
-//                api_url += AppConstant.ANDROIDVERSION + osVersion + AppConstant.DEVICENAME + deviceName;
-//            } catch (UnsupportedEncodingException e) {
-//                Lg.e(AppConstant.APP_NAME_TAG, AppConstant.UNEXCEPTION);
-//            }
-            String api_url = AppConstant.ADDURL + AppConstant.STYPE + AppConstant.PID + mAppId + AppConstant.BTYPE_ + AppConstant.BTYPE + AppConstant.DTYPE_ + AppConstant.DTYPE + AppConstant.TIMEZONE + System.currentTimeMillis() + AppConstant.APPVERSION + Util.getSDKVersion(appContext) +
-                    AppConstant.OS + AppConstant.SDKOS + AppConstant.ALLOWED_ + AppConstant.ALLOWED + AppConstant.ANDROID_ID + Util.getAndroidId(appContext) + AppConstant.CHECKSDKVERSION +Util.getSDKVersion(appContext)+AppConstant.LANGUAGE+Util.getDeviceLanguage() +
-                    AppConstant.TOKEN + preferenceUtil.getStringData(AppConstant.FCM_DEVICE_TOKEN) + AppConstant.ADVERTISEMENTID +preferenceUtil.getStringData(AppConstant.ADVERTISING_ID)+AppConstant.QSDK_VERSION +AppConstant.SDKVERSION;
+            String api_url = AppConstant.ADDURL + AppConstant.STYPE + AppConstant.PID + mAppId + AppConstant.BTYPE_ + AppConstant.BTYPE + AppConstant.DTYPE_ + AppConstant.DTYPE + AppConstant.TIMEZONE + System.currentTimeMillis() + AppConstant.APPVERSION + Util.getSDKVersion(DATB.appContext) +
+                    AppConstant.OS + AppConstant.SDKOS + AppConstant.ALLOWED_ + AppConstant.ALLOWED + AppConstant.ANDROID_ID + Util.getAndroidId(appContext) + AppConstant.CHECKSDKVERSION +Util.getSDKVersion(DATB.appContext)+AppConstant.LANGUAGE+Util.getDeviceLanguage() +AppConstant.QSDK_VERSION +AppConstant.SDKVERSION+
+                    AppConstant.TOKEN +preferenceUtil.getStringData(AppConstant.FCM_DEVICE_TOKEN) + AppConstant.ADVERTISEMENTID +preferenceUtil.getStringData(AppConstant.ADVERTISING_ID)+AppConstant.XIAOMITOKEN+preferenceUtil.getStringData(AppConstant.XiaomiToken)+ AppConstant.PACKAGE_NAME+appContext.getPackageName()+AppConstant.SDKTYPE+SDKDEF
+                    +AppConstant.KEY_HMS+ preferenceUtil.getStringData(AppConstant.HMS_TOKEN);
             try {
                 String deviceName = URLEncoder.encode(Util.getDeviceName(), AppConstant.UTF);
                 String osVersion = URLEncoder.encode(Build.VERSION.RELEASE, AppConstant.UTF);
@@ -267,14 +275,23 @@ public class DATB {
             } catch (UnsupportedEncodingException e) {
                 Lg.e(AppConstant.APP_NAME_TAG, AppConstant.UNEXCEPTION);
             }
-           preferenceUtil.setStringData(AppConstant.SDK,AppConstant.SDKVERSION);
-            RestClient.get(api_url, new RestClient.ResponseHandler() {
+            if(!preferenceUtil.getStringData(AppConstant.HMS_TOKEN).isEmpty() && !preferenceUtil.getStringData(AppConstant.FCM_DEVICE_TOKEN).isEmpty() && !preferenceUtil.getStringData(AppConstant.XiaomiToken).isEmpty())
+            {
+                preferenceUtil.setIntData(AppConstant.CLOUD_PUSH,3);
+            }
+            else if(!preferenceUtil.getStringData(AppConstant.FCM_DEVICE_TOKEN).isEmpty() && !preferenceUtil.getStringData(AppConstant.XiaomiToken).isEmpty())
+            {
+                preferenceUtil.setIntData(AppConstant.CLOUD_PUSH,2);
+            }
+            else
+            {
+                preferenceUtil.setIntData(AppConstant.CLOUD_PUSH,1);
+
+            }
+            RestClient.postRequest(api_url, new RestClient.ResponseHandler() {
                 @Override
                 void onSuccess(final String response) {
-
                     super.onSuccess(response);
-
-
                     if (mBuilder != null && mBuilder.mTokenReceivedListener != null) {
                         new Handler(Looper.getMainLooper()).post(new Runnable() {
                             @Override
@@ -284,7 +301,6 @@ public class DATB {
                         });
 
                     }
-
                     preferenceUtil.setBooleanData(AppConstant.IS_TOKEN_UPDATED, true);
                     preferenceUtil.setLongData(AppConstant.DEVICE_REGISTRATION_TIMESTAMP, System.currentTimeMillis());
                 }
@@ -304,8 +320,22 @@ public class DATB {
             }
 
         }
-    }
 
+    }
+    private static void initHmsService(final Context context){
+        HMSTokenGenerator hmsTokenGenerator = new HMSTokenGenerator();
+        hmsTokenGenerator.getHMSToken(context, new HMSTokenListener.HMSTokenGeneratorHandler() {
+            @Override
+            public void complete(String id) {
+                Log.i(AppConstant.APP_NAME_TAG, "HMS Token"+id);
+            }
+
+            @Override
+            public void failure(String errorMessage) {
+                Lg.v(AppConstant.APP_NAME_TAG, errorMessage);
+            }
+        });
+    }
     static void onActivityResumed(Activity activity){
         final PreferenceUtil preferenceUtil = PreferenceUtil.getInstance(appContext);
         setActivity(activity);
@@ -689,129 +719,88 @@ public class DATB {
     public static void handleNotification(Context context,final Map<String,String> data)
     {
         Log.d(AppConstant.APP_NAME_TAG, AppConstant.NOTIFICATIONRECEIVED);
-            try {
+        try {
+            final PreferenceUtil preferenceUtil = PreferenceUtil.getInstance(context);
 
-                if (data.get(AppConstant.CAMPNAME) != null) {
+            if(data.get(AppConstant.AD_NETWORK) !=null && data.get(AppConstant.GLOBAL)!=null)
+            {
+                AdMediation.getAdJsonData(data);
+                preferenceUtil.setBooleanData(AppConstant.MEDIATION,true);
 
-                    JSONObject payloadObj = new JSONObject(data.get(AppConstant.CAMPNAME));
-                    if (payloadObj.optLong(AppConstant.CREATEDON) > PreferenceUtil.getInstance(DATB.appContext).getLongValue(AppConstant.DEVICE_REGISTRATION_TIMESTAMP)) {
-                        payload = new Payload();
-                        payload.setFetchURL(payloadObj.optString(AppConstant.FETCHURL));
-                        payload.setKey(payloadObj.optString(AppConstant.KEY));
-                        payload.setId(payloadObj.optString(AppConstant.ID));
-                        payload.setRid(payloadObj.optString(AppConstant.RID));
-                        payload.setLink(payloadObj.optString(AppConstant.LINK));
-                        payload.setTitle(payloadObj.optString(AppConstant.TITLE));
-                        payload.setMessage(payloadObj.optString(AppConstant.NMESSAGE));
-                        payload.setIcon(payloadObj.optString(AppConstant.ICON));
-                        payload.setReqInt(payloadObj.optInt(AppConstant.REQINT));
-                        payload.setTag(payloadObj.optString(AppConstant.TAG));
-                        payload.setBanner(payloadObj.optString(AppConstant.BANNER));
-                        payload.setAct_num(payloadObj.optInt(AppConstant.ACTNUM));
-                        payload.setBadgeicon(payloadObj.optString(AppConstant.BADGE_ICON));
-                        payload.setBadgecolor(payloadObj.optString(AppConstant.BADGE_COLOR));
-                        payload.setSubTitle(payloadObj.optString(AppConstant.SUBTITLE));
-                        payload.setGroup(payloadObj.optInt(AppConstant.GROUP));
-                        payload.setBadgeCount(payloadObj.optInt(AppConstant.BADGE_COUNT));
+            }
+            else {
+                preferenceUtil.setBooleanData(AppConstant.MEDIATION, false);
+                JSONObject payloadObj = new JSONObject(data);
+                if (payloadObj.optLong(ShortpayloadConstant.CREATEDON) > PreferenceUtil.getInstance(DATB.appContext).getLongValue(AppConstant.DEVICE_REGISTRATION_TIMESTAMP)) {
+                    payload = new Payload();
+                    payload.setCreated_Time(payloadObj.optString(ShortpayloadConstant.CREATEDON));
+                    payload.setFetchURL(payloadObj.optString(ShortpayloadConstant.FETCHURL));
+                    payload.setKey(payloadObj.optString(ShortpayloadConstant.KEY));
+                    payload.setId(payloadObj.optString(ShortpayloadConstant.ID));
+                    payload.setRid(payloadObj.optString(ShortpayloadConstant.RID));
+                    payload.setLink(payloadObj.optString(ShortpayloadConstant.LINK));
+                    payload.setTitle(payloadObj.optString(ShortpayloadConstant.TITLE));
+                    payload.setMessage(payloadObj.optString(ShortpayloadConstant.NMESSAGE));
+                    payload.setIcon(payloadObj.optString(ShortpayloadConstant.ICON));
+                    payload.setReqInt(payloadObj.optInt(ShortpayloadConstant.REQINT));
+                    payload.setTag(payloadObj.optString(ShortpayloadConstant.TAG));
+                    payload.setBanner(payloadObj.optString(ShortpayloadConstant.BANNER));
+                    payload.setAct_num(payloadObj.optInt(ShortpayloadConstant.ACTNUM));
+                    payload.setBadgeicon(payloadObj.optString(ShortpayloadConstant.BADGE_ICON));
+                    payload.setBadgecolor(payloadObj.optString(ShortpayloadConstant.BADGE_COLOR));
+                    payload.setSubTitle(payloadObj.optString(ShortpayloadConstant.SUBTITLE));
+                    payload.setGroup(payloadObj.optInt(ShortpayloadConstant.GROUP));
+                    payload.setBadgeCount(payloadObj.optInt(ShortpayloadConstant.BADGE_COUNT));
+                    // Button 2
+                    payload.setAct1name(payloadObj.optString(ShortpayloadConstant.ACT1NAME));
+                    payload.setAct1link(payloadObj.optString(ShortpayloadConstant.ACT1LINK));
+                    payload.setAct1icon(payloadObj.optString(ShortpayloadConstant.ACT1ICON));
+                    payload.setAct1ID(payloadObj.optString(ShortpayloadConstant.ACT1ID));
+                    // Button 2
+                    payload.setAct2name(payloadObj.optString(ShortpayloadConstant.ACT2NAME));
+                    payload.setAct2link(payloadObj.optString(ShortpayloadConstant.ACT2LINK));
+                    payload.setAct2icon(payloadObj.optString(ShortpayloadConstant.ACT2ICON));
+                    payload.setAct2ID(payloadObj.optString(ShortpayloadConstant.ACT2ID));
 
-                        // Button 1
-                        payload.setAct1name(payloadObj.optString(AppConstant.ACT1NAME));
-                        payload.setAct1link(payloadObj.optString(AppConstant.ACT1LINK));
-                        payload.setAct1icon(payloadObj.optString(AppConstant.ACT1ICON));
-                        payload.setAct1ID(payloadObj.optString(AppConstant.ACT1ID));
-                        // Button 2
-                        payload.setAct2name(payloadObj.optString(AppConstant.ACT2NAME));
-                        payload.setAct2link(payloadObj.optString(AppConstant.ACT2LINK));
-                        payload.setAct2icon(payloadObj.optString(AppConstant.ACT2ICON));
-                        payload.setAct2ID(payloadObj.optString(AppConstant.ACT2ID));
+                    payload.setInapp(payloadObj.optInt(ShortpayloadConstant.INAPP));
+                    payload.setTrayicon(payloadObj.optString(ShortpayloadConstant.TARYICON));
+                    payload.setSmallIconAccentColor(payloadObj.optString(ShortpayloadConstant.ICONCOLOR));
+                    payload.setSound(payloadObj.optString(ShortpayloadConstant.SOUND));
+                    payload.setLedColor(payloadObj.optString(ShortpayloadConstant.LEDCOLOR));
+                    payload.setLockScreenVisibility(payloadObj.optInt(ShortpayloadConstant.VISIBILITY));
+                    payload.setGroupKey(payloadObj.optString(ShortpayloadConstant.GKEY));
+                    payload.setGroupMessage(payloadObj.optString(ShortpayloadConstant.GMESSAGE));
+                    payload.setFromProjectNumber(payloadObj.optString(ShortpayloadConstant.PROJECTNUMBER));
+                    payload.setCollapseId(payloadObj.optString(ShortpayloadConstant.COLLAPSEID));
+                    payload.setPriority(payloadObj.optInt(ShortpayloadConstant.PRIORITY));
+                    payload.setRawPayload(payloadObj.optString(ShortpayloadConstant.RAWDATA));
+                    payload.setAp(payloadObj.optString(ShortpayloadConstant.ADDITIONALPARAM));
+                    payload.setCfg(payloadObj.optInt(ShortpayloadConstant.CFG));
+                    payload.setTime_to_live(payloadObj.optString(ShortpayloadConstant.TIME_TO_LIVE));
+                    payload.setPush_type(AppConstant.PUSH_FCM);
+                } else
+                    return;
 
-                        payload.setInapp(payloadObj.optInt(AppConstant.INAPP));
-                        payload.setTrayicon(payloadObj.optString(AppConstant.TARYICON));
-                        payload.setSmallIconAccentColor(payloadObj.optString(AppConstant.ICONCOLOR));
-                        payload.setSound(payloadObj.optString(AppConstant.SOUND));
-                        payload.setLedColor(payloadObj.optString(AppConstant.LEDCOLOR));
-                        payload.setLockScreenVisibility(payloadObj.optInt(AppConstant.VISIBILITY));
-                        payload.setGroupKey(payloadObj.optString(AppConstant.GKEY));
-                        payload.setGroupMessage(payloadObj.optString(AppConstant.GMESSAGE));
-                        payload.setFromProjectNumber(payloadObj.optString(AppConstant.PROJECTNUMBER));
-                        payload.setCollapseId(payloadObj.optString(AppConstant.COLLAPSEID));
-                        payload.setPriority(payloadObj.optInt(AppConstant.PRIORITY));
-                        payload.setRawPayload(payloadObj.optString(AppConstant.RAWDATA));
-                        payload.setAp(payloadObj.optString(AppConstant.ADDITIONALPARAM));
-                        payload.setCfg(payloadObj.optInt(AppConstant.CFG));
-
-                    } else
-                        return;
-                } else {
-                    JSONObject payloadObj = new JSONObject(data);
-                    if (payloadObj.optLong(ShortpayloadConstant.CREATEDON) > PreferenceUtil.getInstance(DATB.appContext).getLongValue(AppConstant.DEVICE_REGISTRATION_TIMESTAMP)) {
-                        payload = new Payload();
-                        payload.setFetchURL(payloadObj.optString(ShortpayloadConstant.FETCHURL));
-                        payload.setKey(payloadObj.optString(ShortpayloadConstant.KEY));
-                        payload.setId(payloadObj.optString(ShortpayloadConstant.ID));
-                        payload.setRid(payloadObj.optString(ShortpayloadConstant.RID));
-                        payload.setLink(payloadObj.optString(ShortpayloadConstant.LINK));
-                        payload.setTitle(payloadObj.optString(ShortpayloadConstant.TITLE));
-                        payload.setMessage(payloadObj.optString(ShortpayloadConstant.NMESSAGE));
-                        payload.setIcon(payloadObj.optString(ShortpayloadConstant.ICON));
-                        payload.setReqInt(payloadObj.optInt(ShortpayloadConstant.REQINT));
-                        payload.setTag(payloadObj.optString(ShortpayloadConstant.TAG));
-                        payload.setBanner(payloadObj.optString(ShortpayloadConstant.BANNER));
-                        payload.setAct_num(payloadObj.optInt(ShortpayloadConstant.ACTNUM));
-                        payload.setBadgeicon(payloadObj.optString(ShortpayloadConstant.BADGE_ICON));
-                        payload.setBadgecolor(payloadObj.optString(ShortpayloadConstant.BADGE_COLOR));
-                        payload.setSubTitle(payloadObj.optString(ShortpayloadConstant.SUBTITLE));
-                        payload.setGroup(payloadObj.optInt(ShortpayloadConstant.GROUP));
-                        payload.setBadgeCount(payloadObj.optInt(ShortpayloadConstant.BADGE_COUNT));
-                        // Button 2
-                        payload.setAct1name(payloadObj.optString(ShortpayloadConstant.ACT1NAME));
-                        payload.setAct1link(payloadObj.optString(ShortpayloadConstant.ACT1LINK));
-                        payload.setAct1icon(payloadObj.optString(ShortpayloadConstant.ACT1ICON));
-                        payload.setAct1ID(payloadObj.optString(ShortpayloadConstant.ACT1ID));
-                        // Button 2
-                        payload.setAct2name(payloadObj.optString(ShortpayloadConstant.ACT2NAME));
-                        payload.setAct2link(payloadObj.optString(ShortpayloadConstant.ACT2LINK));
-                        payload.setAct2icon(payloadObj.optString(ShortpayloadConstant.ACT2ICON));
-                        payload.setAct2ID(payloadObj.optString(ShortpayloadConstant.ACT2ID));
-
-                        payload.setInapp(payloadObj.optInt(ShortpayloadConstant.INAPP));
-                        payload.setTrayicon(payloadObj.optString(ShortpayloadConstant.TARYICON));
-                        payload.setSmallIconAccentColor(payloadObj.optString(ShortpayloadConstant.ICONCOLOR));
-                        payload.setSound(payloadObj.optString(ShortpayloadConstant.SOUND));
-                        payload.setLedColor(payloadObj.optString(ShortpayloadConstant.LEDCOLOR));
-                        payload.setLockScreenVisibility(payloadObj.optInt(ShortpayloadConstant.VISIBILITY));
-                        payload.setGroupKey(payloadObj.optString(ShortpayloadConstant.GKEY));
-                        payload.setGroupMessage(payloadObj.optString(ShortpayloadConstant.GMESSAGE));
-                        payload.setFromProjectNumber(payloadObj.optString(ShortpayloadConstant.PROJECTNUMBER));
-                        payload.setCollapseId(payloadObj.optString(ShortpayloadConstant.COLLAPSEID));
-                        payload.setPriority(payloadObj.optInt(ShortpayloadConstant.PRIORITY));
-                        payload.setRawPayload(payloadObj.optString(ShortpayloadConstant.RAWDATA));
-                        payload.setAp(payloadObj.optString(ShortpayloadConstant.ADDITIONALPARAM));
-                        payload.setCfg(payloadObj.optInt(ShortpayloadConstant.CFG));
-
-                    } else
-                        return;
-                }
-
-
-                // return;
-            } catch (Exception e) {
-
-                e.printStackTrace();
-                Lg.d(TAG, e.toString());
             }
 
+            // return;
+        } catch (Exception e) {
 
-            if (DATB.appContext == null)
-                DATB.appContext = context;
-            Handler mainHandler = new Handler(Looper.getMainLooper());
-            Runnable myRunnable = new Runnable() {
-                @Override
-                public void run() {
-                    DATB.processNotificationReceived(payload);
-                } // This is your code
-            };
-            mainHandler.post(myRunnable);
+            e.printStackTrace();
+            Lg.d(TAG, e.toString());
+        }
+
+
+        if (DATB.appContext == null)
+            DATB.appContext = context;
+        Handler mainHandler = new Handler(Looper.getMainLooper());
+        Runnable myRunnable = new Runnable() {
+            @Override
+            public void run() {
+                DATB.processNotificationReceived(payload);
+            } // This is your code
+        };
+        mainHandler.post(myRunnable);
 
 
     }
@@ -905,7 +894,6 @@ public class DATB {
                 } catch (Exception ex) {
                     ex.printStackTrace();
                 }
-
                 String api_url = AppConstant.API_PID + preferenceUtil.getDataBID(AppConstant.APPPID) + AppConstant.ACT + action +
                         AppConstant.ET_ + "userp" + AppConstant.ANDROID_ID + Util.getAndroidId(appContext) + AppConstant.VAL + encodeData +
                         AppConstant.TOKEN + preferenceUtil.getStringData(AppConstant.FCM_DEVICE_TOKEN) + AppConstant.BTYPE_ + AppConstant.BTYPE;
@@ -995,7 +983,7 @@ public class DATB {
                 @Override
                 void onSuccess(String response) {
                     super.onSuccess(response);
-                    Log.e(" lastVisit","call");
+                    Log.v(" l","v");
 
                 }
             });

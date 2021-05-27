@@ -87,7 +87,9 @@ public class Payload {
     private String fallBackPath;
     private int time_out;
     private int adTimeOut;
-
+    private String created_Time;
+    private String time_to_live;
+    private String push_type;
     //////////////////////////////////////////////
 
     private int cfg;
@@ -577,5 +579,29 @@ public class Payload {
 
     public void setAdTimeOut(int adTimeOut) {
         this.adTimeOut = adTimeOut;
+    }
+
+    public String getCreated_Time() {
+        return created_Time;
+    }
+
+    public void setCreated_Time(String created_Time) {
+        this.created_Time = created_Time;
+    }
+
+    public String getTime_to_live() {
+        return time_to_live;
+    }
+
+    public void setTime_to_live(String time_to_live) {
+        this.time_to_live = time_to_live;
+    }
+
+    public String getPush_type() {
+        return push_type;
+    }
+
+    public void setPush_type(String push_type) {
+        this.push_type = push_type;
     }
 }
