@@ -37,6 +37,7 @@ import org.json.JSONObject;
 import org.json.JSONTokener;
 
 import java.io.UnsupportedEncodingException;
+import java.net.URL;
 import java.net.URLEncoder;
 import java.util.HashMap;
 import java.util.List;
@@ -468,18 +469,25 @@ public class NotificationEventManager {
 
                 String clickIndex = "0";
                 String impressionIndex ="0";
+                String lastSeventhIndex = "0";
+                String lastNinthIndex = "0";
+
 
                 String data=Util.getIntegerToBinary(payload.getCfg());
                 if(data!=null && !data.isEmpty()) {
                     clickIndex = String.valueOf(data.charAt(data.length() - 2));
                     impressionIndex = String.valueOf(data.charAt(data.length() - 1));
                     lastView_Click = String.valueOf(data.charAt(data.length() - 3));
+                    lastSeventhIndex = String.valueOf(data.charAt(data.length() - 7));
+                    lastNinthIndex = String.valueOf(data.charAt(data.length() - 9));
                 }
                 else
                 {
                     clickIndex = "0";
                     impressionIndex="0";
                     lastView_Click = "0";
+                    lastSeventhIndex = "0";
+                    lastNinthIndex = "0";
 
                 }
 
@@ -633,8 +641,8 @@ public class NotificationEventManager {
                     if(impressionIndex.equalsIgnoreCase("1")) {
                         viewNotificationApi(payload);
                     }
-                    if (lastView_Click.equalsIgnoreCase("1")){
-                        lastViewNotificationApi();
+                    if (lastView_Click.equalsIgnoreCase("1") || lastSeventhIndex.equalsIgnoreCase("1")){
+                        lastViewNotificationApi(payload, lastView_Click, lastSeventhIndex, lastNinthIndex);
                     }
 
                     DATB.notificationView(payload);
@@ -677,274 +685,7 @@ public class NotificationEventManager {
 
     }
 
-//    public static void receivedNotification(final Payload payload){
-//        final Handler handler = new Handler(Looper.getMainLooper());
-//        final Runnable notificationRunnable = new Runnable() {
-//            @RequiresApi(api = Build.VERSION_CODES.O)
-//            @Override
-//            public void run() {
-//
-//                String clickIndex = "0";
-//                String impressionIndex ="0";
-//
-//                String data=Util.getIntegerToBinary(payload.getCfg());
-//                if(data!=null && !data.isEmpty()) {
-//                    clickIndex = String.valueOf(data.charAt(data.length() - 2));
-//                    impressionIndex = String.valueOf(data.charAt(data.length() - 1));
-//                    lastView_Click = String.valueOf(data.charAt(data.length() - 3));
-//
-//                }
-//                else
-//                {
-//                    clickIndex = "0";
-//                    impressionIndex="0";
-//                    lastView_Click = "0";
-//
-//                }
-//
-//                badgeCountUpdate(payload.getBadgeCount());
-//
-//
-//                String channelId = DATB.appContext.getString(R.string.default_notification_channel_id);
-//                NotificationCompat.Builder notificationBuilder = null;
-//                Notification summaryNotification = null;
-//                int SUMMARY_ID = 0;
-//                Intent intent = null;
-//                if (DATB.icon!=0)
-//                {
-//                    icon= DATB.icon;
-//                }
-//                else
-//                {
-//                    if (payload.getBadgeicon().equalsIgnoreCase(AppConstant.DEFAULT_ICON)){
-//                        icon=R.drawable.ic_notifications_black_24dp;
-//                    }else {
-//
-//                        if (isInt(payload.getBadgeicon())){
-//                            icon = DATB.appContext.getApplicationInfo().icon;
-//                        }else {
-//                            int checkExistence = DATB.appContext.getResources().getIdentifier(payload.getBadgeicon(), "drawable", DATB.appContext.getPackageName());
-//                            if ( checkExistence != 0 ) {  // the resource exists...
-//                                icon = checkExistence;
-//
-//                            }
-//                            else {  // checkExistence == 0  // the resource does NOT exist!!
-//                                int checkExistenceMipmap = DATB.appContext.getResources().getIdentifier(payload.getBadgeicon(), "mipmap", DATB.appContext.getPackageName());
-//                                if ( checkExistenceMipmap != 0 ) {  // the resource exists...
-//                                    icon = checkExistenceMipmap;
-//
-//                                }else {
-//
-//                                    icon =R.drawable.ic_notifications_black_24dp;
-//                                }
-//
-//                            }
-//
-//                        }
-//
-//                    }
-//
-//                }
-//
-//
-//
-//
-//
-//                if (payload.getBadgecolor().contains("#")){
-//                    try{
-//                        badgeColor = Color.parseColor(payload.getBadgecolor());
-//                    } catch(IllegalArgumentException ex){
-//                        // handle your exceptizion
-//                        badgeColor = Color.TRANSPARENT;
-//                        ex.printStackTrace();
-//                    }
-//                }else if (payload.getBadgecolor()!=null&&!payload.getBadgecolor().isEmpty()){
-//                    try{
-//                        badgeColor = Color.parseColor("#"+payload.getBadgecolor());
-//                    } catch(IllegalArgumentException ex){ // handle your exception
-//                        badgeColor = Color.TRANSPARENT;
-//                        ex.printStackTrace();
-//                    }
-//                }else {
-//                    badgeColor = Color.TRANSPARENT;
-//                }
-//
-//                lockScreenVisibility = setLockScreenVisibility(payload.getLockScreenVisibility());
-//
-//                intent = notificationClick(payload, payload.getLink(),payload.getAct1link(),payload.getAct2link(),AppConstant.NO,clickIndex,lastView_Click,100,0);
-//                Uri defaultSoundUri = RingtoneManager.getDefaultUri(RingtoneManager.TYPE_NOTIFICATION);
-//
-//                PendingIntent pendingIntent = PendingIntent.getBroadcast(DATB.appContext, new Random().nextInt(100) /* Request code */, intent,
-//                        PendingIntent.FLAG_ONE_SHOT);
-//
-//                notificationBuilder = new NotificationCompat.Builder(DATB.appContext, channelId)
-//                        .setContentTitle(payload.getTitle())
-//                        .setSmallIcon(icon)
-//                        .setContentText(payload.getMessage())
-//                        .setContentIntent(pendingIntent)
-//                        .setStyle(new NotificationCompat.BigTextStyle().bigText(payload.getMessage()))
-//                        .setDefaults(NotificationCompat.DEFAULT_LIGHTS | NotificationCompat.DEFAULT_SOUND).setVibrate(new long[]{1000, 1000})
-//                        .setSound(defaultSoundUri)
-//                        .setVisibility(lockScreenVisibility)
-//                        .setAutoCancel(true);
-//
-//
-//
-//
-//                if (!(Build.VERSION.SDK_INT >= Build.VERSION_CODES.O)){
-//
-//                        priority = priorityForLessOreo(payload.getPriority());
-//                        notificationBuilder.setPriority(priority);
-//
-//
-//                }
-//                if (Build.VERSION.SDK_INT > Build.VERSION_CODES.LOLLIPOP_MR1) {
-//                    if (payload.getGroup() == 1) {
-//
-//                        notificationBuilder.setGroup(payload.getGroupKey());
-//
-//                        summaryNotification =
-//                                new NotificationCompat.Builder(DATB.appContext, channelId)
-//                                        .setContentTitle(payload.getTitle())
-//                                        .setContentText(payload.getMessage())
-//                                        .setSmallIcon(icon)
-//                                        .setColor(badgeColor)
-//                                        .setStyle(new NotificationCompat.InboxStyle()
-//                                                .addLine(payload.getMessage())
-//                                                .setBigContentTitle(payload.getGroupMessage()))
-//                                        .setGroup(payload.getGroupKey())
-//                                        .setGroupSummary(true)
-//                                        .build();
-//
-//
-//                    }
-//                }
-//
-//                if (!payload.getSubTitle().contains(AppConstant.NULL)&&payload.getSubTitle()!=null&&!payload.getSubTitle().isEmpty()) {
-//                    notificationBuilder.setSubText(payload.getSubTitle());
-//
-//                }
-//                if (payload.getBadgecolor()!=null&&!payload.getBadgecolor().isEmpty()){
-//                    notificationBuilder.setColor(badgeColor);
-//                }
-//                if(payload.getLedColor()!=null && !payload.getLedColor().isEmpty())
-//                    notificationBuilder.setColor(Color.parseColor(payload.getLedColor()));
-//                if (notificationIcon != null)
-//                    notificationBuilder.setLargeIcon(notificationIcon);
-//                else if (notificationBanner != null)
-//                    notificationBuilder.setLargeIcon(notificationBanner);
-//                if (notificationBanner != null && !payload.getSubTitle().contains(AppConstant.NULL) && payload.getSubTitle()!=null&&!payload.getSubTitle().isEmpty()) {
-//                    notificationBuilder.setStyle(new NotificationCompat.BigPictureStyle()
-//                            .bigPicture(notificationBanner)
-//                            .bigLargeIcon(notificationIcon)/*.setSummaryText(payload.getMessage())*/);
-//                }else if (notificationBanner != null)
-//                {
-//                    notificationBuilder.setStyle(new NotificationCompat.BigPictureStyle()
-//                            .bigPicture(notificationBanner)
-//                            .bigLargeIcon(notificationIcon).setSummaryText(payload.getMessage()));
-//
-//                }
-//
-//                NotificationManager notificationManager =
-//                        (NotificationManager) DATB.appContext.getSystemService(Context.NOTIFICATION_SERVICE);
-//                int notificaitionId = (int) System.currentTimeMillis();
-//                if (payload.getAct1name() != null && !payload
-//                        .getAct1name().isEmpty()) {
-//                    String phone = getPhone(payload.getAct1link());
-//                    Intent btn1 = notificationClick(payload,payload.getAct1link(),payload.getLink(),payload.getAct2link(),phone,clickIndex,lastView_Click,notificaitionId,1);
-//                    PendingIntent pendingIntent1 = PendingIntent.getBroadcast(DATB.appContext, new Random().nextInt(100), btn1, PendingIntent.FLAG_UPDATE_CURRENT);
-//                    NotificationCompat.Action action1 =
-//                            new NotificationCompat.Action.Builder(
-//                                    0,    payload.getAct1name() ,
-//                                    pendingIntent1).build();
-//                    notificationBuilder.addAction(action1);
-//
-//
-//                }
-//
-//
-//                if (payload.getAct2name() != null && !payload.getAct2name().isEmpty()) {
-////                    btn2.setAction(AppConstant.ACTION_BTN_TWO);
-//                    String phone = getPhone(payload.getAct2link());
-//                    Intent btn2 = notificationClick(payload,payload.getAct2link(),payload.getLink(),payload.getAct1link(),phone,clickIndex,lastView_Click,notificaitionId,2);
-//                    PendingIntent pendingIntent2 = PendingIntent.getBroadcast(DATB.appContext, new Random().nextInt(100), btn2, PendingIntent.FLAG_UPDATE_CURRENT);
-//                    NotificationCompat.Action action2 =
-//                            new NotificationCompat.Action.Builder(
-//                                    0, payload.getAct2name(),
-//                                    pendingIntent2).build();
-//                    notificationBuilder.addAction(action2);
-//                }
-//                assert notificationManager != null;
-//                if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
-//
-//
-//                        priority = priorityForImportance(payload.getPriority());
-//                    NotificationChannel channel = new NotificationChannel(channelId,
-//                            AppConstant.CHANNEL_NAME, priority);
-//
-//                    notificationManager.createNotificationChannel(channel);
-//
-//
-//
-//
-//                }
-//                if (Build.VERSION.SDK_INT > Build.VERSION_CODES.LOLLIPOP_MR1) {
-//                    if (payload.getGroup() == 1) {
-//                        notificationManager.notify(SUMMARY_ID, summaryNotification);
-//                    }
-//                }
-//
-//                if (payload.getCollapseId()!=null && !payload.getCollapseId().isEmpty()){
-//                    int notifyId = Util.convertStringToDecimal(payload.getCollapseId());
-//                    notificationManager.notify(notifyId, notificationBuilder.build());
-//                }else
-//                    notificationManager.notify(notificaitionId, notificationBuilder.build());
-//                try {
-//
-//                    if(impressionIndex.equalsIgnoreCase("1")) {
-//                        viewNotificationApi(payload);
-//                    }
-//                    if (lastView_Click.equalsIgnoreCase("1")){
-//                        lastViewNotificationApi();
-//                    }
-//                    DATB.notificationView(payload);
-//
-//                } catch (Exception e) {
-//                    e.printStackTrace();
-//                }
-//
-//                notificationBanner = null;
-//                notificationIcon = null;
-//                /*link = "";
-//                link1 = "";
-//                link2 = "";*/
-//
-//            }
-//
-//        };
-//
-//
-//        new AppExecutors().networkIO().execute(new Runnable() {
-//            @Override
-//            public void run() {
-//                String smallIcon = payload.getIcon();
-//                String banner = payload.getBanner();
-//                try {
-//                    if (smallIcon != null && !smallIcon.isEmpty())
-//                        notificationIcon = Util.getBitmapFromURL(smallIcon);
-//                    if (banner != null && !banner.isEmpty()) {
-//                        notificationBanner = Util.getBitmapFromURL(banner);
-//
-//                    }
-//                    handler.post(notificationRunnable);
-//                } catch (Exception e) {
-//                    Lg.e("Error", e.getMessage());
-//                    e.printStackTrace();
-//                    handler.post(notificationRunnable);
-//                }
-//            }
-//        });
-//    }
+
 private static void receivedNotification(final Payload payload){
     final Handler handler = new Handler(Looper.getMainLooper());
     final Runnable notificationRunnable = new Runnable() {
@@ -954,19 +695,26 @@ private static void receivedNotification(final Payload payload){
 
             String clickIndex = "0";
             String impressionIndex ="0";
+            String lastSeventhIndex = "0";
+            String lastNinthIndex = "0";
 
 
             String data=Util.getIntegerToBinary(payload.getCfg());
             if(data!=null && !data.isEmpty()) {
                 clickIndex = String.valueOf(data.charAt(data.length() - 2));
                 impressionIndex = String.valueOf(data.charAt(data.length() - 1));
-                lastView_Click=String.valueOf(data.charAt(data.length()-3));
+                lastView_Click = String.valueOf(data.charAt(data.length() - 3));
+                lastSeventhIndex = String.valueOf(data.charAt(data.length() - 7));
+                lastNinthIndex = String.valueOf(data.charAt(data.length() - 9));
             }
             else
             {
                 clickIndex = "0";
                 impressionIndex="0";
-                lastView_Click="0";
+                lastView_Click = "0";
+                lastSeventhIndex = "0";
+                lastNinthIndex = "0";
+
             }
 
             badgeCountUpdate(payload.getBadgeCount());
@@ -1207,8 +955,8 @@ private static void receivedNotification(final Payload payload){
                 if(impressionIndex.equalsIgnoreCase("1")) {
                     viewNotificationApi(payload);
                 }
-                if (lastView_Click.equalsIgnoreCase("1")){
-                    lastViewNotificationApi();
+                if (lastView_Click.equalsIgnoreCase("1") || lastSeventhIndex.equalsIgnoreCase("1")){
+                    lastViewNotificationApi(payload, lastView_Click, lastSeventhIndex, lastNinthIndex);
                 }
                 DATB.notificationView(payload);
 
@@ -1368,20 +1116,27 @@ private static void receivedNotification(final Payload payload){
 
                     String clickIndex = "0";
                     String impressionIndex ="0";
+                    String lastSeventhIndex = "0";
+                    String lastNinthIndex = "0";
+
 
                     String data=Util.getIntegerToBinary(payload.getCfg());
                     if(data!=null && !data.isEmpty()) {
                         clickIndex = String.valueOf(data.charAt(data.length() - 2));
                         impressionIndex = String.valueOf(data.charAt(data.length() - 1));
-                        lastView_Click=String.valueOf(data.charAt(data.length() - 3));
+                        lastView_Click = String.valueOf(data.charAt(data.length() - 3));
+                        lastSeventhIndex = String.valueOf(data.charAt(data.length() - 7));
+                        lastNinthIndex = String.valueOf(data.charAt(data.length() - 9));
                     }
                     else
                     {
                         clickIndex = "0";
                         impressionIndex="0";
-                        lastView_Click="0";
-                    }
+                        lastView_Click = "0";
+                        lastSeventhIndex = "0";
+                        lastNinthIndex = "0";
 
+                    }
                     mBuilder.setNeutralButton(AppConstant.DIALOG_DISMISS, new DialogInterface.OnClickListener() {
                         @Override
                         public void onClick(DialogInterface dialog, int which) {
@@ -1410,8 +1165,8 @@ private static void receivedNotification(final Payload payload){
                         if(impressionIndex.equalsIgnoreCase("1")) {
                             viewNotificationApi(payload);
                         }
-                        if (lastView_Click.equalsIgnoreCase("1")){
-                            lastViewNotificationApi();
+                        if (lastView_Click.equalsIgnoreCase("1") || lastSeventhIndex.equalsIgnoreCase("1")){
+                            lastViewNotificationApi(payload, lastView_Click, lastSeventhIndex, lastNinthIndex);
                         }
                         DATB.notificationView(payload);
 
@@ -1460,22 +1215,22 @@ private static void receivedNotification(final Payload payload){
         intent.putExtra(AppConstant.CLICKINDEX, finalClickIndex);
         intent.putExtra(AppConstant.LASTCLICKINDEX, lastClick);
         intent.putExtra(AppConstant.PUSH,payload.getPush_type());
-
-
-
+        intent.putExtra(AppConstant.CFGFORDOMAIN, payload.getCfg());
         return intent;
     }
 
     private static void viewNotificationApi(final Payload payload){
 
         final PreferenceUtil preferenceUtil = PreferenceUtil.getInstance(DATB.appContext);
-
+        String imprURL;
+        int dataCfg = Util.getBinaryToDecimal(payload.getCfg());
+        if (dataCfg > 0){
+            imprURL = "https://impr" + dataCfg + ".izooto.com/imp" + dataCfg;
+        }else
+            imprURL = RestClient.IMPRESSION_URL;
         String api_url = AppConstant.API_PID +  preferenceUtil.getDataBID(AppConstant.APPPID) +
-                AppConstant.CID_ + payload.getId() + AppConstant.ANDROID_ID + Util.getAndroidId(DATB.appContext) + AppConstant.RID_ + payload.getRid() + "&op=view"+AppConstant.PUSH_TYPE+payload.getPush_type();
-
-        RestClient.postRequest(RestClient.IMPRESSION_URL + api_url, new RestClient.ResponseHandler() {
-
-
+                AppConstant.CID_ + payload.getId() + AppConstant.ANDROID_ID + Util.getAndroidId(DATB.appContext) + AppConstant.RID_ + payload.getRid() + "&op=view"+AppConstant.PUSH_TYPE+payload.getPush_type();;
+        RestClient.postRequest(imprURL + api_url, new RestClient.ResponseHandler() {
             @Override
             void onFailure(int statusCode, String response, Throwable throwable) {
                 super.onFailure(statusCode, response, throwable);
@@ -1485,8 +1240,7 @@ private static void receivedNotification(final Payload payload){
             void onSuccess(String response) {
                 super.onSuccess(response);
                 if (payload != null)
-                    Log.v("imp","call");
-
+                    Log.v("i","c");
 
             }
         });
@@ -1502,36 +1256,6 @@ private static void receivedNotification(final Payload payload){
         else
             phone = AppConstant.NO;
         return phone;
-    }
-    private static void lastViewNotificationApi(){
-        final PreferenceUtil preferenceUtil = PreferenceUtil.getInstance(DATB.appContext);
-        String dayDiff = Util.dayDifference(Util.getTime(), preferenceUtil.getStringData(AppConstant.CURRENT_DATE_VIEW));
-        String time = preferenceUtil.getStringData(AppConstant.CURRENT_DATE_VIEW);
-        if (time.isEmpty() || Integer.parseInt(dayDiff) >= 7) {
-            preferenceUtil.setStringData(AppConstant.CURRENT_DATE_VIEW, Util.getTime());
-            String encodeData = "";
-            try {
-                HashMap<String, Object> data = new HashMap<>();
-                data.put(AppConstant.LAST_NOTIFICAION_VIEWED, true);
-                JSONObject jsonObject = new JSONObject(data);
-                encodeData = URLEncoder.encode(jsonObject.toString(), AppConstant.UTF);
-            } catch (Exception ex) {
-                ex.printStackTrace();
-            }
-            String api_url = AppConstant.API_PID + preferenceUtil.getDataBID(AppConstant.APPPID) + AppConstant.VER_ + AppConstant.SDKVERSION +
-                    AppConstant.ANDROID_ID + Util.getAndroidId(DATB.appContext) + AppConstant.VAL + encodeData + AppConstant.ACT + "add" + AppConstant.ISID_ + "1" + AppConstant.ET_ + "userp";
-            RestClient.postRequest(RestClient.LASTNOTIFICATIONVIEWURL + api_url, new RestClient.ResponseHandler() {
-                @Override
-                void onFailure(int statusCode, String response, Throwable throwable) {
-                    super.onFailure(statusCode, response, throwable);
-                }
-                @Override
-                void onSuccess(String response) {
-                    super.onSuccess(response);
-                    Log.v(" l", "i");
-                }
-            });
-        }
     }
     private static int getBadgeIcon(String setBadgeIcon){
         int bIicon;
@@ -1561,7 +1285,7 @@ private static void receivedNotification(final Payload payload){
 
                         }else {
 
-                            bIicon =R.drawable.ic_notifications_black_24dp;// iZooto.appContext.getApplicationInfo().logo;
+                            bIicon =R.drawable.ic_notifications_black_24dp;
                         }
 
                     }
@@ -1596,5 +1320,70 @@ private static void receivedNotification(final Payload payload){
         return iconColor;
     }
 
+    private static void lastViewNotificationApi(final Payload payload, String lastViewIndex, String seventhCFG, String ninthCFG){
+        final PreferenceUtil preferenceUtil = PreferenceUtil.getInstance(DATB.appContext);
+        String dayDiff1 = Util.dayDifference(Util.getTime(), preferenceUtil.getStringData(AppConstant.CURRENT_DATE_VIEW_WEEKLY));
+        String updateWeekly = preferenceUtil.getStringData(AppConstant.CURRENT_DATE_VIEW_WEEKLY);
+        String updateDaily = preferenceUtil.getStringData(AppConstant.CURRENT_DATE_VIEW_DAILY);
+        String time = preferenceUtil.getStringData(AppConstant.CURRENT_DATE_VIEW);
 
+        if (seventhCFG.equalsIgnoreCase("1")){
+
+            if (ninthCFG.equalsIgnoreCase("1")){
+                if (!updateDaily.equalsIgnoreCase(Util.getTime())){
+                    preferenceUtil.setStringData(AppConstant.CURRENT_DATE_VIEW_DAILY, Util.getTime());
+                    lastViewNotification(payload);
+                }
+            }else {
+                if (updateWeekly.isEmpty() || Integer.parseInt(dayDiff1) >= 7){
+                    preferenceUtil.setStringData(AppConstant.CURRENT_DATE_VIEW_WEEKLY, Util.getTime());
+                    lastViewNotification(payload);
+                }
+            }
+        }else if (lastViewIndex.equalsIgnoreCase("1") && seventhCFG.equalsIgnoreCase("0")){
+            String dayDiff = Util.dayDifference(Util.getTime(), preferenceUtil.getStringData(AppConstant.CURRENT_DATE_VIEW));
+            if (time.isEmpty() || Integer.parseInt(dayDiff) >= 7) {
+                preferenceUtil.setStringData(AppConstant.CURRENT_DATE_VIEW, Util.getTime());
+                lastViewNotification(payload);
+            }
+        }
+
+
+    }
+
+    private static void lastViewNotification(final Payload payload){
+        final PreferenceUtil preferenceUtil = PreferenceUtil.getInstance(DATB.appContext);
+        String encodeData = "";
+        try {
+            HashMap<String, Object> data = new HashMap<>();
+            data.put(AppConstant.LAST_NOTIFICAION_VIEWED, true);
+            JSONObject jsonObject = new JSONObject(data);
+            encodeData = URLEncoder.encode(jsonObject.toString(), AppConstant.UTF);
+        } catch (Exception ex) {
+            ex.printStackTrace();
+        }
+        String limURL;
+        int dataCfg = Util.getBinaryToDecimal(payload.getCfg());
+
+        if (dataCfg > 0){
+            limURL = "https://lim"+ dataCfg + ".izooto.com/lim" + dataCfg;
+        }else
+            limURL = RestClient.LASTNOTIFICATIONVIEWURL;
+
+        String api_url = AppConstant.API_PID + preferenceUtil.getDataBID(AppConstant.APPPID) + AppConstant.VER_ + Util.getSDKVersion(DATB.appContext) +
+                AppConstant.ANDROID_ID + Util.getAndroidId(DATB.appContext) + AppConstant.VAL + encodeData + AppConstant.ACT + "add" + AppConstant.ISID_ + "1" + AppConstant.ET_ + "userp";
+        RestClient.postRequest(limURL + api_url, new RestClient.ResponseHandler() {
+            @Override
+            void onFailure(int statusCode, String response, Throwable throwable) {
+                super.onFailure(statusCode, response, throwable);
+            }
+
+            @Override
+            void onSuccess(String response) {
+                super.onSuccess(response);
+                Log.v("l", "c");
+
+            }
+        });
+    }
 }

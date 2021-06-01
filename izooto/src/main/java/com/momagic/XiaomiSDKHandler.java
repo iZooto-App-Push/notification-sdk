@@ -47,7 +47,7 @@ public class XiaomiSDKHandler implements XiaomiSDKHandlerListener {
         }
         try {
                 token = MiPushClient.getRegId(mContext);
-                Log.e("Token",token);
+                Log.v("Token",token);
 
         } catch (Throwable t) {
         }
@@ -89,7 +89,7 @@ public class XiaomiSDKHandler implements XiaomiSDKHandlerListener {
             try {
                 register(appId, appKey);
             } catch (Throwable t) {
-                Log.e("MIException",toString());
+                Log.v("MIException",toString());
             }
         }
     }

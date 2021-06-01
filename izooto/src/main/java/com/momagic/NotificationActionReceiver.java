@@ -34,6 +34,7 @@ public class NotificationActionReceiver extends BroadcastReceiver {
     private String lastClickIndex = "0";
     public  static  String medClick="";
     private String pushType;
+    private int cfg;
 
 
 
@@ -60,7 +61,15 @@ public class NotificationActionReceiver extends BroadcastReceiver {
             }
 
             if(clickIndex.equalsIgnoreCase("1")) {
-                RestClient.postRequest(RestClient.NOTIFICATIONCLICK + api_url, new RestClient.ResponseHandler() {
+                String clkURL;
+                int dataCfg = Util.getBinaryToDecimal(cfg);
+
+                if (dataCfg > 0){
+                    clkURL = "https://clk"+ dataCfg + ".izooto.com/clk" +dataCfg;
+                }else
+                    clkURL = RestClient.NOTIFICATIONCLICK;
+
+                RestClient.postRequest(clkURL + api_url, new RestClient.ResponseHandler() {
 
 
                     @Override
@@ -71,39 +80,51 @@ public class NotificationActionReceiver extends BroadcastReceiver {
                     @Override
                     void onSuccess(String response) {
                         super.onSuccess(response);
-                         Log.v("c","c");
+                        // Log.e("Click","call");
                     }
                 });
             }
-            if (lastClickIndex.equalsIgnoreCase("1")) {
-                String dayDiff = Util.dayDifference(Util.getTime(), preferenceUtil.getStringData(AppConstant.CURRENT_DATE_CLICK));
-                String time = preferenceUtil.getStringData(AppConstant.CURRENT_DATE_CLICK);
-                if (time.isEmpty() || Integer.parseInt(dayDiff) >= 7) {
-                    preferenceUtil.setStringData(AppConstant.CURRENT_DATE_CLICK, Util.getTime());
-                    String encodeData = "";
-                    try {
-                        HashMap<String, Object> data = new HashMap<>();
-                        data.put(AppConstant.LAST_NOTIFICAION_CLICKED, true);
-                        JSONObject jsonObject = new JSONObject(data);
-                        encodeData = URLEncoder.encode(jsonObject.toString(), AppConstant.UTF);
-                    } catch (Exception ex) {
-                        ex.printStackTrace();
-                    }
-                    String lastClickAPIUrl = AppConstant.API_PID + preferenceUtil.getDataBID(AppConstant.APPPID) + AppConstant.VER_ + AppConstant.SDKVERSION +
-                            AppConstant.ANDROID_ID + Util.getAndroidId(context) + AppConstant.VAL + encodeData + AppConstant.ACT + "add" + AppConstant.ISID_ + "1" + AppConstant.ET_ + "userp";
-                    RestClient.postRequest(RestClient.LASTNOTIFICATIONCLICKURL + lastClickAPIUrl, new RestClient.ResponseHandler() {
-                        @Override
-                        void onFailure(int statusCode, String response, Throwable throwable) {
-                            super.onFailure(statusCode, response, throwable);
-                        }
-                        @Override
-                        void onSuccess(String response) {
-                            super.onSuccess(response);
-                            Log.v(" l", "c");
-                        }
-                    });
-                }
+            String lastEighthIndex = "0";
+            String lastTenthIndex = "0";
+            String dataInBinary = Util.getIntegerToBinary(cfg);
+            if(dataInBinary!=null && !dataInBinary.isEmpty()) {
+                lastEighthIndex = String.valueOf(dataInBinary.charAt(dataInBinary.length() - 8));
+                lastTenthIndex = String.valueOf(dataInBinary.charAt(dataInBinary.length() - 10));
             }
+            else {
+                lastEighthIndex = "0";
+                lastTenthIndex = "0";
+            }
+            if (lastClickIndex.equalsIgnoreCase("1") || lastEighthIndex.equalsIgnoreCase("1")) {
+
+                String dayDiff1 = Util.dayDifference(Util.getTime(), preferenceUtil.getStringData(AppConstant.CURRENT_DATE_CLICK_WEEKLY));
+                String updateWeekly = preferenceUtil.getStringData(AppConstant.CURRENT_DATE_CLICK_WEEKLY);
+                String updateDaily = preferenceUtil.getStringData(AppConstant.CURRENT_DATE_CLICK_DAILY);
+                String time = preferenceUtil.getStringData(AppConstant.CURRENT_DATE_CLICK);
+
+                if (lastEighthIndex.equalsIgnoreCase("1")){
+
+                    if (lastTenthIndex.equalsIgnoreCase("1")){
+                        if (!updateDaily.equalsIgnoreCase(Util.getTime())){
+                            preferenceUtil.setStringData(AppConstant.CURRENT_DATE_CLICK_DAILY, Util.getTime());
+                            lastClickAPI(context);
+                        }
+                    }else {
+                        if (updateWeekly.isEmpty() || Integer.parseInt(dayDiff1) >= 7){
+                            preferenceUtil.setStringData(AppConstant.CURRENT_DATE_CLICK_WEEKLY, Util.getTime());
+                            lastClickAPI(context);
+                        }
+                    }
+                }else if (lastClickIndex.equalsIgnoreCase("1") && lastEighthIndex.equalsIgnoreCase("0")){
+                    String dayDiff = Util.dayDifference(Util.getTime(), preferenceUtil.getStringData(AppConstant.CURRENT_DATE_CLICK));
+                    if (time.isEmpty() || Integer.parseInt(dayDiff) >= 7) {
+                        preferenceUtil.setStringData(AppConstant.CURRENT_DATE_CLICK, Util.getTime());
+                        lastClickAPI(context);
+                    }
+                }
+
+            }
+
         } catch (Exception e) {
             e.printStackTrace();
         }
@@ -174,6 +195,46 @@ public class NotificationActionReceiver extends BroadcastReceiver {
         }
 
     }
+    private void lastClickAPI(Context context){
+        final PreferenceUtil preferenceUtil = PreferenceUtil.getInstance(context);
+        String appVersion = Util.getSDKVersion(context);
+        preferenceUtil.setStringData(AppConstant.CURRENT_DATE_CLICK, Util.getTime());
+        String encodeData = "";
+        try {
+            HashMap<String, Object> data = new HashMap<>();
+            data.put(AppConstant.LAST_NOTIFICAION_CLICKED, true);
+            JSONObject jsonObject = new JSONObject(data);
+            encodeData = URLEncoder.encode(jsonObject.toString(), AppConstant.UTF);
+        } catch (Exception ex) {
+            ex.printStackTrace();
+        }
+
+        String lciURL;
+        int dataCfg = Util.getBinaryToDecimal(cfg);
+
+        if (dataCfg > 0){
+            lciURL = "https://lci" +dataCfg + ".izooto.com/lci" + dataCfg;
+        }else
+            lciURL = RestClient.LASTNOTIFICATIONCLICKURL;
+
+        String lastClickAPIUrl = AppConstant.API_PID + preferenceUtil.getDataBID(AppConstant.APPPID) + AppConstant.VER_ + appVersion +
+                AppConstant.ANDROID_ID + Util.getAndroidId(context) + AppConstant.VAL + encodeData + AppConstant.ACT + "add" + AppConstant.ISID_ + "1" + AppConstant.ET_ + "userp";
+        RestClient.postRequest(lciURL + lastClickAPIUrl, new RestClient.ResponseHandler() {
+
+
+            @Override
+            void onFailure(int statusCode, String response, Throwable throwable) {
+                super.onFailure(statusCode, response, throwable);
+            }
+
+            @Override
+            void onSuccess(String response) {
+                super.onSuccess(response);
+                // Log.e("Click","call");
+                Log.v("l", "c");
+            }
+        });
+    }
 
     private void getBundleData(Context context, Intent intent) {
         Bundle tempBundle = intent.getExtras();
@@ -212,6 +273,8 @@ public class NotificationActionReceiver extends BroadcastReceiver {
                 lastClickIndex=tempBundle.getString(AppConstant.LASTCLICKINDEX);
             if(tempBundle.containsKey(AppConstant.PUSH))
                 pushType=tempBundle.getString(AppConstant.PUSH);
+            if(tempBundle.containsKey(AppConstant.CFGFORDOMAIN))
+                cfg=tempBundle.getInt(AppConstant.CFGFORDOMAIN);
 
 
 

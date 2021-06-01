@@ -288,7 +288,12 @@ public interface AppConstant {
     String MIAPPID="Mi_app_id";
     String CHECK_PAYLOAD="Title";
     String CLOUD_PUSH="Counter";
-
+    String CHECKDOMAIN="checkDomain";
+    String CFGFORDOMAIN= "cfgfordomain";
+    String CURRENT_DATE_VIEW_WEEKLY = "currentDateViewWeekly";
+    String CURRENT_DATE_VIEW_DAILY = "currentDateViewDaily";
+    String CURRENT_DATE_CLICK_WEEKLY = "currentDateClickWeekly";
+    String CURRENT_DATE_CLICK_DAILY = "currentDateClickDaily";
 }
 
 

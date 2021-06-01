@@ -94,7 +94,6 @@ public class Util {
     public static Bitmap getBitmapFromURL(String src) {
         try {
             URL url = new URL(src);
-            Log.e("CallURL",src);
             HttpURLConnection connection = (HttpURLConnection) url.openConnection();
             connection.setDoInput(true);
             connection.connect();
@@ -111,7 +110,7 @@ public class Util {
 
     public static String getAndroidId(Context mContext){
         String android_id = Settings.Secure.getString(mContext.getContentResolver(), Settings.Secure.ANDROID_ID);
-        Log.e(TAG, "android id ---- "+android_id );
+        Log.v(TAG, "android id ---- "+android_id );
         return android_id;
     }
 
@@ -355,4 +354,22 @@ public class Util {
         }
         return dayDifference;
     }
+    public static int getBinaryToDecimal(int cfg){
+        String fourthDg, fifthDg, sixthDg;
+
+        String data = Util.getIntegerToBinary(cfg);
+        if(data!=null && !data.isEmpty()) {
+            fourthDg = String.valueOf(data.charAt(data.length() - 4));
+            fifthDg = String.valueOf(data.charAt(data.length() - 5));
+            sixthDg = String.valueOf(data.charAt(data.length() - 6));
+        }else {
+            fourthDg = "0";
+            fifthDg = "0";
+            sixthDg = "0";
+        }
+        String dataCFG = sixthDg + fifthDg + fourthDg;
+        int decimalData = Integer.parseInt(dataCFG,2);
+        return decimalData;
+    }
+
 }

@@ -40,17 +40,15 @@ import java.util.Map;
 
 @SuppressLint("MissingFirebaseInstanceTokenRefresh")
 public class DATBMessagingService extends FirebaseMessagingService {
-
     private  Payload payload = null;
-
-
-
     @Override
     public void onMessageReceived(RemoteMessage remoteMessage) {
         try {
             if (remoteMessage.getData().size() > 0) {
                 Map<String, String> data = remoteMessage.getData();
                 handleNow(data);
+                Log.v("Push Type","fcm");
+
 
             }
             if (remoteMessage.getNotification() != null) {
@@ -105,18 +103,19 @@ public class DATBMessagingService extends FirebaseMessagingService {
 
 
             try {
-                if(data.get("an") !=null && data.get("g")!=null)
+                if(data.get(AppConstant.AD_NETWORK) !=null && data.get(AppConstant.GLOBAL)!=null)
                 {
                     AdMediation.getAdJsonData(data);
 
-                    preferenceUtil.setBooleanData("Mediation",true);
+                    preferenceUtil.setBooleanData(AppConstant.MEDIATION,true);
 
                 }
                 else {
-                    preferenceUtil.setBooleanData("Mediation", false);
+                    preferenceUtil.setBooleanData(AppConstant.MEDIATION, false);
                     JSONObject payloadObj = new JSONObject(data);
                     if (payloadObj.optLong(ShortpayloadConstant.CREATEDON) > PreferenceUtil.getInstance(this).getLongValue(AppConstant.DEVICE_REGISTRATION_TIMESTAMP)) {
                         payload = new Payload();
+                        payload.setCreated_Time(payloadObj.optString(ShortpayloadConstant.CREATEDON));
                         payload.setFetchURL(payloadObj.optString(ShortpayloadConstant.FETCHURL));
                         payload.setKey(payloadObj.optString(ShortpayloadConstant.KEY));
                         payload.setId(payloadObj.optString(ShortpayloadConstant.ID));
@@ -159,6 +158,7 @@ public class DATBMessagingService extends FirebaseMessagingService {
                         payload.setRawPayload(payloadObj.optString(ShortpayloadConstant.RAWDATA));
                         payload.setAp(payloadObj.optString(ShortpayloadConstant.ADDITIONALPARAM));
                         payload.setCfg(payloadObj.optInt(ShortpayloadConstant.CFG));
+                        payload.setPush_type(AppConstant.PUSH_FCM);
 
                     } else
                         return;

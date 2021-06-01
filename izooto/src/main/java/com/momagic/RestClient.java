@@ -91,7 +91,6 @@ public class RestClient {
         try {
             if (url.contains(AppConstant.HTTPS) || url.contains(AppConstant.HTTP) || url.contains(AppConstant.IMPR)) {
                 con = (HttpURLConnection) new URL(url).openConnection();
-
             } else {
                 con = (HttpURLConnection) new URL(BASE_URL + url).openConnection();
             }

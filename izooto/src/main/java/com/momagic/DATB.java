@@ -113,7 +113,6 @@ public class DATB {
                                 String hms_appId=jsonObject.optString(AppConstant.HMS_APP_ID);
                                 mAppId = jsonObject.getString(AppConstant.APPPID);
                                 preferenceUtil.setDataBID(AppConstant.APPPID,mAppId);
-                                Log.e("JSON",jsonObject.toString());
                                 trackAdvertisingId();
                                 if(!mKey.isEmpty() && !mId.isEmpty())
                                 {
@@ -202,7 +201,7 @@ public class DATB {
 
     protected void start(final Context context, final Listener listener) {
         if (listener == null) {
-            Log.e(AppConstant.APP_NAME_TAG, "getAdvertisingId - Error: null listener, dropping call");
+            Log.v(AppConstant.APP_NAME_TAG, "getAdvertisingId - Error: null listener, dropping call");
         } else {
             mHandler = new Handler(Looper.getMainLooper());
             mListener = listener;
@@ -571,7 +570,7 @@ public class DATB {
                 });
             }
         } else {
-            Log.e(AppConstant.APP_NAME_TAG, "Event length more than 32...");
+            Log.v(AppConstant.APP_NAME_TAG, "Event length more than 32...");
         }
     }
 
