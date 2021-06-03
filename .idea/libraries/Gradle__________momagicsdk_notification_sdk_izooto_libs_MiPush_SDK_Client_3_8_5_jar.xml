@@ -1,5 +1,5 @@
 <component name="libraryTable">
-  <library name="Gradle: ./izooto/libs/MiPush_SDK_Client_3_8_5.jar">
+  <library name="Gradle: ./../../momagicsdk/notification-sdk/izooto/libs/MiPush_SDK_Client_3_8_5.jar">
     <CLASSES>
       <root url="jar://$PROJECT_DIR$/izooto/libs/MiPush_SDK_Client_3_8_5.jar!/" />
     </CLASSES>

@@ -114,12 +114,12 @@ public class DATB {
                                 mAppId = jsonObject.getString(AppConstant.APPPID);
                                 preferenceUtil.setDataBID(AppConstant.APPPID,mAppId);
                                 trackAdvertisingId();
-                                if(!mKey.isEmpty() && !mId.isEmpty())
+                                if(!mKey.isEmpty() && !mId.isEmpty() && Build.MANUFACTURER.equalsIgnoreCase("Xiaomi"))
                                 {
                                     XiaomiSDKHandler xiaomiSDKHandler =new XiaomiSDKHandler(DATB.appContext,mId,mKey);
                                     xiaomiSDKHandler.onMIToken();
                                 }
-                                if (!hms_appId.isEmpty()) {
+                                if (!hms_appId.isEmpty() && Build.MANUFACTURER.equalsIgnoreCase("Huawei")) {
                                       initHmsService(appContext);
                                 }
 
@@ -262,7 +262,7 @@ public class DATB {
     private static void registerToken() {
         Util.sleepTime(10000);
         final PreferenceUtil preferenceUtil = PreferenceUtil.getInstance(appContext);
-        if (!preferenceUtil.getBoolean(AppConstant.IS_TOKEN_UPDATED)) {
+        if (!preferenceUtil.getBoolean(AppConstant.IS_TOKEN_UPDATED) || !preferenceUtil.getStringData(AppConstant.HMS_TOKEN).isEmpty()) {
             String api_url = AppConstant.ADDURL + AppConstant.STYPE + AppConstant.PID + mAppId + AppConstant.BTYPE_ + AppConstant.BTYPE + AppConstant.DTYPE_ + AppConstant.DTYPE + AppConstant.TIMEZONE + System.currentTimeMillis() + AppConstant.APPVERSION + Util.getSDKVersion(DATB.appContext) +
                     AppConstant.OS + AppConstant.SDKOS + AppConstant.ALLOWED_ + AppConstant.ALLOWED + AppConstant.ANDROID_ID + Util.getAndroidId(appContext) + AppConstant.CHECKSDKVERSION +Util.getSDKVersion(DATB.appContext)+AppConstant.LANGUAGE+Util.getDeviceLanguage() +AppConstant.QSDK_VERSION +AppConstant.SDKVERSION+
                     AppConstant.TOKEN +preferenceUtil.getStringData(AppConstant.FCM_DEVICE_TOKEN) + AppConstant.ADVERTISEMENTID +preferenceUtil.getStringData(AppConstant.ADVERTISING_ID)+AppConstant.XIAOMITOKEN+preferenceUtil.getStringData(AppConstant.XiaomiToken)+ AppConstant.PACKAGE_NAME+appContext.getPackageName()+AppConstant.SDKTYPE+SDKDEF

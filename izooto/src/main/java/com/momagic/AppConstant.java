@@ -258,7 +258,7 @@ public interface AppConstant {
     String AD_TYPE="tp";
     String NOTIFICATION_MESSAGE="Send Notification";
     String YES="yes";
-    String SDKVERSION="1.0.3";
+    String SDKVERSION="1.0.4";
     String QSDK_VERSION="&av=";
     String SDK="SDKVERSION";
     String PACKAGE_NAME="&mpn=";
