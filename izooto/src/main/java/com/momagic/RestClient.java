@@ -28,8 +28,8 @@ public class RestClient {
     public static final String LASTNOTIFICATIONCLICKURL="https://lci.izooto.com/lci";
     public static final String LASTNOTIFICATIONVIEWURL="https://lim.izooto.com/lim";
     public static final String LASTVISITURL="https://lvi.izooto.com/lvi";
-    public static final String MEDIATION_IMPRESSION="https://med.izooto.com/medi";
-    public static final String MEDIATION_CLICKS="https://med.izooto.com/medc";
+    public static final String MEDIATION_IMPRESSION="https://med.dtblt.com/medi";
+    public static final String MEDIATION_CLICKS="https://med.dtblt.com/medc";
     private static int getThreadTimeout(int timeout) {
         return timeout + 5000;
     }

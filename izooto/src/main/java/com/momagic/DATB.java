@@ -837,7 +837,6 @@ public class DATB {
                         }
                     }
                 }
-                Log.e(AppConstant.APP_NAME_TAG, "subscribeTopic: add " + topicList);
                 topicApi(AppConstant.ADD_TOPIC, topicList);
             }
         }

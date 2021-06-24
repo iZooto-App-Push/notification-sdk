@@ -21,3 +21,4 @@
 #-renamesourcefileattribute SourceFile
 -keep class com.momagic.XiaomiPushReceiver{*;}
 -dontwarn com.xiaomi.push.**
+-dontwarn com.huawei.**
