@@ -43,6 +43,10 @@ public class MainActivity extends AppCompatActivity
                 Log.e("Token",token);
             }
         });
+
+
+
+       DATB.setSubscriberID("9807484803");
     }
 
 

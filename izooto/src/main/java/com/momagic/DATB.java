@@ -540,6 +540,36 @@ public class DATB {
                 addEventAPI(eventName,newListEvent);
         }
     }
+    public static void setSubscriberID(String subscriberID)
+    {
+        final PreferenceUtil preferenceUtil = PreferenceUtil.getInstance(appContext);
+        if (subscriberID != null && !subscriberID.isEmpty()) {
+            if (!preferenceUtil.getDataBID(AppConstant.APPPID).isEmpty() && !preferenceUtil.getStringData(AppConstant.FCM_DEVICE_TOKEN).isEmpty()) {
+                String api_url = AppConstant.API_PID + preferenceUtil.getDataBID(AppConstant.APPPID)
+                        + AppConstant.OPERATION + "add_property" +
+                        AppConstant.BTYPE_ + AppConstant.BTYPE +
+                        "&pte=1" +
+                        AppConstant.ANDROID_ID + Util.getAndroidId(appContext)
+                        + "&name=subscriber_id"
+                        + "&at=" + preferenceUtil.getStringData(AppConstant.FCM_DEVICE_TOKEN)
+                        + AppConstant.VALUE + subscriberID;
+                    RestClient.postRequest(RestClient.SUBSCRIBER_URL + api_url, new RestClient.ResponseHandler() {
+                        @Override
+                        void onFailure(int statusCode, String response, Throwable throwable) {
+                            super.onFailure(statusCode, response, throwable);
+                        }
+
+                        @Override
+                        void onSuccess(String response) {
+                            super.onSuccess(response);
+                        }
+                    });
+                }
+
+        }
+        }
+
+
     private static void addEventAPI(String eventName,HashMap<String,Object> data){
         final PreferenceUtil preferenceUtil = PreferenceUtil.getInstance(appContext);
         String encodeData = "";

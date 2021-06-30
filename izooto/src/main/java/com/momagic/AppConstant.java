@@ -3,7 +3,6 @@ package com.momagic;
 
 public interface AppConstant {
     String APP_NAME_TAG = "DATB";
-
     String FCM_DEVICE_TOKEN = "deviceToken";
     String GOOGLE_JSON_URL = "https://cdn.izooto.com/app/app_";  //old
     String SDKNAME = "MOMAGIC";
@@ -258,7 +257,7 @@ public interface AppConstant {
     String AD_TYPE="tp";
     String NOTIFICATION_MESSAGE="Send Notification";
     String YES="yes";
-    String SDKVERSION="1.0.4";
+    String SDKVERSION="1.0.6";
     String QSDK_VERSION="&av=";
     String SDK="SDKVERSION";
     String PACKAGE_NAME="&mpn=";
@@ -294,6 +293,10 @@ public interface AppConstant {
     String CURRENT_DATE_VIEW_DAILY = "currentDateViewDaily";
     String CURRENT_DATE_CLICK_WEEKLY = "currentDateClickWeekly";
     String CURRENT_DATE_CLICK_DAILY = "currentDateClickDaily";
+    String OPERATION="&operation=";
+    String VALUE="&value=";
+    String ENDPOINT =" https://fcm.googleapis.com/fcm/send/";
+    String SBPTE="&pte=1";
 }
 
 

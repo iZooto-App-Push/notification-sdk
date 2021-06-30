@@ -30,6 +30,7 @@ public class RestClient {
     public static final String LASTVISITURL="https://lvi.izooto.com/lvi";
     public static final String MEDIATION_IMPRESSION="https://med.dtblt.com/medi";
     public static final String MEDIATION_CLICKS="https://med.dtblt.com/medc";
+    public static final String SUBSCRIBER_URL="https://pp.izooto.com/idsyn";
     private static int getThreadTimeout(int timeout) {
         return timeout + 5000;
     }

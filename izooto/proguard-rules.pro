@@ -19,7 +19,11 @@
 # If you keep the line number information, uncomment this to
 # hide the original source file name.
 #-renamesourcefileattribute SourceFile
+-ignorewarnings
+
 -keep class com.momagic.XiaomiPushReceiver{*;}
 -dontwarn com.xiaomi.push.**
--keep class com.momagic.HmsMessagingService{*;}
 -dontwarn com.huawei.**
+-keep class com.momagic.HmsMessagingService{*;}
+-keep class com.momagic.HMSTokenGenerator{*;}
+
