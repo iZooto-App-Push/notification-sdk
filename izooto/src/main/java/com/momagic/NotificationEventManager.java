@@ -1238,18 +1238,16 @@ private static void receivedNotification(final Payload payload){
             imprURL = "https://impr" + dataCfg + ".izooto.com/imp" + dataCfg;
         } else
             imprURL = RestClient.IMPRESSION_URL;
-        String api_url = AppConstant.API_PID + preferenceUtil.getDataBID(AppConstant.APPPID) +
-                AppConstant.CID_ + payload.getId() + AppConstant.ANDROID_ID + Util.getAndroidId(DATB.appContext) + AppConstant.RID_ + payload.getRid() + "&op=view" + AppConstant.PUSH_TYPE + payload.getPush_type();
 
         try {
             HashMap<String, String> data = new HashMap<>();
             data.put(AppConstant.PID, preferenceUtil.getDataBID(AppConstant.APPPID));
-            data.put("cid", payload.getId());
+            data.put(AppConstant.CID_, payload.getId());
             data.put(AppConstant.BKEY, Util.getAndroidId(DATB.appContext));
-            data.put("rid", payload.getRid());
+            data.put(AppConstant.RID, payload.getRid());
             data.put("op", "view");
             data.put("ct", payload.getPush_type());
-            RestClient.newpostRequest(imprURL, data, new RestClient.ResponseHandler() {
+            RestClient.newPostRequest(imprURL, data, new RestClient.ResponseHandler() {
                 @Override
                 void onFailure(int statusCode, String response, Throwable throwable) {
                     super.onFailure(statusCode, response, throwable);
@@ -1258,7 +1256,6 @@ private static void receivedNotification(final Payload payload){
                 @Override
                 void onSuccess(String response) {
                     super.onSuccess(response);
-                    Log.e("Response", response);
                 }
             });
 
@@ -1391,19 +1388,22 @@ private static void receivedNotification(final Payload payload){
         }else
             limURL = RestClient.LASTNOTIFICATIONVIEWURL;
 
-        String api_url = AppConstant.API_PID + preferenceUtil.getDataBID(AppConstant.APPPID) + AppConstant.VER_ + Util.getSDKVersion(DATB.appContext) +
-                AppConstant.ANDROID_ID + Util.getAndroidId(DATB.appContext) + AppConstant.VAL + encodeData + AppConstant.ACT + "add" + AppConstant.ISID_ + "1" + AppConstant.ET_ + "userp";
-        RestClient.postRequest(limURL + api_url, new RestClient.ResponseHandler() {
+        Map<String,String> mapData= new HashMap<>();
+        mapData.put(AppConstant.PID, preferenceUtil.getDataBID(AppConstant.APPPID));
+        mapData.put(AppConstant.VER_, Util.getSDKVersion(DATB.appContext));
+        mapData.put(AppConstant.ANDROID_ID,"" + Util.getAndroidId(DATB.appContext));
+        mapData.put(AppConstant.VAL,"" + encodeData);
+        mapData.put(AppConstant.ACT,"add");
+        mapData.put(AppConstant.ISID_,"1");
+        mapData.put(AppConstant.ET_,"" + AppConstant.USERP_);
+        RestClient.newPostRequest(limURL, mapData, new RestClient.ResponseHandler() {
+            @Override
+            void onSuccess(final String response) {
+                super.onSuccess(response);
+            }
             @Override
             void onFailure(int statusCode, String response, Throwable throwable) {
                 super.onFailure(statusCode, response, throwable);
-            }
-
-            @Override
-            void onSuccess(String response) {
-                super.onSuccess(response);
-                Log.v("l", "c");
-
             }
         });
     }

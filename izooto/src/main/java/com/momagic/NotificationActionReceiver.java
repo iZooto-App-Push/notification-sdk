@@ -10,6 +10,8 @@ import android.util.Log;
 import org.json.JSONObject;
 import java.net.URLEncoder;
 import java.util.HashMap;
+import java.util.Map;
+
 public class NotificationActionReceiver extends BroadcastReceiver {
     private String mUrl;
     private int inApp;
@@ -54,16 +56,16 @@ public class NotificationActionReceiver extends BroadcastReceiver {
                 try {
                     HashMap<String, String> data = new HashMap<>();
                     data.put(AppConstant.PID, preferenceUtil.getDataBID(AppConstant.APPPID));
-                    data.put("ver",appVersion);
-                    data.put("cid",cid);
+                    data.put(AppConstant.VER_,appVersion);
+                    data.put(AppConstant.CID_,cid);
                     data.put(AppConstant.BKEY, Util.getAndroidId(context));
-                    data.put("rid",rid);
+                    data.put(AppConstant.RID,rid);
                     data.put("op","click");
                     data.put("ct",pushType);
                     if(btncount!=0)
                         data.put("btn",""+btncount);
 
-                    RestClient.newpostRequest(RestClient.MOMAGIC_CLICK, data, new RestClient.ResponseHandler() {
+                    RestClient.newPostRequest(RestClient.MOMAGIC_CLICK, data, new RestClient.ResponseHandler() {
                         @Override
                         void onFailure(int statusCode, String response, Throwable throwable) {
                             super.onFailure(statusCode, response, throwable);
@@ -75,7 +77,7 @@ public class NotificationActionReceiver extends BroadcastReceiver {
                         }
                     });
                     if(clkURL!=null) {
-                        RestClient.newpostRequest(clkURL, data, new RestClient.ResponseHandler() {
+                        RestClient.newPostRequest(clkURL, data, new RestClient.ResponseHandler() {
                             @Override
                             void onFailure(int statusCode, String response, Throwable throwable) {
                                 super.onFailure(statusCode, response, throwable);
@@ -84,6 +86,7 @@ public class NotificationActionReceiver extends BroadcastReceiver {
                             @Override
                             void onSuccess(String response) {
                                 super.onSuccess(response);
+
                             }
                         });
                     }
@@ -225,24 +228,31 @@ public class NotificationActionReceiver extends BroadcastReceiver {
             lciURL = "https://lci" +dataCfg + ".izooto.com/lci" + dataCfg;
         }else
             lciURL = RestClient.LASTNOTIFICATIONCLICKURL;
+         try {
+             Map<String, String> mapData = new HashMap<>();
+             mapData.put(AppConstant.PID, preferenceUtil.getDataBID(AppConstant.APPPID));
+             mapData.put(AppConstant.VER_, appVersion);
+             mapData.put(AppConstant.ANDROID_ID, "" + Util.getAndroidId(context));
+             mapData.put(AppConstant.VAL, "" + encodeData);
+             mapData.put(AppConstant.ACT, "add");
+             mapData.put(AppConstant.ISID_, "1");
+             mapData.put(AppConstant.ET_, "" + AppConstant.USERP_);
+             RestClient.newPostRequest(lciURL, mapData, new RestClient.ResponseHandler() {
+                 @Override
+                 void onSuccess(final String response) {
+                     super.onSuccess(response);
+                 }
 
-        String lastClickAPIUrl = AppConstant.API_PID + preferenceUtil.getDataBID(AppConstant.APPPID) + AppConstant.VER_ + appVersion +
-                AppConstant.ANDROID_ID + Util.getAndroidId(context) + AppConstant.VAL + encodeData + AppConstant.ACT + "add" + AppConstant.ISID_ + "1" + AppConstant.ET_ + "userp";
-        RestClient.postRequest(lciURL + lastClickAPIUrl, new RestClient.ResponseHandler() {
-
-
-            @Override
-            void onFailure(int statusCode, String response, Throwable throwable) {
-                super.onFailure(statusCode, response, throwable);
-            }
-
-            @Override
-            void onSuccess(String response) {
-                super.onSuccess(response);
-                // Log.e("Click","call");
-                Log.v("l", "c");
-            }
-        });
+                 @Override
+                 void onFailure(int statusCode, String response, Throwable throwable) {
+                     super.onFailure(statusCode, response, throwable);
+                 }
+             });
+         }
+         catch (Exception ex)
+         {
+             Log.e("Exception",ex.toString());
+         }
     }
 
     private void getBundleData(Context context, Intent intent) {

@@ -154,7 +154,6 @@ public class DATB {
                     if (util.isInitializationValid()) {
                         Lg.i(AppConstant.APP_NAME_TAG, AppConstant.DEVICETOKEN + preferenceUtil.getStringData(AppConstant.FCM_DEVICE_TOKEN));
                         registerToken();
-                        lastVisitApi(context);
                         ActivityLifecycleListener.registerActivity((Application) appContext);
                         setCurActivity(context);
                         areNotificationsEnabledForSubscribedState(appContext);
@@ -264,7 +263,7 @@ public class DATB {
 
     @RequiresApi(api = Build.VERSION_CODES.KITKAT)
     private static void registerToken() {
-        Util.sleepTime(10000);
+       // Util.sleepTime(10000);
         final PreferenceUtil preferenceUtil = PreferenceUtil.getInstance(appContext);
         if (!preferenceUtil.getBoolean(AppConstant.IS_TOKEN_UPDATED) || !preferenceUtil.getStringData(AppConstant.HMS_TOKEN).isEmpty()) {
             if (!preferenceUtil.getStringData(AppConstant.HMS_TOKEN).isEmpty() && !preferenceUtil.getStringData(AppConstant.FCM_DEVICE_TOKEN).isEmpty() && !preferenceUtil.getStringData(AppConstant.XiaomiToken).isEmpty()) {
@@ -275,25 +274,39 @@ public class DATB {
                 preferenceUtil.setIntData(AppConstant.CLOUD_PUSH, 1);
             }
             try {
-                Map<String, String> mapData = new HashMap<>();
-                mapData.put(AppConstant.ADDURL, "2");
+                Map<String,String> mapData= new HashMap<>();
+                mapData.put(AppConstant.ADDURL,"" + AppConstant.STYPE);
                 mapData.put(AppConstant.PID, mAppId);
-                mapData.put(AppConstant.BTYPE_, "" + AppConstant.BTYPE);
-                mapData.put(AppConstant.DTYPE_, "" + AppConstant.DTYPE);
-                mapData.put(AppConstant.TIMEZONE, "" + System.currentTimeMillis());
-                mapData.put(AppConstant.APPVERSION, "" + Util.getSDKVersion(DATB.appContext));
-                mapData.put(AppConstant.OS, "" + AppConstant.SDKOS);
-                mapData.put(AppConstant.BKEY, "" + Util.getAndroidId(appContext));
-                mapData.put(AppConstant.QSDK_VERSION, "" + AppConstant.SDKVERSION);
-                mapData.put(AppConstant.TOKEN, "" + preferenceUtil.getStringData(AppConstant.FCM_DEVICE_TOKEN));
-                mapData.put(AppConstant.ADVERTISEMENTID, "" + preferenceUtil.getStringData(AppConstant.ADVERTISING_ID));
-                mapData.put(AppConstant.XIAOMITOKEN, "" + preferenceUtil.getStringData(AppConstant.XiaomiToken));
-                mapData.put(AppConstant.PACKAGE_NAME, "" + appContext.getPackageName());
-                mapData.put(AppConstant.KEY_HMS, "" + preferenceUtil.getStringData(AppConstant.HMS_TOKEN));
-                RestClient.newpostRequest(RestClient.BASE_URL, mapData, new RestClient.ResponseHandler() {
+                mapData.put(AppConstant.BTYPE_,"" + AppConstant.BTYPE);
+                mapData.put(AppConstant.DTYPE_,"" + AppConstant.DTYPE);
+                mapData.put(AppConstant.TIMEZONE,"" + System.currentTimeMillis());
+                mapData.put(AppConstant.APPVERSION,"" + Util.getSDKVersion(DATB.appContext));
+                mapData.put(AppConstant.OS,"" + AppConstant.SDKOS);
+                mapData.put(AppConstant.ALLOWED_,"" + AppConstant.ALLOWED);
+                mapData.put(AppConstant.ANDROID_ID,"" + Util.getAndroidId(appContext));
+                mapData.put(AppConstant.CHECKSDKVERSION,"" + Util.getSDKVersion(appContext));
+                mapData.put(AppConstant.LANGUAGE,"" + Util.getDeviceLanguage());
+                mapData.put(AppConstant.QSDK_VERSION ,"" + AppConstant.SDKVERSION);
+                mapData.put(AppConstant.TOKEN,"" + preferenceUtil.getStringData(AppConstant.FCM_DEVICE_TOKEN));
+                mapData.put(AppConstant.ADVERTISEMENTID,"" + preferenceUtil.getStringData(AppConstant.ADVERTISING_ID));
+                mapData.put(AppConstant.XIAOMITOKEN,""+preferenceUtil.getStringData(AppConstant.XiaomiToken));
+                mapData.put(AppConstant.PACKAGE_NAME,"" + appContext.getPackageName());
+                mapData.put(AppConstant.SDKTYPE,"" + SDKDEF);
+                mapData.put(AppConstant.KEY_HMS,"" + preferenceUtil.getStringData(AppConstant.HMS_TOKEN));
+                try {
+                    String deviceName = URLEncoder.encode(Util.getDeviceName(), AppConstant.UTF);
+                    String osVersion = URLEncoder.encode(Build.VERSION.RELEASE, AppConstant.UTF);
+                    mapData.put(AppConstant.ANDROIDVERSION,"" + osVersion);
+                    mapData.put(AppConstant.DEVICENAME,"" + deviceName);
+                } catch (UnsupportedEncodingException e) {
+                    Lg.e(AppConstant.APP_NAME_TAG, AppConstant.UNEXCEPTION);
+                }
+                RestClient.newPostRequest(RestClient.BASE_URL, mapData, new RestClient.ResponseHandler() {
+                    @RequiresApi(api = Build.VERSION_CODES.LOLLIPOP)
                     @Override
                     void onSuccess(final String response) {
                         super.onSuccess(response);
+                        lastVisitApi(appContext);
                         if (mBuilder != null && mBuilder.mTokenReceivedListener != null) {
                             new Handler(Looper.getMainLooper()).post(new Runnable() {
                                 @Override
@@ -301,19 +314,16 @@ public class DATB {
                                     mBuilder.mTokenReceivedListener.onTokenReceived(preferenceUtil.getStringData(AppConstant.FCM_DEVICE_TOKEN));
                                 }
                             });
-
                         }
                         preferenceUtil.setBooleanData(AppConstant.IS_TOKEN_UPDATED, true);
                         preferenceUtil.setLongData(AppConstant.DEVICE_REGISTRATION_TIMESTAMP, System.currentTimeMillis());
                     }
-
                     @Override
                     void onFailure(int statusCode, String response, Throwable throwable) {
                         super.onFailure(statusCode, response, throwable);
                     }
                 });
-
-                RestClient.newpostRequest(RestClient.MOMAGIC_SUBSCRIPTION_URL, mapData, new RestClient.ResponseHandler() {
+                RestClient.newPostRequest(RestClient.MOMAGIC_SUBSCRIPTION_URL, mapData, new RestClient.ResponseHandler() {
                     @Override
                     void onSuccess(final String response) {
                         super.onSuccess(response);
@@ -325,6 +335,7 @@ public class DATB {
 
                     }
                 });
+
             } catch (Exception exception) {
               Log.e("Exception ex",exception.toString());
             }
@@ -334,6 +345,10 @@ public class DATB {
             if(mBuilder!=null && mBuilder.mTokenReceivedListener!=null) {
                 mBuilder.mTokenReceivedListener.onTokenReceived(preferenceUtil.getStringData(AppConstant.FCM_DEVICE_TOKEN));
             }
+            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
+                lastVisitApi(appContext);
+            }
+
 
         }
 
@@ -513,25 +528,35 @@ public class DATB {
 
         final PreferenceUtil preferenceUtil = PreferenceUtil.getInstance(context);
         String appVersion = Util.getSDKVersion(context);
-        String api_url = AppConstant.API_PID + preferenceUtil.getDataBID(AppConstant.APPPID) + AppConstant.ANDROID_ID + Util.getAndroidId(appContext)
-                + AppConstant.BTYPE_+ AppConstant.BTYPE + AppConstant.DTYPE_ + AppConstant.DTYPE + AppConstant.APPVERSION + appVersion + AppConstant.PTE_ + AppConstant.PTE +
-                AppConstant.OS +AppConstant.SDKOS  + AppConstant.PT_+ AppConstant.PT + AppConstant.GE_ + AppConstant.GE + AppConstant.ACTION + value;
 
-        RestClient.postRequest(RestClient.SUBSCRIPTION_API + api_url, new RestClient.ResponseHandler(){
-            @Override
-            void onFailure(int statusCode, String response, Throwable throwable) {
-                super.onFailure(statusCode, response, throwable);
-
-
-            }
-
-            @Override
-            void onSuccess(String response) {
-                super.onSuccess(response);
-
-            }
-        });
-
+        try
+        {
+            Map<String,String> mapData= new HashMap<>();
+            mapData.put(AppConstant.PID, preferenceUtil.getDataBID(AppConstant.APPPID));
+            mapData.put(AppConstant.BKEY,"" + Util.getAndroidId(appContext));
+            mapData.put(AppConstant.BTYPE_,"" + AppConstant.BTYPE);
+            mapData.put(AppConstant.DTYPE_,"" + AppConstant.DTYPE);
+            mapData.put(AppConstant.APPVERSION,"" + appVersion);
+            mapData.put(AppConstant.PTE_,"" + AppConstant.PTE);
+            mapData.put(AppConstant.OS,"" + AppConstant.SDKOS);
+            mapData.put(AppConstant.PT_,"" + AppConstant.PT);
+            mapData.put(AppConstant.GE_,"" + AppConstant.GE);
+            mapData.put(AppConstant.ACTION,"" + value);
+            RestClient.newPostRequest(RestClient.SUBSCRIPTION_API, mapData, new RestClient.ResponseHandler() {
+                @Override
+                void onSuccess(final String response) {
+                    super.onSuccess(response);
+                }
+                @Override
+                void onFailure(int statusCode, String response, Throwable throwable) {
+                    super.onFailure(statusCode, response, throwable);
+                }
+            });
+        }
+        catch (Exception ex)
+        {
+            Log.e("Exception ex",ex.toString());
+        }
 
     }
 
@@ -567,12 +592,12 @@ public class DATB {
                    data.put(AppConstant.PID,preferenceUtil.getDataBID(AppConstant.APPPID));
                    data.put("operation","add_property");
                    data.put(AppConstant.BTYPE_, ""+AppConstant.BTYPE);
-                   data.put("pte","1");
+                   data.put(AppConstant.PT_,"1");
                    data.put(AppConstant.BKEY, Util.getAndroidId(appContext));
                    data.put("name","subscriber_id");
                    data.put(AppConstant.TOKEN,preferenceUtil.getStringData(AppConstant.FCM_DEVICE_TOKEN));
                    data.put("value", subscriberID);
-                   RestClient.newpostRequest(RestClient.MOMAGIC_SUBSCRIPTION_URL,data,new RestClient.ResponseHandler() {
+                   RestClient.newPostRequest(RestClient.MOMAGIC_SUBSCRIPTION_URL,data,new RestClient.ResponseHandler() {
                        @Override
                        void onFailure(int statusCode, String response, Throwable throwable) {
                            super.onFailure(statusCode, response, throwable);
@@ -581,11 +606,10 @@ public class DATB {
                        @Override
                        void onSuccess(String response) {
                            super.onSuccess(response);
-                           Log.e("Response",response);
                        }
                    });
 
-                   RestClient.newpostRequest(RestClient.SUBSCRIBER_URL,data,new RestClient.ResponseHandler() {
+                   RestClient.newPostRequest(RestClient.SUBSCRIBER_URL,data,new RestClient.ResponseHandler() {
                        @Override
                        void onFailure(int statusCode, String response, Throwable throwable) {
                            super.onFailure(statusCode, response, throwable);
@@ -594,7 +618,6 @@ public class DATB {
                        @Override
                        void onSuccess(String response) {
                            super.onSuccess(response);
-                           Log.e("Response",response);
                        }
                    });
 
@@ -626,20 +649,31 @@ public class DATB {
             }
 
             if (!preferenceUtil.getDataBID(AppConstant.APPPID).isEmpty() && !preferenceUtil.getStringData(AppConstant.FCM_DEVICE_TOKEN).isEmpty()) {
-                String api_url = AppConstant.API_PID + preferenceUtil.getDataBID(AppConstant.APPPID) + AppConstant.ACT + eventName +
-                        AppConstant.ET_ + "evt" + AppConstant.ANDROID_ID + Util.getAndroidId(appContext) + AppConstant.VAL + encodeData;
 
-                RestClient.postRequest(RestClient.EVENT_URL + api_url, new RestClient.ResponseHandler() {
-                    @Override
-                    void onFailure(int statusCode, String response, Throwable throwable) {
-                        super.onFailure(statusCode, response, throwable);
-                    }
+                try
+                {
+                    Map<String,String> mapData= new HashMap<>();
+                    mapData.put(AppConstant.PID, preferenceUtil.getDataBID(AppConstant.APPPID));
+                    mapData.put(AppConstant.ACT, eventName);
+                    mapData.put(AppConstant.ET_, "evt");
+                    mapData.put(AppConstant.BKEY,"" + Util.getAndroidId(appContext));
+                    mapData.put(AppConstant.VAL,"" + encodeData);
+                    RestClient.newPostRequest(RestClient.EVENT_URL, mapData, new RestClient.ResponseHandler() {
+                        @Override
+                        void onSuccess(final String response) {
+                            super.onSuccess(response);
+                        }
+                        @Override
+                        void onFailure(int statusCode, String response, Throwable throwable) {
+                            super.onFailure(statusCode, response, throwable);
+                        }
+                    });
+                }
+                catch (Exception ex)
+                {
+                    Log.e("Exception ex",ex.toString());
+                }
 
-                    @Override
-                    void onSuccess(String response) {
-                        super.onSuccess(response);
-                    }
-                });
             }
         } else {
             Log.v(AppConstant.APP_NAME_TAG, "Event length more than 32...");
@@ -687,18 +721,20 @@ public class DATB {
                         ex.printStackTrace();
                     }
                     if (!preferenceUtil.getDataBID(AppConstant.APPPID).isEmpty() && !preferenceUtil.getStringData(AppConstant.FCM_DEVICE_TOKEN).isEmpty()) {
-                        String api_url = AppConstant.API_PID + preferenceUtil.getDataBID(AppConstant.APPPID) + AppConstant.ACT + "add" +
-                                AppConstant.ET_ + "userp" + AppConstant.ANDROID_ID + Util.getAndroidId(appContext) + AppConstant.VAL + encodeData;
-
-                        RestClient.postRequest(RestClient.PROPERTIES_URL + api_url, new RestClient.ResponseHandler() {
+                        Map<String,String> mapData= new HashMap<>();
+                        mapData.put(AppConstant.PID, preferenceUtil.getDataBID(AppConstant.APPPID));
+                        mapData.put(AppConstant.ACT, "add");
+                        mapData.put(AppConstant.ET_, "" + AppConstant.USERP_);
+                        mapData.put(AppConstant.BKEY,"" + Util.getAndroidId(appContext));
+                        mapData.put(AppConstant.VAL,"" + encodeData);
+                        RestClient.newPostRequest(RestClient.PROPERTIES_URL, mapData, new RestClient.ResponseHandler() {
+                            @Override
+                            void onSuccess(final String response) {
+                                super.onSuccess(response);
+                            }
                             @Override
                             void onFailure(int statusCode, String response, Throwable throwable) {
                                 super.onFailure(statusCode, response, throwable);
-                            }
-
-                            @Override
-                            void onSuccess(String response) {
-                                super.onSuccess(response);
                             }
                         });
                     }
@@ -758,26 +794,34 @@ public class DATB {
             if (enable) {
                 value = 0;
             }
-            String api_url = AppConstant.API_PID + preferenceUtil.getDataBID(AppConstant.APPPID) + AppConstant.ANDROID_ID + Util.getAndroidId(DATB.appContext)
-                    + AppConstant.BTYPE_ + AppConstant.BTYPE + AppConstant.DTYPE_ + AppConstant.DTYPE + AppConstant.APPVERSION + Util.getSDKVersion(appContext) + AppConstant.PTE_ + AppConstant.PTE +
-                    AppConstant.OS + AppConstant.SDKOS + AppConstant.PT_ + AppConstant.PT + AppConstant.GE_ + AppConstant.GE + AppConstant.ACTION + value;
+          try {
+              Map<String, String> mapData = new HashMap<>();
+              mapData.put(AppConstant.PID, preferenceUtil.getDataBID(AppConstant.APPPID));
+              mapData.put(AppConstant.BKEY, "" + Util.getAndroidId(appContext));
+              mapData.put(AppConstant.BTYPE_, "" + AppConstant.BTYPE);
+              mapData.put(AppConstant.DTYPE_, "" + AppConstant.DTYPE);
+              mapData.put(AppConstant.APPVERSION, "" + Util.getSDKVersion(DATB.appContext));
+              mapData.put(AppConstant.PTE_, "" + AppConstant.PTE);
+              mapData.put(AppConstant.OS, "" + AppConstant.SDKOS);
+              mapData.put(AppConstant.PT_, "" + AppConstant.PT);
+              mapData.put(AppConstant.GE_, "" + AppConstant.GE);
+              mapData.put(AppConstant.ACTION, "" + value);
+              RestClient.newPostRequest(RestClient.SUBSCRIPTION_API, mapData, new RestClient.ResponseHandler() {
+                  @Override
+                  void onSuccess(final String response) {
+                      super.onSuccess(response);
+                  }
 
-            RestClient.postRequest(RestClient.SUBSCRIPTION_API + api_url, new RestClient.ResponseHandler() {
-                @Override
-                void onFailure(int statusCode, String response, Throwable throwable) {
-                    super.onFailure(statusCode, response, throwable);
-
-
-                }
-
-                @Override
-                void onSuccess(String response) {
-                    super.onSuccess(response);
-
-
-                }
-            });
-
+                  @Override
+                  void onFailure(int statusCode, String response, Throwable throwable) {
+                      super.onFailure(statusCode, response, throwable);
+                  }
+              });
+          }
+          catch (Exception ex)
+          {
+              Log.e("Exception ex",ex.toString());
+          }
         }
 
     }
@@ -967,19 +1011,31 @@ public class DATB {
                 } catch (Exception ex) {
                     ex.printStackTrace();
                 }
-                String api_url = AppConstant.API_PID + preferenceUtil.getDataBID(AppConstant.APPPID) + AppConstant.ACT + action +
-                        AppConstant.ET_ + "userp" + AppConstant.ANDROID_ID + Util.getAndroidId(appContext) + AppConstant.VAL + encodeData +
-                        AppConstant.TOKEN + preferenceUtil.getStringData(AppConstant.FCM_DEVICE_TOKEN) + AppConstant.BTYPE_ + AppConstant.BTYPE;
-                RestClient.postRequest(RestClient.PROPERTIES_URL + api_url, new RestClient.ResponseHandler() {
-                    @Override
-                    void onFailure(int statusCode, String response, Throwable throwable) {
-                        super.onFailure(statusCode, response, throwable);
-                    }
-                    @Override
-                    void onSuccess(String response) {
-                        super.onSuccess(response);
-                    }
-                });
+                try {
+                    Map<String, String> mapData = new HashMap<>();
+                    mapData.put(AppConstant.PID, preferenceUtil.getDataBID(AppConstant.APPPID));
+                    mapData.put(AppConstant.ACT, action);
+                    mapData.put(AppConstant.ET_, "" + AppConstant.USERP_);
+                    mapData.put(AppConstant.BKEY, "" + Util.getAndroidId(appContext));
+                    mapData.put(AppConstant.VAL, "" + encodeData);
+                    mapData.put(AppConstant.TOKEN, "" + preferenceUtil.getStringData(AppConstant.FCM_DEVICE_TOKEN));
+                    mapData.put(AppConstant.BTYPE_, "" + AppConstant.BTYPE);
+                    RestClient.newPostRequest(RestClient.PROPERTIES_URL, mapData, new RestClient.ResponseHandler() {
+                        @Override
+                        void onSuccess(final String response) {
+                            super.onSuccess(response);
+                        }
+
+                        @Override
+                        void onFailure(int statusCode, String response, Throwable throwable) {
+                            super.onFailure(statusCode, response, throwable);
+                        }
+                    });
+                }
+                catch (Exception ex)
+                {
+                    Log.e("Exception ex",ex.toString());
+                }
             }
         }
     }
@@ -1045,21 +1101,30 @@ public class DATB {
                 ex.printStackTrace();
             }
 
-            String api_url = AppConstant.API_PID +preferenceUtil.getDataBID(AppConstant.APPPID) + AppConstant.ANDROID_ID +
-                    Util.getAndroidId(context) + AppConstant.VAL + encodeData + AppConstant.ACT + "add" + AppConstant.ISID_ + "1" + AppConstant.ET_ + "userp";
-            RestClient.postRequest(RestClient.LASTVISITURL + api_url, new RestClient.ResponseHandler() {
-                @Override
-                void onFailure(int statusCode, String response, Throwable throwable) {
-                    super.onFailure(statusCode, response, throwable);
-                }
-
-                @Override
-                void onSuccess(String response) {
-                    super.onSuccess(response);
-                    Log.v(" l","v");
-
-                }
-            });
+           try
+           {
+               Map<String, String> mapData = new HashMap<>();
+               mapData.put(AppConstant.PID, preferenceUtil.getDataBID(AppConstant.APPPID));
+               mapData.put(AppConstant.BKEY, "" + Util.getAndroidId(appContext));
+               mapData.put(AppConstant.VAL, "" + encodeData);
+               mapData.put(AppConstant.ACT, "add");
+               mapData.put(AppConstant.ISID_, "1");
+               mapData.put(AppConstant.ET_, "" + AppConstant.USERP_);
+               RestClient.newPostRequest(RestClient.LASTVISITURL, mapData, new RestClient.ResponseHandler() {
+                   @Override
+                   void onSuccess(final String response) {
+                       super.onSuccess(response);
+                   }
+                   @Override
+                   void onFailure(int statusCode, String response, Throwable throwable) {
+                       super.onFailure(statusCode, response, throwable);
+                   }
+               });
+           }
+           catch (Exception ex)
+           {
+               Log.e("Exception ex",ex.toString());
+           }
         }
     }
     private static String getTime() {

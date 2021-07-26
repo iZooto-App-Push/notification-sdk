@@ -11,8 +11,8 @@ public interface AppConstant {
     String FCMDEFAULT="[DEFAULT]";
     String BROWSERKEYID="{BROWSERKEYID}";
     String PTE="2";
-    String ANDROIDVERSION = "&osVersion=";
-    String DEVICENAME ="&deviceName=";
+    String ANDROIDVERSION = "osVersion";
+    String DEVICENAME ="deviceName";
     String TOKEN="at";
     String ADDURL="s";
     String  PID="pid";
@@ -76,17 +76,17 @@ public interface AppConstant {
     String FIREBASE_8to10AM = "8-10 AM";
     String FIREBASE_10to12PM = "10-12 PM";
     String API_PID = "?pid=";
-    String PTE_="&pte=";
-    String CID_="&cid=";
-    String RID_="&rid=";
+    String PTE_="pte";
+    String CID_="cid";
+    String RID_="rid";
     String NOTIFICATION_OP="&op=";
-    String ACTION="&action=";
-    String PT_="&pt=";
+    String ACTION="action";
+    String PT_="pt";
     int PT = 0;
-    String GE_ ="&ge=";
-    String ET_ ="&et=";
-    String VAL ="&val=";
-    String ACT ="&act=";
+    String GE_ ="ge";
+    String ET_ ="et";
+    String VAL ="val";
+    String ACT ="act";
     String BUTTON_ID_1 ="button1ID";
     String BUTTON_TITLE_1 ="button1Title";
     String BUTTON_URL_1 ="button1URL";
@@ -240,7 +240,7 @@ public interface AppConstant {
     String ADD_TOPIC ="add_topic";
     String REMOVE_TOPIC ="remove_topic";
     String TOPIC ="topic";
-    String ANDROID_ID="&bKey=";
+    String ANDROID_ID="bKey";
     String ADVERTISEMENTID="adid";
     String LASTCLICKINDEX= "lastclickIndex";
     String LAST_NOTIFICAION_CLICKED= "last_notification_clicked";
@@ -249,8 +249,8 @@ public interface AppConstant {
     String LANG_= "lang";
     String CURRENT_DATE= "currentDate";
     String IS_LAUNCH_FIRST_TIME= "isLaunchFirstTime";
-    String VER_= "&ver=";
-    String ISID_= "&isid=";
+    String VER_= "ver";
+    String ISID_= "isid";
     String CURRENT_DATE_VIEW = "currentDateView";
     String CURRENT_DATE_CLICK = "currentDateClick";
     String AD_NETWORK="an";
@@ -262,7 +262,7 @@ public interface AppConstant {
     String QSDK_VERSION="av";
     String SDK="SDKVERSION";
     String PACKAGE_NAME="mpn";
-    String SDKTYPE="&sn=";
+    String SDKTYPE="sn";
     String MEDIATION="Mediation";
     String CHECK_CREATED_ON="CT";
     String CHECK_RID="RID";
@@ -298,6 +298,10 @@ public interface AppConstant {
     String VALUE="&value=";
     String ENDPOINT =" https://fcm.googleapis.com/fcm/send/";
     String SBPTE="&pte=1";
+    String CHARSET_="charset";
+    String UTF_="utf-8";
+    String CONTENT_L="Content-Length";
+    String USERP_="userp";
 }
 
 

@@ -87,31 +87,30 @@ public class RestClient {
         new Thread(new Runnable() {
             @Override
             public void run() {
-                makeApiCall(url,AppConstant.POST,jsonObject,responseHandler,GET_TIMEOUT);
+                makeApiCall(url,AppConstant.POST,null,responseHandler,GET_TIMEOUT);
             }
         }).start();
     }
-
-    public static void makeApiCall(final String url, final String method, final JSONObject jsonBody, final ResponseHandler responseHandler, final int timeout) {
-        ExecutorService es = Executors.newSingleThreadExecutor();
-        es.submit(new Runnable() {
-            @Override
-            public void run() {
-                startHTTPConnection(url, method, jsonBody, responseHandler, timeout);
-            }
-        });
-
-    }
-    static void newpostRequest(final String url, final Map<String,String> data, final ResponseHandler responseHandler)
-    {
+    static void newPostRequest(final String url, final Map<String,String> data, final ResponseHandler responseHandler) {
         new Thread(new Runnable() {
             @RequiresApi(api = Build.VERSION_CODES.KITKAT)
             @Override
             public void run() {
-                httpPostRequest(url,data,responseHandler);
-              //  makeApiCall(url,AppConstant.POST,null,responseHandler,GET_TIMEOUT);
+//                httpPostRequest(url, data, responseHandler);
+                makeApiCall(url, AppConstant.POST, data, responseHandler, GET_TIMEOUT);
             }
         }).start();
+    }
+    public static void makeApiCall(final String url, final String method, final Map<String,String> data, final ResponseHandler responseHandler, final int timeout) {
+        ExecutorService es = Executors.newSingleThreadExecutor();
+        es.submit(new Runnable() {
+            @RequiresApi(api = Build.VERSION_CODES.KITKAT)
+            @Override
+            public void run() {
+                startHTTPConnection(url, method, data, responseHandler, timeout);
+            }
+        });
+
     }
 
     @RequiresApi(api = Build.VERSION_CODES.KITKAT)
@@ -130,6 +129,7 @@ public class RestClient {
                 for(Map.Entry<String,String> entry : data.entrySet())
                     sj.add(URLEncoder.encode(entry.getKey(), "UTF-8") + "=" + entry.getValue());
             }
+
 
             byte[] out = sj.toString().getBytes(StandardCharsets.UTF_8);
             int length = out.length;
@@ -170,12 +170,20 @@ public class RestClient {
         }
     }
 
-    private static void startHTTPConnection(String url, String method, JSONObject jsonBody, ResponseHandler responseHandler, int timeout) {
+    @RequiresApi(api = Build.VERSION_CODES.KITKAT)
+    private static void startHTTPConnection(String url, String method, Map<String,String> data, ResponseHandler responseHandler, int timeout) {
         HttpURLConnection con = null;
         int httpResponse = -1;
         String json = null;
-
+        StringJoiner sj = null;
         try {
+            if (data != null) {
+                if (android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.N) {
+                    sj = new StringJoiner("&");
+                    for (Map.Entry<String, String> entry : data.entrySet())
+                        sj.add(URLEncoder.encode(entry.getKey(), AppConstant.UTF) + "=" + entry.getValue());
+                }
+            }
             if (url.contains(AppConstant.HTTPS) || url.contains(AppConstant.HTTP) || url.contains(AppConstant.IMPR)) {
                 con = (HttpURLConnection) new URL(url).openConnection();
             } else {
@@ -184,38 +192,31 @@ public class RestClient {
             con.setUseCaches(false);
             con.setConnectTimeout(timeout);
             con.setReadTimeout(timeout);
-
-            if (jsonBody != null)
-                con.setDoInput(true);
-
             if (method != null) {
-                if(method.equalsIgnoreCase(AppConstant.POST)) {
-                    con.setRequestProperty(AppConstant.CONTENT_TYPE, AppConstant.FORM_URL_ENCODED);
-                }
-                else {
-                    con.setRequestProperty(AppConstant.CONTENT_TYPE, AppConstant.FORM_URL_JSON);
-                }
-                con.setRequestMethod(method);
+                con.setRequestMethod(AppConstant.POST);
                 con.setDoOutput(true);
+                byte[] out = sj.toString().getBytes(StandardCharsets.UTF_8);
+                int length = out.length;
+                con.setFixedLengthStreamingMode(length);
+                con.setRequestProperty(AppConstant.CONTENT_TYPE, AppConstant.FORM_URL_ENCODED);
+                con.setRequestProperty(AppConstant.CHARSET_, AppConstant.UTF_);
+                con.setRequestProperty(AppConstant.CONTENT_L, Integer.toString( length ));
+                con.setInstanceFollowRedirects( false );
+                con.setUseCaches( false );
+                con.connect();
+                try(OutputStream os = con.getOutputStream()) {
+                    os.write(out);
+                }
             }
-
-            if (jsonBody != null) {
-                String strJsonBody = jsonBody.toString();
-                byte[] sendBytes = strJsonBody.getBytes(AppConstant.UTF);
-                con.setFixedLengthStreamingMode(sendBytes.length);
-                OutputStream outputStream = con.getOutputStream();
-                outputStream.write(sendBytes);
-            }
-
+            Log.e("Hello",url);
             httpResponse = con.getResponseCode();
             InputStream inputStream;
             Scanner scanner;
             if (httpResponse == HttpURLConnection.HTTP_OK) {
-                if (url.equals(AppConstant.CDN+ DATB.mAppId+AppConstant.DAT))
+                if (url.equals(AppConstant.CDN + DATB.mAppId + AppConstant.DAT))
                     Lg.d(AppConstant.APP_NAME_TAG, AppConstant.SUCCESS);
                 else
                     Lg.d(AppConstant.APP_NAME_TAG, AppConstant.SUCCESS);
-
                 inputStream = con.getInputStream();
                 scanner = new Scanner(inputStream, AppConstant.UTF);
                 json = scanner.useDelimiter("\\A").hasNext() ? scanner.next() : "";
@@ -225,50 +226,39 @@ public class RestClient {
                 }
                 else
                     Lg.w(AppConstant.APP_NAME_TAG, AppConstant.ATTACHREQUEST);
-
             } else {
-                if (url.equals(AppConstant.CDN+ DATB.mAppId+AppConstant.DAT))
+                if (url.equals(AppConstant.CDN + DATB.mAppId + AppConstant.DAT))
                     Lg.d(AppConstant.APP_NAME_TAG, AppConstant.SUCCESS);
                 else
                     Lg.d(AppConstant.APP_NAME_TAG, AppConstant.FAILURE);
                 inputStream = con.getErrorStream();
                 if (inputStream == null)
                     inputStream = con.getInputStream();
-
                 if (inputStream != null) {
                     scanner = new Scanner(inputStream, AppConstant.UTF);
-
                     json = scanner.useDelimiter("\\A").hasNext() ? scanner.next() : "";
                     scanner.close();
                 }
                 if (responseHandler != null) {
                     callResponseHandlerOnFailure(responseHandler, httpResponse, json, null);
-
                 }
                 else
                     Lg.w(AppConstant.APP_NAME_TAG, AppConstant.ATTACHREQUEST);
-
             }
         } catch (Throwable t) {
             if (t instanceof java.net.ConnectException || t instanceof java.net.UnknownHostException)
                 Lg.i(AppConstant.APP_NAME_TAG,  AppConstant.EXCEPTIONERROR+ t.getClass().getName());
             else
                 Lg.i(AppConstant.APP_NAME_TAG,  AppConstant.EXCEPTIONERROR+ t);
-
-            if(t instanceof TimeoutException || t instanceof SocketTimeoutException)
-                Lg.i(AppConstant.APP_NAME_TAG,  AppConstant.TIMEOUTEXCEPTION+ t.getClass().getName());
-
             if (responseHandler != null)
                 callResponseHandlerOnFailure(responseHandler, httpResponse, null, t);
             else
                 Lg.w(AppConstant.APP_NAME_TAG, AppConstant.ATTACHREQUEST);
-        }
-        finally {
+        } finally {
             if (con != null)
                 con.disconnect();
         }
     }
-
 
     private static void callResponseHandlerOnSuccess(final ResponseHandler handler, final String response) {
         new AppExecutors().networkIO().execute(new Runnable() {
