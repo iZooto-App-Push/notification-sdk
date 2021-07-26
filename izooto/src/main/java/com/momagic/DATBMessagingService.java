@@ -97,18 +97,13 @@ public class DATBMessagingService extends FirebaseMessagingService {
 
 
     public   void handleNow(final Map<String, String> data) {
-
         Log.d(AppConstant.APP_NAME_TAG, AppConstant.NOTIFICATIONRECEIVED);
-        PreferenceUtil preferenceUtil =PreferenceUtil.getInstance(DATB.appContext);
-
-
+        PreferenceUtil preferenceUtil =PreferenceUtil.getInstance(this);
             try {
                 if(data.get(AppConstant.AD_NETWORK) !=null && data.get(AppConstant.GLOBAL)!=null)
                 {
                     AdMediation.getAdJsonData(data);
-
                     preferenceUtil.setBooleanData(AppConstant.MEDIATION,true);
-
                 }
                 else {
                     preferenceUtil.setBooleanData(AppConstant.MEDIATION, false);
@@ -159,6 +154,8 @@ public class DATBMessagingService extends FirebaseMessagingService {
                         payload.setAp(payloadObj.optString(ShortpayloadConstant.ADDITIONALPARAM));
                         payload.setCfg(payloadObj.optInt(ShortpayloadConstant.CFG));
                         payload.setPush_type(AppConstant.PUSH_FCM);
+                        payload.setSound(payloadObj.optString(ShortpayloadConstant.NOTIFICATION_SOUND));
+                        payload.setMaxNotification(payloadObj.optInt(ShortpayloadConstant.MAX_NOTIFICATION));
 
                     } else
                         return;

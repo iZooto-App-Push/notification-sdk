@@ -1,10 +1,12 @@
 package com.momagic;
 
 
+import android.content.ContentResolver;
 import android.content.Context;
 import android.content.pm.ApplicationInfo;
 import android.content.pm.PackageInfo;
 import android.content.pm.PackageManager;
+import android.content.res.Resources;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.graphics.BitmapShader;
@@ -15,6 +17,7 @@ import android.graphics.Shader;
 import android.graphics.drawable.Drawable;
 import android.net.ConnectivityManager;
 import android.net.NetworkInfo;
+import android.net.Uri;
 import android.os.Build;
 import android.provider.Settings;
 import android.text.Html;
@@ -288,7 +291,6 @@ public class Util {
     @RequiresApi(api = Build.VERSION_CODES.LOLLIPOP)
     public static String getDeviceLanguageTag()
     {
-        //return Locale.getDefault().getDisplayLanguage();
         Locale locale;
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.N) {
             locale = DATB.appContext.getResources().getConfiguration().getLocales().get(0);
@@ -370,6 +372,24 @@ public class Util {
         String dataCFG = sixthDg + fifthDg + fourthDg;
         int decimalData = Integer.parseInt(dataCFG,2);
         return decimalData;
+    }
+    static boolean isValidResourceName(String name) {
+        return (name != null && !name.matches("^[0-9]"));
+    }
+
+    static Uri getSoundUri(Context context, String sound) {
+        Resources resources = context.getResources();
+        String packageName = context.getPackageName();
+        int soundId;
+        if (isValidResourceName(sound)) {
+            soundId = resources.getIdentifier(sound, "raw", packageName);
+            if (soundId != 0)
+                return Uri.parse(ContentResolver.SCHEME_ANDROID_RESOURCE + "://" + packageName + "/" + soundId);
+        }
+        soundId = resources.getIdentifier("izooto_default_sound", "raw", packageName);
+        if (soundId != 0)
+            return Uri.parse(ContentResolver.SCHEME_ANDROID_RESOURCE + "://" + packageName + "/" + soundId);
+        return null;
     }
 
 }

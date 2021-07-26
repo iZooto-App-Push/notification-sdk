@@ -428,6 +428,7 @@ public class AdMediation {
         try {
             PreferenceUtil preferenceUtil=PreferenceUtil.getInstance(DATB.appContext);
 
+
             payload.setTitle(getParsedValue(jsonObject, payload.getTitle()));
             if (payload.getReceived_bid().equalsIgnoreCase("-1"))
                 payload.setReceived_bid(payload.getReceived_bid());

@@ -100,6 +100,9 @@ public class XiaomiPushReceiver extends PushMessageReceiver {
                             payload.setCfg(payloadObj.optInt(ShortpayloadConstant.CFG));
                             payload.setTime_to_live(payloadObj.optString(ShortpayloadConstant.TIME_TO_LIVE));
                             payload.setPush_type(AppConstant.PUSH_XIAOMI);
+                            payload.setSound(payloadObj.optString(ShortpayloadConstant.NOTIFICATION_SOUND));
+                            payload.setMaxNotification(payloadObj.optInt(ShortpayloadConstant.MAX_NOTIFICATION));
+
                         }
                         else
                             return;

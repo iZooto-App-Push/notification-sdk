@@ -41,9 +41,7 @@ public class PreferenceUtil {
     }
 
 
-    public int getIntData(String key) {
-        return mSpref.getInt(key, 0);
-    }
+
 
 
     public void setFloatData(Context context, String key, float value) {
@@ -72,7 +70,9 @@ public class PreferenceUtil {
         return mSpref.getString(key, "");
 
     }
-
+    public int getIntData(String key) {
+        return mSpref.getInt(key, 0);
+    }
     public String getStringDataFilterCount(String key) {
         return mSpref.getString(key, "0");
 

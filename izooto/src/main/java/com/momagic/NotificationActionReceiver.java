@@ -7,14 +7,10 @@ import android.content.Intent;
 import android.net.Uri;
 import android.os.Bundle;
 import android.util.Log;
-
 import org.json.JSONObject;
-
 import java.net.URLEncoder;
 import java.util.HashMap;
-
 public class NotificationActionReceiver extends BroadcastReceiver {
-
     private String mUrl;
     private int inApp;
     private String rid;
@@ -35,100 +31,113 @@ public class NotificationActionReceiver extends BroadcastReceiver {
     public  static  String medClick="";
     private String pushType;
     private int cfg;
-
-
-
     @Override
     public void onReceive(Context context, Intent intent) {
         Intent it = new Intent(Intent.ACTION_CLOSE_SYSTEM_DIALOGS);
-
         context.sendBroadcast(it);
         getBundleData(context, intent);
         String appVersion = Util.getSDKVersion(context);
-        mUrl.replace(AppConstant.BROWSERKEYID, PreferenceUtil.getInstance(DATB.appContext).getStringData(AppConstant.FCM_DEVICE_TOKEN));
+        mUrl.replace(AppConstant.BROWSERKEYID, PreferenceUtil.getInstance(context).getStringData(AppConstant.FCM_DEVICE_TOKEN));
         getBundleData(context, intent);
         try {
-            final PreferenceUtil preferenceUtil = PreferenceUtil.getInstance(DATB.appContext);
-
-            if (btncount!=0) {
-                api_url = AppConstant.API_PID + preferenceUtil.getDataBID(AppConstant.APPPID)+ "&ver=" + appVersion +
-                        AppConstant.CID_ + cid + AppConstant.ANDROID_ID + Util.getAndroidId(context) + AppConstant.RID_ + rid + AppConstant.NOTIFICATION_OP + "click&btn=" + btncount+AppConstant.PUSH_TYPE+pushType;
-            }
-            else
-            {
-                api_url = AppConstant.API_PID +preferenceUtil.getDataBID(AppConstant.APPPID) + "&ver=" + appVersion +
-                        AppConstant.CID_  + cid + AppConstant.ANDROID_ID + Util.getAndroidId(context) + AppConstant.RID_ + rid + AppConstant.NOTIFICATION_OP + "click"+AppConstant.PUSH_TYPE+pushType;
-            }
-
+            final PreferenceUtil preferenceUtil = PreferenceUtil.getInstance(context);
             if(clickIndex.equalsIgnoreCase("1")) {
                 String clkURL;
                 int dataCfg = Util.getBinaryToDecimal(cfg);
 
-                if (dataCfg > 0){
-                    clkURL = "https://clk"+ dataCfg + ".izooto.com/clk" +dataCfg;
-                }else
+                if (dataCfg > 0) {
+                    clkURL = "https://clk" + dataCfg + ".izooto.com/clk" + dataCfg;
+                } else {
                     clkURL = RestClient.NOTIFICATIONCLICK;
+                }
 
-                RestClient.postRequest(clkURL + api_url, new RestClient.ResponseHandler() {
+                try {
+                    HashMap<String, String> data = new HashMap<>();
+                    data.put(AppConstant.PID, preferenceUtil.getDataBID(AppConstant.APPPID));
+                    data.put("ver",appVersion);
+                    data.put("cid",cid);
+                    data.put(AppConstant.BKEY, Util.getAndroidId(context));
+                    data.put("rid",rid);
+                    data.put("op","click");
+                    data.put("ct",pushType);
+                    if(btncount!=0)
+                        data.put("btn",""+btncount);
 
+                    RestClient.newpostRequest(RestClient.MOMAGIC_CLICK, data, new RestClient.ResponseHandler() {
+                        @Override
+                        void onFailure(int statusCode, String response, Throwable throwable) {
+                            super.onFailure(statusCode, response, throwable);
+                        }
 
-                    @Override
-                    void onFailure(int statusCode, String response, Throwable throwable) {
-                        super.onFailure(statusCode, response, throwable);
+                        @Override
+                        void onSuccess(String response) {
+                            super.onSuccess(response);
+                        }
+                    });
+                    if(clkURL!=null) {
+                        RestClient.newpostRequest(clkURL, data, new RestClient.ResponseHandler() {
+                            @Override
+                            void onFailure(int statusCode, String response, Throwable throwable) {
+                                super.onFailure(statusCode, response, throwable);
+                            }
+
+                            @Override
+                            void onSuccess(String response) {
+                                super.onSuccess(response);
+                            }
+                        });
                     }
 
-                    @Override
-                    void onSuccess(String response) {
-                        super.onSuccess(response);
-                        // Log.e("Click","call");
-                    }
-                });
-            }
-            String lastEighthIndex = "0";
-            String lastTenthIndex = "0";
-            String dataInBinary = Util.getIntegerToBinary(cfg);
-            if(dataInBinary!=null && !dataInBinary.isEmpty()) {
-                lastEighthIndex = String.valueOf(dataInBinary.charAt(dataInBinary.length() - 8));
-                lastTenthIndex = String.valueOf(dataInBinary.charAt(dataInBinary.length() - 10));
-            }
-            else {
-                lastEighthIndex = "0";
-                lastTenthIndex = "0";
-            }
-            if (lastClickIndex.equalsIgnoreCase("1") || lastEighthIndex.equalsIgnoreCase("1")) {
 
-                String dayDiff1 = Util.dayDifference(Util.getTime(), preferenceUtil.getStringData(AppConstant.CURRENT_DATE_CLICK_WEEKLY));
-                String updateWeekly = preferenceUtil.getStringData(AppConstant.CURRENT_DATE_CLICK_WEEKLY);
-                String updateDaily = preferenceUtil.getStringData(AppConstant.CURRENT_DATE_CLICK_DAILY);
-                String time = preferenceUtil.getStringData(AppConstant.CURRENT_DATE_CLICK);
+                } catch (Exception ex) {
+                    Log.e("Exception ex", ex.toString());
+                }
 
-                if (lastEighthIndex.equalsIgnoreCase("1")){
+                String lastEighthIndex = "0";
+                String lastTenthIndex = "0";
+                String dataInBinary = Util.getIntegerToBinary(cfg);
+                if (dataInBinary != null && !dataInBinary.isEmpty()) {
+                    lastEighthIndex = String.valueOf(dataInBinary.charAt(dataInBinary.length() - 8));
+                    lastTenthIndex = String.valueOf(dataInBinary.charAt(dataInBinary.length() - 10));
+                } else {
+                    lastEighthIndex = "0";
+                    lastTenthIndex = "0";
+                }
+                if (lastClickIndex.equalsIgnoreCase("1") || lastEighthIndex.equalsIgnoreCase("1")) {
 
-                    if (lastTenthIndex.equalsIgnoreCase("1")){
-                        if (!updateDaily.equalsIgnoreCase(Util.getTime())){
-                            preferenceUtil.setStringData(AppConstant.CURRENT_DATE_CLICK_DAILY, Util.getTime());
+                    String dayDiff1 = Util.dayDifference(Util.getTime(), preferenceUtil.getStringData(AppConstant.CURRENT_DATE_CLICK_WEEKLY));
+                    String updateWeekly = preferenceUtil.getStringData(AppConstant.CURRENT_DATE_CLICK_WEEKLY);
+                    String updateDaily = preferenceUtil.getStringData(AppConstant.CURRENT_DATE_CLICK_DAILY);
+                    String time = preferenceUtil.getStringData(AppConstant.CURRENT_DATE_CLICK);
+
+                    if (lastEighthIndex.equalsIgnoreCase("1")) {
+
+                        if (lastTenthIndex.equalsIgnoreCase("1")) {
+                            if (!updateDaily.equalsIgnoreCase(Util.getTime())) {
+                                preferenceUtil.setStringData(AppConstant.CURRENT_DATE_CLICK_DAILY, Util.getTime());
+                                lastClickAPI(context);
+                            }
+                        } else {
+                            if (updateWeekly.isEmpty() || Integer.parseInt(dayDiff1) >= 7) {
+                                preferenceUtil.setStringData(AppConstant.CURRENT_DATE_CLICK_WEEKLY, Util.getTime());
+                                lastClickAPI(context);
+                            }
+                        }
+                    } else if (lastClickIndex.equalsIgnoreCase("1") && lastEighthIndex.equalsIgnoreCase("0")) {
+                        String dayDiff = Util.dayDifference(Util.getTime(), preferenceUtil.getStringData(AppConstant.CURRENT_DATE_CLICK));
+                        if (time.isEmpty() || Integer.parseInt(dayDiff) >= 7) {
+                            preferenceUtil.setStringData(AppConstant.CURRENT_DATE_CLICK, Util.getTime());
                             lastClickAPI(context);
                         }
-                    }else {
-                        if (updateWeekly.isEmpty() || Integer.parseInt(dayDiff1) >= 7){
-                            preferenceUtil.setStringData(AppConstant.CURRENT_DATE_CLICK_WEEKLY, Util.getTime());
-                            lastClickAPI(context);
-                        }
                     }
-                }else if (lastClickIndex.equalsIgnoreCase("1") && lastEighthIndex.equalsIgnoreCase("0")){
-                    String dayDiff = Util.dayDifference(Util.getTime(), preferenceUtil.getStringData(AppConstant.CURRENT_DATE_CLICK));
-                    if (time.isEmpty() || Integer.parseInt(dayDiff) >= 7) {
-                        preferenceUtil.setStringData(AppConstant.CURRENT_DATE_CLICK, Util.getTime());
-                        lastClickAPI(context);
-                    }
+
                 }
 
             }
-
         } catch (Exception e) {
             e.printStackTrace();
         }
-        final PreferenceUtil preferenceUtil = PreferenceUtil.getInstance(DATB.appContext);
+        final PreferenceUtil preferenceUtil = PreferenceUtil.getInstance(context);
         if(preferenceUtil.getBoolean(AppConstant.MEDIATION)) {
             if (AdMediation.clicksData.size() > 0) {
                 for (int i = 0; i < AdMediation.clicksData.size(); i++) {
@@ -237,52 +246,57 @@ public class NotificationActionReceiver extends BroadcastReceiver {
     }
 
     private void getBundleData(Context context, Intent intent) {
-        Bundle tempBundle = intent.getExtras();
-        if (tempBundle != null) {
-            if (tempBundle.containsKey(AppConstant.KEY_WEB_URL))
-                mUrl = tempBundle.getString(AppConstant.KEY_WEB_URL);
-            if (tempBundle.containsKey(AppConstant.KEY_IN_APP))
-                inApp = tempBundle.getInt(AppConstant.KEY_IN_APP);
-            if (tempBundle.containsKey(AppConstant.KEY_IN_RID))
-                rid = tempBundle.getString(AppConstant.KEY_IN_RID);
-            if (tempBundle.containsKey(AppConstant.KEY_IN_CID))
-                cid = tempBundle.getString(AppConstant.KEY_IN_CID);
-            if(tempBundle.containsKey(AppConstant.KEY_IN_BUTOON))
-                btncount = tempBundle.getInt(AppConstant.KEY_IN_BUTOON);
-            if(tempBundle.containsKey(AppConstant.KEY_IN_ADDITIONALDATA))
-                additionalData = tempBundle.getString(AppConstant.KEY_IN_ADDITIONALDATA);
-            if(tempBundle.containsKey(AppConstant.KEY_IN_PHONE))
-                phoneNumber=tempBundle.getString(AppConstant.KEY_IN_PHONE);
-            if(tempBundle.containsKey(AppConstant.KEY_IN_ACT1ID))
-                act1ID=tempBundle.getString(AppConstant.KEY_IN_ACT1ID);
-            if(tempBundle.containsKey(AppConstant.KEY_IN_ACT2ID))
-                act2ID=tempBundle.getString(AppConstant.KEY_IN_ACT2ID);
-            if(tempBundle.containsKey(AppConstant.LANDINGURL))
-                langingURL=tempBundle.getString(AppConstant.LANDINGURL);
-            if(tempBundle.containsKey(AppConstant.ACT1URL))
-                act1URL=tempBundle.getString(AppConstant.ACT1URL);
-            if(tempBundle.containsKey(AppConstant.ACT2URL))
-                act2URL=tempBundle.getString(AppConstant.ACT2URL);
-            if(tempBundle.containsKey(AppConstant.ACT1TITLE))
-                btn1Title=tempBundle.getString(AppConstant.ACT1TITLE);
-            if(tempBundle.containsKey(AppConstant.ACT2TITLE))
-                btn2Title=tempBundle.getString(AppConstant.ACT2TITLE);
-            if(tempBundle.containsKey(AppConstant.CLICKINDEX))
-                clickIndex=tempBundle.getString(AppConstant.CLICKINDEX);
-            if(tempBundle.containsKey(AppConstant.LASTCLICKINDEX))
-                lastClickIndex=tempBundle.getString(AppConstant.LASTCLICKINDEX);
-            if(tempBundle.containsKey(AppConstant.PUSH))
-                pushType=tempBundle.getString(AppConstant.PUSH);
-            if(tempBundle.containsKey(AppConstant.CFGFORDOMAIN))
-                cfg=tempBundle.getInt(AppConstant.CFGFORDOMAIN);
+        try {
+            Bundle tempBundle = intent.getExtras();
+            if (tempBundle != null) {
+                if (tempBundle.containsKey(AppConstant.KEY_WEB_URL))
+                    mUrl = tempBundle.getString(AppConstant.KEY_WEB_URL);
+                if (tempBundle.containsKey(AppConstant.KEY_IN_APP))
+                    inApp = tempBundle.getInt(AppConstant.KEY_IN_APP);
+                if (tempBundle.containsKey(AppConstant.KEY_IN_RID))
+                    rid = tempBundle.getString(AppConstant.KEY_IN_RID);
+                if (tempBundle.containsKey(AppConstant.KEY_IN_CID))
+                    cid = tempBundle.getString(AppConstant.KEY_IN_CID);
+                if (tempBundle.containsKey(AppConstant.KEY_IN_BUTOON))
+                    btncount = tempBundle.getInt(AppConstant.KEY_IN_BUTOON);
+                if (tempBundle.containsKey(AppConstant.KEY_IN_ADDITIONALDATA))
+                    additionalData = tempBundle.getString(AppConstant.KEY_IN_ADDITIONALDATA);
+                if (tempBundle.containsKey(AppConstant.KEY_IN_PHONE))
+                    phoneNumber = tempBundle.getString(AppConstant.KEY_IN_PHONE);
+                if (tempBundle.containsKey(AppConstant.KEY_IN_ACT1ID))
+                    act1ID = tempBundle.getString(AppConstant.KEY_IN_ACT1ID);
+                if (tempBundle.containsKey(AppConstant.KEY_IN_ACT2ID))
+                    act2ID = tempBundle.getString(AppConstant.KEY_IN_ACT2ID);
+                if (tempBundle.containsKey(AppConstant.LANDINGURL))
+                    langingURL = tempBundle.getString(AppConstant.LANDINGURL);
+                if (tempBundle.containsKey(AppConstant.ACT1URL))
+                    act1URL = tempBundle.getString(AppConstant.ACT1URL);
+                if (tempBundle.containsKey(AppConstant.ACT2URL))
+                    act2URL = tempBundle.getString(AppConstant.ACT2URL);
+                if (tempBundle.containsKey(AppConstant.ACT1TITLE))
+                    btn1Title = tempBundle.getString(AppConstant.ACT1TITLE);
+                if (tempBundle.containsKey(AppConstant.ACT2TITLE))
+                    btn2Title = tempBundle.getString(AppConstant.ACT2TITLE);
+                if (tempBundle.containsKey(AppConstant.CLICKINDEX))
+                    clickIndex = tempBundle.getString(AppConstant.CLICKINDEX);
+                if (tempBundle.containsKey(AppConstant.LASTCLICKINDEX))
+                    lastClickIndex = tempBundle.getString(AppConstant.LASTCLICKINDEX);
+                if (tempBundle.containsKey(AppConstant.PUSH))
+                    pushType = tempBundle.getString(AppConstant.PUSH);
+                if (tempBundle.containsKey(AppConstant.CFGFORDOMAIN))
+                    cfg = tempBundle.getInt(AppConstant.CFGFORDOMAIN);
 
 
-
-            if (tempBundle.containsKey(AppConstant.KEY_NOTIFICITON_ID)) {
-                NotificationManager notificationManager =
-                        (NotificationManager) context.getSystemService(Context.NOTIFICATION_SERVICE);
-                notificationManager.cancel(tempBundle.getInt(AppConstant.KEY_NOTIFICITON_ID));
+                if (tempBundle.containsKey(AppConstant.KEY_NOTIFICITON_ID)) {
+                    NotificationManager notificationManager =
+                            (NotificationManager) context.getSystemService(Context.NOTIFICATION_SERVICE);
+                    notificationManager.cancel(tempBundle.getInt(AppConstant.KEY_NOTIFICITON_ID));
+                }
             }
+        }
+        catch (Exception ex)
+        {
+          Log.e("Exception ex",ex.toString());
         }
     }
     private void callMediationClicks(final String medClick) {

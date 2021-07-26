@@ -19,6 +19,7 @@ import android.net.Uri;
 import android.os.Build;
 import android.os.Handler;
 import android.os.Looper;
+import android.service.notification.StatusBarNotification;
 import android.util.Base64;
 import android.util.Log;
 import android.widget.RemoteViews;
@@ -41,7 +42,11 @@ import java.net.URL;
 import java.net.URLEncoder;
 import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 import java.util.Random;
+import java.util.SortedMap;
+import java.util.TreeMap;
+
 public class NotificationEventManager {
     private static Bitmap notificationIcon, notificationBanner;//,act1Icon,act2Icon;
     private static int icon;
@@ -69,7 +74,7 @@ public class NotificationEventManager {
         try
         {
             PreferenceUtil preferenceUtil =PreferenceUtil.getInstance(DATB.appContext);
-            if(preferenceUtil.getIntData("Counter")==1)
+            if(preferenceUtil.getIntData(AppConstant.CLOUD_PUSH)==1)
             {
                 if (preferenceUtil.getBoolean(AppConstant.MEDIATION)) {
                     showNotification(payload);
@@ -87,17 +92,10 @@ public class NotificationEventManager {
                     JSONObject jsonObject = new JSONObject();
                     if (!data.isEmpty()) {
                         JSONArray jsonArray1 = new JSONArray(data);
-                        if (jsonArray1.length() > 150) {
-                            long currentTime = System.currentTimeMillis(); //fetch start time
+                        if (jsonArray1.length() > 550) {
                             for (int i = 0; i < jsonArray1.length(); i++) {
-                                JSONObject jsonObject2 = jsonArray1.getJSONObject(i);
-                                if ((currentTime - (Long.parseLong(jsonObject2.getString(AppConstant.CHECK_CREATED_ON)))) > Long.parseLong(payload.getTime_to_live())) {
-                                    jsonArray1.remove(i);
-                                } else {
-                                    if (i < 10) {
                                         jsonArray1.remove(i);
-                                    }
-                                }
+
                             }
                             preferenceUtil.setStringData(AppConstant.NOTIFICATION_DUPLICATE, jsonArray1.toString());
                         } else {
@@ -197,17 +195,9 @@ public class NotificationEventManager {
                 JSONObject jsonObject = new JSONObject();
                 if (!data.isEmpty()) {
                     JSONArray jsonArray1 = new JSONArray(data);
-                    if (jsonArray1.length() > 150) {
-                        long currentTime = System.currentTimeMillis(); //fetch start time
+                    if (jsonArray1.length() > 550) {
                         for (int i = 0; i < jsonArray1.length(); i++) {
-                            JSONObject jsonObject2 = jsonArray1.getJSONObject(i);
-                            if ((currentTime - (Long.parseLong(jsonObject2.getString(AppConstant.CHECK_CREATED_ON)))) > Long.parseLong(payload.getTime_to_live())) {
-                                jsonArray1.remove(i);
-                            } else {
-                                if (i < 10) {
                                     jsonArray1.remove(i);
-                                }
-                            }
                         }
                         preferenceUtil.setStringData(AppConstant.NOTIFICATION_DUPLICATE, jsonArray1.toString());
 
@@ -622,6 +612,22 @@ public class NotificationEventManager {
                         channel = new NotificationChannel(channelId,
                                 AppConstant.CHANNEL_NAME, priority);
                     }
+                    if(DATB.soundID!=null || payload.getSound()!=null) {
+
+                        priority = NotificationManagerCompat.IMPORTANCE_HIGH;
+                        channel = new NotificationChannel(channelId,
+                                AppConstant.CHANNEL_NAME, priority);
+                        Uri uri = Util.getSoundUri(DATB.appContext, DATB.soundID);
+                        if (uri != null){
+                            channel.setSound(uri, null);}
+                        else{
+                            channel.setSound(null, null);}
+                    }
+                    else
+                    {
+                        channel.setSound(null, null);
+
+                    }
 
                     notificationManager.createNotificationChannel(channel);
                 }
@@ -644,8 +650,9 @@ public class NotificationEventManager {
                     if (lastView_Click.equalsIgnoreCase("1") || lastSeventhIndex.equalsIgnoreCase("1")){
                         lastViewNotificationApi(payload, lastView_Click, lastSeventhIndex, lastNinthIndex);
                     }
-
                     DATB.notificationView(payload);
+                    if (payload.getMaxNotification() != 0){
+                        getMaximumNotificationInTray(DATB.appContext, payload.getMaxNotification());}
 
                 } catch (Exception e) {
                     e.printStackTrace();
@@ -960,6 +967,9 @@ private static void receivedNotification(final Payload payload){
                 }
                 DATB.notificationView(payload);
 
+                if (payload.getMaxNotification() != 0){
+                    getMaximumNotificationInTray(DATB.appContext, payload.getMaxNotification());}
+
             } catch (Exception e) {
                 e.printStackTrace();
             }
@@ -1219,31 +1229,42 @@ private static void receivedNotification(final Payload payload){
         return intent;
     }
 
-    private static void viewNotificationApi(final Payload payload){
+    private static void viewNotificationApi(final Payload payload) {
 
         final PreferenceUtil preferenceUtil = PreferenceUtil.getInstance(DATB.appContext);
         String imprURL;
         int dataCfg = Util.getBinaryToDecimal(payload.getCfg());
-        if (dataCfg > 0){
+        if (dataCfg > 0) {
             imprURL = "https://impr" + dataCfg + ".izooto.com/imp" + dataCfg;
-        }else
+        } else
             imprURL = RestClient.IMPRESSION_URL;
-        String api_url = AppConstant.API_PID +  preferenceUtil.getDataBID(AppConstant.APPPID) +
-                AppConstant.CID_ + payload.getId() + AppConstant.ANDROID_ID + Util.getAndroidId(DATB.appContext) + AppConstant.RID_ + payload.getRid() + "&op=view"+AppConstant.PUSH_TYPE+payload.getPush_type();;
-        RestClient.postRequest(imprURL + api_url, new RestClient.ResponseHandler() {
-            @Override
-            void onFailure(int statusCode, String response, Throwable throwable) {
-                super.onFailure(statusCode, response, throwable);
-            }
+        String api_url = AppConstant.API_PID + preferenceUtil.getDataBID(AppConstant.APPPID) +
+                AppConstant.CID_ + payload.getId() + AppConstant.ANDROID_ID + Util.getAndroidId(DATB.appContext) + AppConstant.RID_ + payload.getRid() + "&op=view" + AppConstant.PUSH_TYPE + payload.getPush_type();
 
-            @Override
-            void onSuccess(String response) {
-                super.onSuccess(response);
-                if (payload != null)
-                    Log.v("i","c");
+        try {
+            HashMap<String, String> data = new HashMap<>();
+            data.put(AppConstant.PID, preferenceUtil.getDataBID(AppConstant.APPPID));
+            data.put("cid", payload.getId());
+            data.put(AppConstant.BKEY, Util.getAndroidId(DATB.appContext));
+            data.put("rid", payload.getRid());
+            data.put("op", "view");
+            data.put("ct", payload.getPush_type());
+            RestClient.newpostRequest(imprURL, data, new RestClient.ResponseHandler() {
+                @Override
+                void onFailure(int statusCode, String response, Throwable throwable) {
+                    super.onFailure(statusCode, response, throwable);
+                }
 
-            }
-        });
+                @Override
+                void onSuccess(String response) {
+                    super.onSuccess(response);
+                    Log.e("Response", response);
+                }
+            });
+
+        } catch (Exception ex) {
+           Log.e("ImprException",ex.toString());
+        }
     }
 
 
@@ -1385,5 +1406,34 @@ private static void receivedNotification(final Payload payload){
 
             }
         });
+    }
+    /*
+     *Set Maximum notification in the tray through getMaximumNotificationInTray() method
+     * */
+    public static void getMaximumNotificationInTray(Context context, int mn){
+        try {
+            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
+                NotificationManager notificationManagerActive =
+                        (NotificationManager) context.getSystemService(Context.NOTIFICATION_SERVICE);
+                StatusBarNotification[] notifications = notificationManagerActive.getActiveNotifications();
+                SortedMap<Long, Integer> activeNotifIds = new TreeMap<>();
+                for (StatusBarNotification notification : notifications) {
+                    if (notification.getTag() == null){
+                        activeNotifIds.put(notification.getNotification().when, notification.getId());
+                    }
+                }
+                int data = activeNotifIds.size() - mn;
+                for (Map.Entry<Long, Integer> mapData : activeNotifIds.entrySet()) {
+                    if (data <= 0)
+                        return;
+                    data--;
+                    NotificationManager notificationManager =
+                            (NotificationManager) context.getSystemService(Context.NOTIFICATION_SERVICE);
+                    notificationManager.cancel(mapData.getValue());
+                }
+            }
+        } catch (Exception e){
+            e.printStackTrace();
+        }
     }
 }

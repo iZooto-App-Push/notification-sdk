@@ -36,6 +36,7 @@ import java.util.Map;
 import java.util.Objects;
 
 import static com.momagic.AppConstant.DAT;
+import static com.momagic.AppConstant.LOG_EVENT;
 import static com.momagic.AppConstant.TAG;
 
 public class DATB {
@@ -53,18 +54,13 @@ public class DATB {
     @SuppressLint("StaticFieldLeak")
     static Activity curActivity;
     public static String SDKDEF ="momagic-sdk";
-
-
-    public static Class<?>  getWebActivity;
-
-
+    public static String soundID;
     public static void setSenderId(String senderId) {
         DATB.senderId = senderId;
     }
     private static void setActivity(Activity activity){
         curActivity = activity;
     }
-
     public static DATB.Builder initialize(Context context) {
         return new DATB.Builder(context);
     }
@@ -145,34 +141,38 @@ public class DATB {
     }
 
     private static void init(final Context context, String apiKey, String appId) {
+        try {
 
-        FCMTokenGenerator fcmTokenGenerator = new FCMTokenGenerator();
-        fcmTokenGenerator.getToken(context, senderId, apiKey, appId, new TokenGenerator.TokenGenerationHandler() {
+            FCMTokenGenerator fcmTokenGenerator = new FCMTokenGenerator();
+            fcmTokenGenerator.getToken(context, senderId, apiKey, appId, new TokenGenerator.TokenGenerationHandler() {
 
-            @RequiresApi(api = Build.VERSION_CODES.LOLLIPOP)
-            @Override
-            public void complete(String id) {
-                Util util = new Util();
-                final PreferenceUtil preferenceUtil = PreferenceUtil.getInstance(appContext);
-                if (util.isInitializationValid()) {
-                    Lg.i(AppConstant.APP_NAME_TAG, AppConstant.DEVICETOKEN  + preferenceUtil.getStringData(AppConstant.FCM_DEVICE_TOKEN));
-                   registerToken();
-                    lastVisitApi(context);
-                    ActivityLifecycleListener.registerActivity((Application)appContext);
-                    setCurActivity(context);
-                    areNotificationsEnabledForSubscribedState(appContext);
-
-                    if (FirebaseAnalyticsTrack.canFirebaseAnalyticsTrack())
-                        firebaseAnalyticsTrack = new FirebaseAnalyticsTrack(appContext);
-
+                @RequiresApi(api = Build.VERSION_CODES.LOLLIPOP)
+                @Override
+                public void complete(String id) {
+                    Util util = new Util();
+                    final PreferenceUtil preferenceUtil = PreferenceUtil.getInstance(appContext);
+                    if (util.isInitializationValid()) {
+                        Lg.i(AppConstant.APP_NAME_TAG, AppConstant.DEVICETOKEN + preferenceUtil.getStringData(AppConstant.FCM_DEVICE_TOKEN));
+                        registerToken();
+                        lastVisitApi(context);
+                        ActivityLifecycleListener.registerActivity((Application) appContext);
+                        setCurActivity(context);
+                        areNotificationsEnabledForSubscribedState(appContext);
+                        if (FirebaseAnalyticsTrack.canFirebaseAnalyticsTrack()){
+                            firebaseAnalyticsTrack = new FirebaseAnalyticsTrack(appContext);}
+                    }
                 }
-            }
 
-            @Override
-            public void failure(String errorMsg) {
-                Lg.e(AppConstant.APP_NAME_TAG, errorMsg);
-            }
-        });
+                @Override
+                public void failure(String errorMsg) {
+                    Lg.e(AppConstant.APP_NAME_TAG, errorMsg);
+                }
+            });
+        }
+        catch (Exception ex)
+        {
+            Log.e("InitialiseFCM",ex.toString());
+        }
 
     }
 
@@ -255,62 +255,79 @@ public class DATB {
         });
     }
 
+ // method for Notification sound
+    public static void  setNotificationSound(String soundName)
+    {
+        soundID = soundName;
+    }
 
 
-
-
+    @RequiresApi(api = Build.VERSION_CODES.KITKAT)
     private static void registerToken() {
         Util.sleepTime(10000);
         final PreferenceUtil preferenceUtil = PreferenceUtil.getInstance(appContext);
         if (!preferenceUtil.getBoolean(AppConstant.IS_TOKEN_UPDATED) || !preferenceUtil.getStringData(AppConstant.HMS_TOKEN).isEmpty()) {
-            String api_url = AppConstant.ADDURL + AppConstant.STYPE + AppConstant.PID + mAppId + AppConstant.BTYPE_ + AppConstant.BTYPE + AppConstant.DTYPE_ + AppConstant.DTYPE + AppConstant.TIMEZONE + System.currentTimeMillis() + AppConstant.APPVERSION + Util.getSDKVersion(DATB.appContext) +
-                    AppConstant.OS + AppConstant.SDKOS + AppConstant.ALLOWED_ + AppConstant.ALLOWED + AppConstant.ANDROID_ID + Util.getAndroidId(appContext) + AppConstant.CHECKSDKVERSION +Util.getSDKVersion(DATB.appContext)+AppConstant.LANGUAGE+Util.getDeviceLanguage() +AppConstant.QSDK_VERSION +AppConstant.SDKVERSION+
-                    AppConstant.TOKEN +preferenceUtil.getStringData(AppConstant.FCM_DEVICE_TOKEN) + AppConstant.ADVERTISEMENTID +preferenceUtil.getStringData(AppConstant.ADVERTISING_ID)+AppConstant.XIAOMITOKEN+preferenceUtil.getStringData(AppConstant.XiaomiToken)+ AppConstant.PACKAGE_NAME+appContext.getPackageName()+AppConstant.SDKTYPE+SDKDEF
-                    +AppConstant.KEY_HMS+ preferenceUtil.getStringData(AppConstant.HMS_TOKEN);
+            if (!preferenceUtil.getStringData(AppConstant.HMS_TOKEN).isEmpty() && !preferenceUtil.getStringData(AppConstant.FCM_DEVICE_TOKEN).isEmpty() && !preferenceUtil.getStringData(AppConstant.XiaomiToken).isEmpty()) {
+                preferenceUtil.setIntData(AppConstant.CLOUD_PUSH, 3);
+            } else if (!preferenceUtil.getStringData(AppConstant.FCM_DEVICE_TOKEN).isEmpty() && !preferenceUtil.getStringData(AppConstant.XiaomiToken).isEmpty()) {
+                preferenceUtil.setIntData(AppConstant.CLOUD_PUSH, 2);
+            } else {
+                preferenceUtil.setIntData(AppConstant.CLOUD_PUSH, 1);
+            }
             try {
-                String deviceName = URLEncoder.encode(Util.getDeviceName(), AppConstant.UTF);
-                String osVersion = URLEncoder.encode(Build.VERSION.RELEASE, AppConstant.UTF);
-                api_url += AppConstant.ANDROIDVERSION + osVersion + AppConstant.DEVICENAME + deviceName;
-            } catch (UnsupportedEncodingException e) {
-                Lg.e(AppConstant.APP_NAME_TAG, AppConstant.UNEXCEPTION);
-            }
-            if(!preferenceUtil.getStringData(AppConstant.HMS_TOKEN).isEmpty() && !preferenceUtil.getStringData(AppConstant.FCM_DEVICE_TOKEN).isEmpty() && !preferenceUtil.getStringData(AppConstant.XiaomiToken).isEmpty())
-            {
-                preferenceUtil.setIntData(AppConstant.CLOUD_PUSH,3);
-            }
-            else if(!preferenceUtil.getStringData(AppConstant.FCM_DEVICE_TOKEN).isEmpty() && !preferenceUtil.getStringData(AppConstant.XiaomiToken).isEmpty())
-            {
-                preferenceUtil.setIntData(AppConstant.CLOUD_PUSH,2);
-            }
-            else
-            {
-                preferenceUtil.setIntData(AppConstant.CLOUD_PUSH,1);
+                Map<String, String> mapData = new HashMap<>();
+                mapData.put(AppConstant.ADDURL, "2");
+                mapData.put(AppConstant.PID, mAppId);
+                mapData.put(AppConstant.BTYPE_, "" + AppConstant.BTYPE);
+                mapData.put(AppConstant.DTYPE_, "" + AppConstant.DTYPE);
+                mapData.put(AppConstant.TIMEZONE, "" + System.currentTimeMillis());
+                mapData.put(AppConstant.APPVERSION, "" + Util.getSDKVersion(DATB.appContext));
+                mapData.put(AppConstant.OS, "" + AppConstant.SDKOS);
+                mapData.put(AppConstant.BKEY, "" + Util.getAndroidId(appContext));
+                mapData.put(AppConstant.QSDK_VERSION, "" + AppConstant.SDKVERSION);
+                mapData.put(AppConstant.TOKEN, "" + preferenceUtil.getStringData(AppConstant.FCM_DEVICE_TOKEN));
+                mapData.put(AppConstant.ADVERTISEMENTID, "" + preferenceUtil.getStringData(AppConstant.ADVERTISING_ID));
+                mapData.put(AppConstant.XIAOMITOKEN, "" + preferenceUtil.getStringData(AppConstant.XiaomiToken));
+                mapData.put(AppConstant.PACKAGE_NAME, "" + appContext.getPackageName());
+                mapData.put(AppConstant.KEY_HMS, "" + preferenceUtil.getStringData(AppConstant.HMS_TOKEN));
+                RestClient.newpostRequest(RestClient.BASE_URL, mapData, new RestClient.ResponseHandler() {
+                    @Override
+                    void onSuccess(final String response) {
+                        super.onSuccess(response);
+                        if (mBuilder != null && mBuilder.mTokenReceivedListener != null) {
+                            new Handler(Looper.getMainLooper()).post(new Runnable() {
+                                @Override
+                                public void run() {
+                                    mBuilder.mTokenReceivedListener.onTokenReceived(preferenceUtil.getStringData(AppConstant.FCM_DEVICE_TOKEN));
+                                }
+                            });
 
-            }
-            RestClient.postRequest(api_url, new RestClient.ResponseHandler() {
-                @Override
-                void onSuccess(final String response) {
-                    super.onSuccess(response);
-                    if (mBuilder != null && mBuilder.mTokenReceivedListener != null) {
-                        new Handler(Looper.getMainLooper()).post(new Runnable() {
-                            @Override
-                            public void run() {
-                                mBuilder.mTokenReceivedListener.onTokenReceived(preferenceUtil.getStringData(AppConstant.FCM_DEVICE_TOKEN));
-                            }
-                        });
+                        }
+                        preferenceUtil.setBooleanData(AppConstant.IS_TOKEN_UPDATED, true);
+                        preferenceUtil.setLongData(AppConstant.DEVICE_REGISTRATION_TIMESTAMP, System.currentTimeMillis());
+                    }
+
+                    @Override
+                    void onFailure(int statusCode, String response, Throwable throwable) {
+                        super.onFailure(statusCode, response, throwable);
+                    }
+                });
+
+                RestClient.newpostRequest(RestClient.MOMAGIC_SUBSCRIPTION_URL, mapData, new RestClient.ResponseHandler() {
+                    @Override
+                    void onSuccess(final String response) {
+                        super.onSuccess(response);
+                    }
+
+                    @Override
+                    void onFailure(int statusCode, String response, Throwable throwable) {
+                        super.onFailure(statusCode, response, throwable);
 
                     }
-                    preferenceUtil.setBooleanData(AppConstant.IS_TOKEN_UPDATED, true);
-                    preferenceUtil.setLongData(AppConstant.DEVICE_REGISTRATION_TIMESTAMP, System.currentTimeMillis());
-                }
-
-                @Override
-                void onFailure(int statusCode, String response, Throwable throwable) {
-                    super.onFailure(statusCode, response, throwable);
-
-                }
-            });
-
+                });
+            } catch (Exception exception) {
+              Log.e("Exception ex",exception.toString());
+            }
         }
         else
         {
@@ -545,25 +562,50 @@ public class DATB {
         final PreferenceUtil preferenceUtil = PreferenceUtil.getInstance(appContext);
         if (subscriberID != null && !subscriberID.isEmpty()) {
             if (!preferenceUtil.getDataBID(AppConstant.APPPID).isEmpty() && !preferenceUtil.getStringData(AppConstant.FCM_DEVICE_TOKEN).isEmpty()) {
-                String api_url = AppConstant.API_PID + preferenceUtil.getDataBID(AppConstant.APPPID)
-                        + AppConstant.OPERATION + "add_property" +
-                        AppConstant.BTYPE_ + AppConstant.BTYPE +
-                        "&pte=1" +
-                        AppConstant.ANDROID_ID + Util.getAndroidId(appContext)
-                        + "&name=subscriber_id"
-                        + "&at=" + preferenceUtil.getStringData(AppConstant.FCM_DEVICE_TOKEN)
-                        + AppConstant.VALUE + subscriberID;
-                    RestClient.postRequest(RestClient.SUBSCRIBER_URL + api_url, new RestClient.ResponseHandler() {
-                        @Override
-                        void onFailure(int statusCode, String response, Throwable throwable) {
-                            super.onFailure(statusCode, response, throwable);
-                        }
+               try {
+                   HashMap<String,String> data=new HashMap<>();
+                   data.put(AppConstant.PID,preferenceUtil.getDataBID(AppConstant.APPPID));
+                   data.put("operation","add_property");
+                   data.put(AppConstant.BTYPE_, ""+AppConstant.BTYPE);
+                   data.put("pte","1");
+                   data.put(AppConstant.BKEY, Util.getAndroidId(appContext));
+                   data.put("name","subscriber_id");
+                   data.put(AppConstant.TOKEN,preferenceUtil.getStringData(AppConstant.FCM_DEVICE_TOKEN));
+                   data.put("value", subscriberID);
+                   RestClient.newpostRequest(RestClient.MOMAGIC_SUBSCRIPTION_URL,data,new RestClient.ResponseHandler() {
+                       @Override
+                       void onFailure(int statusCode, String response, Throwable throwable) {
+                           super.onFailure(statusCode, response, throwable);
+                       }
 
-                        @Override
-                        void onSuccess(String response) {
-                            super.onSuccess(response);
-                        }
-                    });
+                       @Override
+                       void onSuccess(String response) {
+                           super.onSuccess(response);
+                           Log.e("Response",response);
+                       }
+                   });
+
+                   RestClient.newpostRequest(RestClient.SUBSCRIBER_URL,data,new RestClient.ResponseHandler() {
+                       @Override
+                       void onFailure(int statusCode, String response, Throwable throwable) {
+                           super.onFailure(statusCode, response, throwable);
+                       }
+
+                       @Override
+                       void onSuccess(String response) {
+                           super.onSuccess(response);
+                           Log.e("Response",response);
+                       }
+                   });
+
+
+                                }
+
+               catch (Exception ex)
+               {
+                   Log.e("Exception ex",ex.toString());
+               }
+
                 }
 
         }
@@ -807,6 +849,9 @@ public class DATB {
                     payload.setCfg(payloadObj.optInt(ShortpayloadConstant.CFG));
                     payload.setTime_to_live(payloadObj.optString(ShortpayloadConstant.TIME_TO_LIVE));
                     payload.setPush_type(AppConstant.PUSH_FCM);
+                    payload.setSound(payloadObj.optString(ShortpayloadConstant.NOTIFICATION_SOUND));
+                    payload.setMaxNotification(payloadObj.optInt(ShortpayloadConstant.MAX_NOTIFICATION));
+
                 } else
                     return;
 

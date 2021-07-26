@@ -1,23 +1,35 @@
 package com.momagic;
 
 
+import android.annotation.SuppressLint;
+import android.os.Build;
 import android.util.Log;
+
+import androidx.annotation.RequiresApi;
 
 import org.json.JSONObject;
 
+import java.io.BufferedReader;
+import java.io.IOException;
 import java.io.InputStream;
+import java.io.InputStreamReader;
 import java.io.OutputStream;
 import java.net.HttpURLConnection;
 import java.net.SocketTimeoutException;
 import java.net.URL;
+import java.net.URLConnection;
+import java.net.URLEncoder;
+import java.nio.charset.StandardCharsets;
+import java.util.Map;
 import java.util.Scanner;
+import java.util.StringJoiner;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 import java.util.concurrent.TimeoutException;
 
 public class RestClient {
 
-    private static final String BASE_URL = "https://aevents.izooto.com/";
+    public static final String BASE_URL = "https://aevents.izooto.com/app.php";
     private static final int TIMEOUT = 120000;
     public static final int GET_TIMEOUT = 60000;
     public static final String EVENT_URL="https://et.izooto.com/evt";
@@ -31,6 +43,12 @@ public class RestClient {
     public static final String MEDIATION_IMPRESSION="https://med.dtblt.com/medi";
     public static final String MEDIATION_CLICKS="https://med.dtblt.com/medc";
     public static final String SUBSCRIBER_URL="https://pp.izooto.com/idsyn";
+
+    // add new url from momagic side
+
+    public static final String MOMAGIC_SUBSCRIPTION_URL="https://irctc.truenotify.in/momagicflow/appenp";
+    public  static final String MOMAGIC_USER_PROPERTY="https://irctc.truenotify.in/momagicflow/appup";
+    public static final String MOMAGIC_CLICK="https://irctc.truenotify.in/momagicflow/appclk";
     private static int getThreadTimeout(int timeout) {
         return timeout + 5000;
     }
@@ -82,6 +100,74 @@ public class RestClient {
                 startHTTPConnection(url, method, jsonBody, responseHandler, timeout);
             }
         });
+
+    }
+    static void newpostRequest(final String url, final Map<String,String> data, final ResponseHandler responseHandler)
+    {
+        new Thread(new Runnable() {
+            @RequiresApi(api = Build.VERSION_CODES.KITKAT)
+            @Override
+            public void run() {
+                httpPostRequest(url,data,responseHandler);
+              //  makeApiCall(url,AppConstant.POST,null,responseHandler,GET_TIMEOUT);
+            }
+        }).start();
+    }
+
+    @RequiresApi(api = Build.VERSION_CODES.KITKAT)
+    public static void  httpPostRequest(String _url, Map<String,String> data,ResponseHandler responseHandler)
+    {
+        URLConnection con=null;
+        try {
+            URL url = new URL( _url );
+             con = url.openConnection();
+            HttpURLConnection http = (HttpURLConnection)con;
+            http.setRequestMethod("POST"); // PUT is another valid option
+            http.setDoOutput(true);
+            StringJoiner sj = null;
+            if (android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.N) {
+                sj = new StringJoiner("&");
+                for(Map.Entry<String,String> entry : data.entrySet())
+                    sj.add(URLEncoder.encode(entry.getKey(), "UTF-8") + "=" + entry.getValue());
+            }
+
+            byte[] out = sj.toString().getBytes(StandardCharsets.UTF_8);
+            int length = out.length;
+            http.setFixedLengthStreamingMode(length);
+            http.setRequestProperty("Content-Type",AppConstant.FORM_URL_ENCODED);
+            http.setRequestProperty( "charset", "utf-8");
+            http.setRequestProperty( "Content-Length", Integer.toString( length ));
+            http.setInstanceFollowRedirects( false );
+            http.setUseCaches( false );
+            http.connect();
+            try(OutputStream os = http.getOutputStream()) {
+                os.write(out);
+            }
+            if (http.getResponseCode() == HttpURLConnection.HTTP_OK) {
+//
+                if (responseHandler != null) {
+                    callResponseHandlerOnSuccess(responseHandler, "Success"+http.getResponseCode());
+                }
+                else
+                    Lg.w(AppConstant.APP_NAME_TAG, AppConstant.ATTACHREQUEST);
+               // }
+            } else {
+                if (responseHandler != null) {
+                    callResponseHandlerOnFailure(responseHandler, http.getResponseCode(),null,null);
+                }
+
+            }
+        }catch (IOException e) {
+            if (responseHandler != null) {
+                callResponseHandlerOnFailure(responseHandler, 400,null,null);
+
+            }
+            e.printStackTrace();
+        }
+        finally {
+            if (con != null)
+                ((HttpURLConnection) con).disconnect();
+        }
     }
 
     private static void startHTTPConnection(String url, String method, JSONObject jsonBody, ResponseHandler responseHandler, int timeout) {
@@ -95,7 +181,6 @@ public class RestClient {
             } else {
                 con = (HttpURLConnection) new URL(BASE_URL + url).openConnection();
             }
-
             con.setUseCaches(false);
             con.setConnectTimeout(timeout);
             con.setReadTimeout(timeout);
