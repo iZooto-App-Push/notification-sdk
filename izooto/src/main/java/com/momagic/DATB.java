@@ -170,7 +170,7 @@ public class DATB {
         }
         catch (Exception ex)
         {
-            Log.e("InitialiseFCM",ex.toString());
+            Log.e("FCM Exception",ex.toString());
         }
 
     }

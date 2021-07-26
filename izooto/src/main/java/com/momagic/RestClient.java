@@ -208,7 +208,6 @@ public class RestClient {
                     os.write(out);
                 }
             }
-            Log.e("Hello",url);
             httpResponse = con.getResponseCode();
             InputStream inputStream;
             Scanner scanner;
