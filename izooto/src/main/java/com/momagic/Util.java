@@ -33,9 +33,12 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.net.HttpURLConnection;
 import java.net.URL;
+import java.net.URLEncoder;
 import java.text.SimpleDateFormat;
 import java.util.Date;
+import java.util.HashMap;
 import java.util.Locale;
+import java.util.Map;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
@@ -391,5 +394,39 @@ public class Util {
             return Uri.parse(ContentResolver.SCHEME_ANDROID_RESOURCE + "://" + packageName + "/" + soundId);
         return null;
     }
+    public static void setException(Context context, String exception, String methodName, String className) {
+        if (context == null)
+            return;
+        try {
+            final PreferenceUtil preferenceUtil = PreferenceUtil.getInstance(context);
+            if (!exception.isEmpty()){
+                Map<String, String> mapData = new HashMap<>();
+                mapData.put(AppConstant.PID, preferenceUtil.getDataBID(AppConstant.APPPID));
+                mapData.put(AppConstant.TOKEN,"" + preferenceUtil.getStringData(AppConstant.FCM_DEVICE_TOKEN));
+                mapData.put(AppConstant.ANDROID_ID, "" + Util.getAndroidId(context));
+                mapData.put(AppConstant.EXCEPTION_, "" + exception);
+                mapData.put(AppConstant.METHOD_NAME, "" + methodName);
+                mapData.put(AppConstant.ClASS_NAME, "" + className);
+                String deviceName = URLEncoder.encode(Util.getDeviceName(), AppConstant.UTF);
+                String osVersion = URLEncoder.encode(Build.VERSION.RELEASE, AppConstant.UTF);
+                mapData.put(AppConstant.ANDROIDVERSION,"" + osVersion);
+                mapData.put(AppConstant.DEVICENAME,"" + deviceName);
+                RestClient.newPostRequest(RestClient.APP_EXCEPTION_URL, mapData, new RestClient.ResponseHandler() {
+                    @Override
+                    void onSuccess(final String response) {
+                        super.onSuccess(response);
+                    }
+                    @Override
+                    void onFailure(int statusCode, String response, Throwable throwable) {
+                        super.onFailure(statusCode, response, throwable);
+                    }
+                });
+            }
+        } catch (Exception e) {
+            Log.e("Exception ex -- ", e.toString());
+        }
+    }
+
+
 
 }

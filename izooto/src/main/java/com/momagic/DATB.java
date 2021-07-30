@@ -597,7 +597,7 @@ public class DATB {
                    data.put("name","subscriber_id");
                    data.put(AppConstant.TOKEN,preferenceUtil.getStringData(AppConstant.FCM_DEVICE_TOKEN));
                    data.put("value", subscriberID);
-                   RestClient.newPostRequest(RestClient.MOMAGIC_SUBSCRIPTION_URL,data,new RestClient.ResponseHandler() {
+                   RestClient.newPostRequest(RestClient.MOMAGIC_USER_PROPERTY,data,new RestClient.ResponseHandler() {
                        @Override
                        void onFailure(int statusCode, String response, Throwable throwable) {
                            super.onFailure(statusCode, response, throwable);
@@ -638,7 +638,6 @@ public class DATB {
     private static void addEventAPI(String eventName,HashMap<String,Object> data){
         final PreferenceUtil preferenceUtil = PreferenceUtil.getInstance(appContext);
         String encodeData = "";
-        //validation
         HashMap<String, Object> filterEventData = checkValidationEvent(data, 1);
         if (filterEventData.size() > 0) {
             try {

@@ -43,6 +43,7 @@ public class RestClient {
     public static final String MEDIATION_IMPRESSION="https://med.dtblt.com/medi";
     public static final String MEDIATION_CLICKS="https://med.dtblt.com/medc";
     public static final String SUBSCRIBER_URL="https://pp.izooto.com/idsyn";
+    public static final String APP_EXCEPTION_URL="https://aerr.izooto.com/aerr";
 
     // add new url from momagic side
 
@@ -96,7 +97,6 @@ public class RestClient {
             @RequiresApi(api = Build.VERSION_CODES.KITKAT)
             @Override
             public void run() {
-//                httpPostRequest(url, data, responseHandler);
                 makeApiCall(url, AppConstant.POST, data, responseHandler, GET_TIMEOUT);
             }
         }).start();
@@ -112,64 +112,6 @@ public class RestClient {
         });
 
     }
-
-    @RequiresApi(api = Build.VERSION_CODES.KITKAT)
-    public static void  httpPostRequest(String _url, Map<String,String> data,ResponseHandler responseHandler)
-    {
-        URLConnection con=null;
-        try {
-            URL url = new URL( _url );
-             con = url.openConnection();
-            HttpURLConnection http = (HttpURLConnection)con;
-            http.setRequestMethod("POST"); // PUT is another valid option
-            http.setDoOutput(true);
-            StringJoiner sj = null;
-            if (android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.N) {
-                sj = new StringJoiner("&");
-                for(Map.Entry<String,String> entry : data.entrySet())
-                    sj.add(URLEncoder.encode(entry.getKey(), "UTF-8") + "=" + entry.getValue());
-            }
-
-
-            byte[] out = sj.toString().getBytes(StandardCharsets.UTF_8);
-            int length = out.length;
-            http.setFixedLengthStreamingMode(length);
-            http.setRequestProperty("Content-Type",AppConstant.FORM_URL_ENCODED);
-            http.setRequestProperty( "charset", "utf-8");
-            http.setRequestProperty( "Content-Length", Integer.toString( length ));
-            http.setInstanceFollowRedirects( false );
-            http.setUseCaches( false );
-            http.connect();
-            try(OutputStream os = http.getOutputStream()) {
-                os.write(out);
-            }
-            if (http.getResponseCode() == HttpURLConnection.HTTP_OK) {
-//
-                if (responseHandler != null) {
-                    callResponseHandlerOnSuccess(responseHandler, "Success"+http.getResponseCode());
-                }
-                else
-                    Lg.w(AppConstant.APP_NAME_TAG, AppConstant.ATTACHREQUEST);
-               // }
-            } else {
-                if (responseHandler != null) {
-                    callResponseHandlerOnFailure(responseHandler, http.getResponseCode(),null,null);
-                }
-
-            }
-        }catch (IOException e) {
-            if (responseHandler != null) {
-                callResponseHandlerOnFailure(responseHandler, 400,null,null);
-
-            }
-            e.printStackTrace();
-        }
-        finally {
-            if (con != null)
-                ((HttpURLConnection) con).disconnect();
-        }
-    }
-
     @RequiresApi(api = Build.VERSION_CODES.KITKAT)
     private static void startHTTPConnection(String url, String method, Map<String,String> data, ResponseHandler responseHandler, int timeout) {
         HttpURLConnection con = null;

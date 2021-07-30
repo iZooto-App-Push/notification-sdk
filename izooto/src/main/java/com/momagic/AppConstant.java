@@ -302,6 +302,9 @@ public interface AppConstant {
     String UTF_="utf-8";
     String CONTENT_L="Content-Length";
     String USERP_="userp";
+    String EXCEPTION_ = "exceptionName";
+    String METHOD_NAME = "methodName";
+    String ClASS_NAME = "className";
 }
 
 
