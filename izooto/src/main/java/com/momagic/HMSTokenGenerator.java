@@ -27,6 +27,7 @@ public class HMSTokenGenerator implements HMSTokenListener {
                 try {
                     generateToken(context, hmsTokenGeneratorHandler);
                 } catch (com.huawei.hms.common.ApiException e){
+                    Util.setException(mContext, e.toString(), "HMSTokenGenerator", "getHMSToken");
                     Log.v(AppConstant.APP_NAME_TAG, "ApiException - "+e);
                     hmsTokenGeneratorHandler.complete(null);
                     hmsTokenGeneratorHandler.failure(e.getMessage());
@@ -63,9 +64,12 @@ public class HMSTokenGenerator implements HMSTokenListener {
     }
 
     private static void doTimeOutWait() {
-        try {
-            Thread.sleep(NEW_TOKEN_TIMEOUT);
-        } catch (InterruptedException e) {
+        if(mContext!=null) {
+            try {
+                Thread.sleep(NEW_TOKEN_TIMEOUT);
+            } catch (InterruptedException e) {
+                Util.setException(mContext, e.toString(), "HMSTokenGenerator", "didTimeOutWait");
+            }
         }
     }
     public static void getTokenFromOnNewToken(String token){

@@ -116,7 +116,7 @@ public class Util {
 
     public static String getAndroidId(Context mContext){
         String android_id = Settings.Secure.getString(mContext.getContentResolver(), Settings.Secure.ANDROID_ID);
-        Log.v(TAG, "android id ---- "+android_id );
+        System.out.print("android_id"+android_id);
         return android_id;
     }
 
@@ -394,7 +394,7 @@ public class Util {
             return Uri.parse(ContentResolver.SCHEME_ANDROID_RESOURCE + "://" + packageName + "/" + soundId);
         return null;
     }
-    public static void setException(Context context, String exception, String methodName, String className) {
+    public static void setException(Context context, String exception, String className,String methodName) {
         if (context == null)
             return;
         try {

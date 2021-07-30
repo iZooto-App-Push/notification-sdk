@@ -56,12 +56,16 @@ public class XiaomiSDKHandler implements XiaomiSDKHandlerListener {
     }
     @RestrictTo(value = RestrictTo.Scope.LIBRARY)
     public void register(String appId, String appKey)  {
-        try {
-            MiPushClient.registerPush(mContext, appId, appKey);
-            isRegistered = true;
+        if(mContext!=null) {
+            try {
+                MiPushClient.registerPush(mContext, appId, appKey);
+                isRegistered = true;
 
-        } catch (Throwable throwable) {
-            isRegistered = false;
+            } catch (Throwable throwable) {
+                Util.setException(mContext, throwable.toString(), "XiaomiSDKHandler", "register");
+
+                isRegistered = false;
+            }
         }
     }
     boolean shouldInit(String mainProcessName) {

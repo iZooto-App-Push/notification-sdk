@@ -53,19 +53,19 @@ public class MainActivity extends AppCompatActivity
                 }
             }
         });
-//        sendToken=findViewById(R.id.sendToken);
-//        sendToken.setOnClickListener(new View.OnClickListener() {
-//            @Override
-//            public void onClick(View v) {
-//
-//                PreferenceUtil preferenceUtil=PreferenceUtil.getInstance(MainActivity.this);
-//                String token=preferenceUtil.getStringData(AppConstant.FCM_DEVICE_TOKEN);
-//                if(token!=null && !token.isEmpty())
-//                {
-//                    sendEmail(token);
-//                }
-//            }
-//        });
+        sendToken=findViewById(R.id.sendToken);
+        sendToken.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+
+                PreferenceUtil preferenceUtil=PreferenceUtil.getInstance(MainActivity.this);
+                String token=preferenceUtil.getStringData(AppConstant.FCM_DEVICE_TOKEN);
+                if(token!=null && !token.isEmpty())
+                {
+                    sendEmail(token);
+                }
+            }
+        });
 
 
 

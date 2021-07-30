@@ -53,70 +53,73 @@ public class FCMTokenGenerator implements TokenGenerator {
 
     }
     public   void initFireBaseApp(final String senderId) {
-        if (firebaseApp != null)
-            return;
-
-
-
-        if(get_Project_ID()!="" && get_Project_ID()!="" && getAPI_KEY()!="" && senderId!="") {
-            FirebaseOptions firebaseOptions =
-                    new FirebaseOptions.Builder()
-                            .setGcmSenderId(senderId) //senderID
-                            .setApplicationId(get_App_ID()) //application ID
-                            .setApiKey(getAPI_KEY()) //Application Key
-                            .setProjectId(get_Project_ID()) //Project ID
-                            .build();
-            firebaseApp = FirebaseApp.initializeApp(DATB.appContext, firebaseOptions, AppConstant.SDKNAME);
-            Lg.d(AppConstant.FCMNAME, firebaseApp.getName());
-        }
-        else
-        {
-            Log.e(AppConstant.APP_NAME_TAG,"Missing google-service.json file");
+        if(DATB.appContext!=null) {
+            if (firebaseApp != null)
+                return;
+            if (get_Project_ID() != "" && get_Project_ID() != "" && getAPI_KEY() != "" && senderId != "") {
+                FirebaseOptions firebaseOptions =
+                        new FirebaseOptions.Builder()
+                                .setGcmSenderId(senderId) //senderID
+                                .setApplicationId(get_App_ID()) //application ID
+                                .setApiKey(getAPI_KEY()) //Application Key
+                                .setProjectId(get_Project_ID()) //Project ID
+                                .build();
+                firebaseApp = FirebaseApp.initializeApp(DATB.appContext, firebaseOptions, AppConstant.SDKNAME);
+                Lg.d(AppConstant.FCMNAME, firebaseApp.getName());
+            } else {
+                Log.e(AppConstant.APP_NAME_TAG, "missing google-service.json file");
+            }
         }
     }
     private static String  getAPI_KEY()
     {
-        try {
-            String apiKey = FirebaseOptions.fromResource(DATB.appContext).getApiKey();
-            if (apiKey != null)
-                return apiKey;
-            //return new String(Base64.decode(FCM_DEFAULT_API_KEY_BASE64, Base64.DEFAULT));
-        }
-        catch (Exception e)
-        {
-            return "";//new String(Base64.decode(FCM_DEFAULT_API_KEY_BASE64, Base64.DEFAULT));
+       if(DATB.appContext!=null) {
+           try {
+               String apiKey = FirebaseOptions.fromResource(DATB.appContext).getApiKey();
+               if (apiKey != null)
+                   return apiKey;
+               //return new String(Base64.decode(FCM_DEFAULT_API_KEY_BASE64, Base64.DEFAULT));
+           } catch (Exception e) {
+               Util.setException(DATB.appContext, e.toString(), "FCMTokenGenerator", "getAPiKey");
 
-        }
+               return "";//new String(Base64.decode(FCM_DEFAULT_API_KEY_BASE64, Base64.DEFAULT));
+
+           }
+       }
         return "";
 
 
     }
     private  static String get_App_ID() {
-        try {
-            String application_id = FirebaseOptions.fromResource(DATB.appContext).getApplicationId();
-            if (application_id!=null)
-                return application_id;
-        }
-        catch (Exception ex)
-        {
-            return "";//FCM_DEFAULT_APP_ID;
+       if(DATB.appContext!=null) {
+           try {
+               String application_id = FirebaseOptions.fromResource(DATB.appContext).getApplicationId();
+               if (application_id != null)
+                   return application_id;
+           } catch (Exception ex) {
+               Util.setException(DATB.appContext, ex.toString(), "FCMTokengeneration", "getAppID");
 
-        }
+               return "";//FCM_DEFAULT_APP_ID;
+
+           }
+       }
         return "";
 
     }
     private  static String get_Project_ID()
     {
-        try {
-            String project_id = FirebaseOptions.fromResource(DATB.appContext).getProjectId();
-            if(project_id!=null)
-                return project_id;
-        }
-        catch (Exception exception)
-        {
-            return "";
+       if(DATB.appContext!=null) {
+           try {
+               String project_id = FirebaseOptions.fromResource(DATB.appContext).getProjectId();
+               if (project_id != null)
+                   return project_id;
+           } catch (Exception exception) {
+               Util.setException(DATB.appContext, exception.toString(), "FCMTokenGenerator", "getProjectID");
 
-        }
+               return "";
+
+           }
+       }
         return "";
 
     }

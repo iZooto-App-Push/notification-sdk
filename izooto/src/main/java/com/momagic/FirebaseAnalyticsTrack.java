@@ -35,96 +35,105 @@ public class FirebaseAnalyticsTrack {
     }
 
     static boolean canFirebaseAnalyticsTrack() {
-        try {
-            FirebaseAnalyticsClass = Class.forName("com.google.firebase.analytics.FirebaseAnalytics");
-            return true;
-        } catch (ClassNotFoundException e) {
-            return false;
+        if (DATB.appContext != null) {
+            try {
+                FirebaseAnalyticsClass = Class.forName("com.google.firebase.analytics.FirebaseAnalytics");
+                return true;
+            } catch (ClassNotFoundException e) {
+               // Util.setException(DATB.appContext, e.toString(), "FirebaseAnalyticsClass", "canFirebase");
+                return false;
+            }
         }
+        return false;
     }
 
+
     void receivedEventTrack(Payload receivedPayload) {
-        try {
+        if(mContext!=null) {
+            try {
+                Object firebaseAnalyticsInstance = getInstanceOfFirebaseAnalytics(mContext);
+                Method trackEventMethod = trackEvent(FirebaseAnalyticsClass);
+                if (getDataFromPayload(receivedPayload) != null) {
+                    Bundle bundle = getDataFromPayload(receivedPayload);
+                    if (trackEventMethod != null) {
+                        trackEventMethod.invoke(firebaseAnalyticsInstance, DATB_NOTIFICATION_RECEIVED_EVENT, bundle);
+                    }
 
-            Object firebaseAnalyticsInstance = getInstanceOfFirebaseAnalytics(mContext);
+                    if (receivedTime == null)
+                        receivedTime = new AtomicLong();
+                    receivedTime.set(System.currentTimeMillis());
 
-            Method trackEventMethod = trackEvent(FirebaseAnalyticsClass);
+                    mPayload = receivedPayload;
 
-            if (getDataFromPayload(receivedPayload) != null){
-                Bundle bundle = getDataFromPayload(receivedPayload);
-                if (trackEventMethod != null) {
-                    trackEventMethod.invoke(firebaseAnalyticsInstance, DATB_NOTIFICATION_RECEIVED_EVENT, bundle);
                 }
 
-                if (receivedTime == null)
-                    receivedTime = new AtomicLong();
-                receivedTime.set(System.currentTimeMillis());
-
-                mPayload = receivedPayload;
+            } catch (Throwable t) {
+                Util.setException(mContext, t.toString(), "FirebaseAnalyticsClass", "receiveEvent");
 
             }
-
-        } catch (Throwable t) {
-            t.printStackTrace();
         }
     }
 
     void influenceOpenTrack() {
-        if (receivedTime == null || mPayload == null)
-            return;
+        if(mContext!=null) {
+            if (receivedTime == null || mPayload == null)
+                return;
 
-        long now = System.currentTimeMillis();
-        if (now - receivedTime.get() > 1000 * 60 * 2)
-            return;
+            long now = System.currentTimeMillis();
+            if (now - receivedTime.get() > 1000 * 60 * 2)
+                return;
 
-        if (openedTime != null && now - openedTime.get() < 1000 * 30)
-            return;
+            if (openedTime != null && now - openedTime.get() < 1000 * 30)
+                return;
 
-        try {
-            Object firebaseAnalyticsInstance = getInstanceOfFirebaseAnalytics(mContext);
-            Method trackEventMethod = trackEvent(FirebaseAnalyticsClass);
-            if (getDataFromPayload(mPayload) != null){
-                Bundle bundle = getDataFromPayload(mPayload);
+            try {
+                Object firebaseAnalyticsInstance = getInstanceOfFirebaseAnalytics(mContext);
+                Method trackEventMethod = trackEvent(FirebaseAnalyticsClass);
+                if (getDataFromPayload(mPayload) != null) {
+                    Bundle bundle = getDataFromPayload(mPayload);
 
-                if (bundle != null) {
-                    bundle.putString(AppConstant.TIME_OF_CLICK, getTimeOfClick());
+                    if (bundle != null) {
+                        bundle.putString(AppConstant.TIME_OF_CLICK, getTimeOfClick());
+                    }
+
+                    if (trackEventMethod != null) {
+                        trackEventMethod.invoke(firebaseAnalyticsInstance, DATB_NOTIFICATION_INFLUENCE_OPEN_EVENT, bundle);
+                    }
+
                 }
-
-                if (trackEventMethod != null) {
-                    trackEventMethod.invoke(firebaseAnalyticsInstance, DATB_NOTIFICATION_INFLUENCE_OPEN_EVENT, bundle);
-                }
-
+            } catch (Throwable t) {
+                Util.setException(mContext, t.toString(), "FirebaseAnalyticsClass", "influence");
             }
-        } catch (Throwable t) {
-            t.printStackTrace();
         }
     }
 
     void openedEventTrack() {
-        if(openedTime == null)
-            openedTime = new AtomicLong();
-        openedTime.set(System.currentTimeMillis());
+        if(mContext!=null) {
+            if (openedTime == null)
+                openedTime = new AtomicLong();
+            openedTime.set(System.currentTimeMillis());
 
-        try {
+            try {
 
-            Object firebaseAnalyticsInstance = getInstanceOfFirebaseAnalytics(mContext);
+                Object firebaseAnalyticsInstance = getInstanceOfFirebaseAnalytics(mContext);
 
-            Method trackEventMethod = trackEvent(FirebaseAnalyticsClass);
-            if (getDataFromPayload(mPayload) != null){
-                Bundle bundle = getDataFromPayload(mPayload);
-                if (bundle != null) {
-                    bundle.putString(AppConstant.TIME_OF_CLICK, getTimeOfClick());
+                Method trackEventMethod = trackEvent(FirebaseAnalyticsClass);
+                if (getDataFromPayload(mPayload) != null) {
+                    Bundle bundle = getDataFromPayload(mPayload);
+                    if (bundle != null) {
+                        bundle.putString(AppConstant.TIME_OF_CLICK, getTimeOfClick());
+                    }
+                    if (trackEventMethod != null) {
+                        trackEventMethod.invoke(firebaseAnalyticsInstance, DATB_NOTIFICATION_OPENED_EVENT, bundle);
+                    }
+
                 }
-                if (trackEventMethod != null) {
-                    trackEventMethod.invoke(firebaseAnalyticsInstance, DATB_NOTIFICATION_OPENED_EVENT, bundle);
-                }
+
+            } catch (Throwable t) {
+                Util.setException(mContext, t.toString(), "FirebaseAnalyticsClass", "openTrackEvent");
 
             }
-
-        } catch (Throwable t) {
-            t.printStackTrace();
         }
-
 
     }
 
@@ -168,14 +177,16 @@ public class FirebaseAnalyticsTrack {
     }
 
     private Object getInstanceOfFirebaseAnalytics(Context context) {
+        if(context!=null) {
 
-        if(mFirebaseAnalyticsInstance == null) {
-            Method getInstanceMethod = getInstance(FirebaseAnalyticsClass);
-            try {
-                mFirebaseAnalyticsInstance = getInstanceMethod.invoke(null,context);
-            } catch (Throwable e) {
-                e.printStackTrace();
-                return null;
+            if (mFirebaseAnalyticsInstance == null) {
+                Method getInstanceMethod = getInstance(FirebaseAnalyticsClass);
+                try {
+                    mFirebaseAnalyticsInstance = getInstanceMethod.invoke(null, context);
+                } catch (Throwable e) {
+                    Util.setException(mContext, e.toString(), "FirebaseAnalyticsClass", "getInstanceOfFirebaseAnalytics");
+                    return null;
+                }
             }
         }
 
@@ -183,12 +194,13 @@ public class FirebaseAnalyticsTrack {
     }
 
     private static Method trackEvent(Class mClass) {
-        try {
-            return mClass.getMethod(AppConstant.LOG_EVENT, String.class, Bundle.class);
-        } catch (NoSuchMethodException e) {
-            e.printStackTrace();
-            return null;
-        }
+            try {
+                return mClass.getMethod(AppConstant.LOG_EVENT, String.class, Bundle.class);
+            } catch (NoSuchMethodException e) {
+                e.printStackTrace();
+                return null;
+            }
+
     }
 
     private static Method getInstance(Class mClass) {

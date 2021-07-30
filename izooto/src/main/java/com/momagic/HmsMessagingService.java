@@ -38,7 +38,7 @@ public class HmsMessagingService extends HmsMessageService {
             JSONObject payloadObj = new JSONObject(data);
             if(payloadObj.has(AppConstant.AD_NETWORK) && payloadObj.has(AppConstant.GLOBAL))
             {
-                AdMediation.getAdNotificationData(payloadObj,AppConstant.PUSH_HMS);
+                AdMediation.getAdNotificationData(context,payloadObj,AppConstant.PUSH_HMS);
                 preferenceUtil.setBooleanData(AppConstant.MEDIATION,true);
             }
             else {
@@ -97,9 +97,8 @@ public class HmsMessagingService extends HmsMessageService {
                     return;
             }
         } catch (Exception e) {
+            Util.setException(context, e.toString(), "HMSMessagingServices", "handleNow");
 
-            e.printStackTrace();
-            Lg.d("TAG", e.toString());
         }
 
 

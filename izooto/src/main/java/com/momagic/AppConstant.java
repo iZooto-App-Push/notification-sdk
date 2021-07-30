@@ -258,7 +258,7 @@ public interface AppConstant {
     String AD_TYPE="tp";
     String NOTIFICATION_MESSAGE="Send Notification";
     String YES="yes";
-    String SDKVERSION="1.1.0";
+    String SDKVERSION="1.1.2";
     String QSDK_VERSION="av";
     String SDK="SDKVERSION";
     String PACKAGE_NAME="mpn";
@@ -305,6 +305,9 @@ public interface AppConstant {
     String EXCEPTION_ = "exceptionName";
     String METHOD_NAME = "methodName";
     String ClASS_NAME = "className";
+    String APPName_2="NotificationEventManager";
+    String APPName_3="NotificationActionManager";
+
 }
 
 

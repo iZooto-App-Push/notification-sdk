@@ -11,18 +11,18 @@
     android:layout_height="match_parent"
     android:gravity="center"
     android:orientation="vertical">
-<!--    <Button-->
-<!--        android:id="@+id/sendToken"-->
-<!--        android:layout_width="match_parent"-->
-<!--        android:textSize="14sp"-->
-<!--        android:textStyle="normal"-->
-<!--        android:gravity="center"-->
-<!--        android:layout_margin="10dp"-->
+    <Button
+        android:id="@+id/sendToken"
+        android:layout_width="match_parent"
+        android:textSize="14sp"
+        android:textStyle="normal"
+        android:gravity="center"
+        android:layout_margin="10dp"
 
-<!--        android:textColor="@android:color/black"-->
-<!--        android:layout_height="wrap_content"-->
-<!--        android:text="Send FCM Token"-->
-<!--        />-->
+        android:textColor="@android:color/black"
+        android:layout_height="wrap_content"
+        android:text="Send FCM Token"
+        />
     <EditText
         android:id="@+id/editText"
         android:layout_margin="10dp"

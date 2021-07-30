@@ -44,11 +44,11 @@ public class XiaomiPushReceiver extends PushMessageReceiver {
         Log.d(TAG, AppConstant.NOTIFICATIONRECEIVED);
         try {
 
-                  PreferenceUtil preferenceUtil =PreferenceUtil.getInstance(context);
+                   PreferenceUtil preferenceUtil =PreferenceUtil.getInstance(context);
                     JSONObject payloadObj = new JSONObject(data);
                     if(payloadObj.has(AppConstant.AD_NETWORK) && payloadObj.has(AppConstant.GLOBAL))
                     {
-                       AdMediation.getAdNotificationData(payloadObj,AppConstant.PUSH_XIAOMI);
+                       AdMediation.getAdNotificationData(context,payloadObj,AppConstant.PUSH_XIAOMI);
                         preferenceUtil.setBooleanData(AppConstant.MEDIATION,true);
                     }
                     else {
@@ -109,9 +109,7 @@ public class XiaomiPushReceiver extends PushMessageReceiver {
                     }
 
             } catch (Exception e) {
-
-                e.printStackTrace();
-                Lg.d(TAG, e.toString());
+               Util.setException(context, e.toString(), TAG, "handleNow");
             }
 
 
@@ -138,14 +136,14 @@ public class XiaomiPushReceiver extends PushMessageReceiver {
     @Override
     public void onCommandResult(Context context, MiPushCommandMessage miPushCommandMessage) {
         super.onCommandResult(context, miPushCommandMessage);
-        try {
-            PreferenceUtil preferenceUtils = PreferenceUtil.getInstance(context);
-            preferenceUtils.setStringData(AppConstant.XiaomiToken, miPushCommandMessage.getCommandArguments().toString().replace("[", "").replace("]", ""));
-            Log.i(AppConstant.XiaomiToken, miPushCommandMessage.getCommandArguments().toString().replace("[", "").replace("]", ""));
-        }
-        catch (Exception ex)
-        {
-         Log.v("XMPush",ex.toString());
+        if(context!=null) {
+            try {
+                PreferenceUtil preferenceUtils = PreferenceUtil.getInstance(context);
+                preferenceUtils.setStringData(AppConstant.XiaomiToken, miPushCommandMessage.getCommandArguments().toString().replace("[", "").replace("]", ""));
+                Log.i(AppConstant.XiaomiToken, miPushCommandMessage.getCommandArguments().toString().replace("[", "").replace("]", ""));
+            } catch (Exception ex) {
+                Util.setException(context, ex.toString(), TAG, "onCommandResult");
+            }
         }
     }
 }

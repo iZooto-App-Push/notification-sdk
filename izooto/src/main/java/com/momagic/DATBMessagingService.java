@@ -41,6 +41,7 @@ import java.util.Map;
 @SuppressLint("MissingFirebaseInstanceTokenRefresh")
 public class DATBMessagingService extends FirebaseMessagingService {
     private  Payload payload = null;
+    private String Name="DATBMessagingService";
     @Override
     public void onMessageReceived(RemoteMessage remoteMessage) {
         try {
@@ -102,13 +103,17 @@ public class DATBMessagingService extends FirebaseMessagingService {
             try {
                 if(data.get(AppConstant.AD_NETWORK) !=null && data.get(AppConstant.GLOBAL)!=null)
                 {
-                    AdMediation.getAdJsonData(data);
+                    AdMediation.getAdJsonData(this,data);
                     preferenceUtil.setBooleanData(AppConstant.MEDIATION,true);
                 }
                 else {
+                    Log.e("Show3","Notificaiton");
+
                     preferenceUtil.setBooleanData(AppConstant.MEDIATION, false);
                     JSONObject payloadObj = new JSONObject(data);
                     if (payloadObj.optLong(ShortpayloadConstant.CREATEDON) > PreferenceUtil.getInstance(this).getLongValue(AppConstant.DEVICE_REGISTRATION_TIMESTAMP)) {
+                        Log.e("Show4","Notificaiton");
+
                         payload = new Payload();
                         payload.setCreated_Time(payloadObj.optString(ShortpayloadConstant.CREATEDON));
                         payload.setFetchURL(payloadObj.optString(ShortpayloadConstant.FETCHURL));
@@ -157,13 +162,17 @@ public class DATBMessagingService extends FirebaseMessagingService {
                         payload.setSound(payloadObj.optString(ShortpayloadConstant.NOTIFICATION_SOUND));
                         payload.setMaxNotification(payloadObj.optInt(ShortpayloadConstant.MAX_NOTIFICATION));
 
-                    } else
+                    } else {
+                        Log.e("Show1","Notificaiton");
+
                         return;
+                    }
                 }
             } catch (Exception e) {
+                Util.setException(this, e.toString(), Name, "handleNow");
+                Log.e("Show2","Notificaiton"+e.toString());
 
-                e.printStackTrace();
-                Lg.d(AppConstant.APP_NAME_TAG, e.toString());
+
             }
 
 

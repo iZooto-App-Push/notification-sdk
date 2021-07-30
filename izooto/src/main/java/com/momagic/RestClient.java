@@ -88,7 +88,7 @@ public class RestClient {
         new Thread(new Runnable() {
             @Override
             public void run() {
-                makeApiCall(url,AppConstant.POST,null,responseHandler,GET_TIMEOUT);
+                makeApiCall1(url,AppConstant.POST,jsonObject,responseHandler,GET_TIMEOUT);
             }
         }).start();
     }
@@ -107,7 +107,20 @@ public class RestClient {
             @RequiresApi(api = Build.VERSION_CODES.KITKAT)
             @Override
             public void run() {
+
                 startHTTPConnection(url, method, data, responseHandler, timeout);
+            }
+        });
+
+    }
+    public static void makeApiCall1(final String url, final String method,  final JSONObject jsonObject, final ResponseHandler responseHandler, final int timeout) {
+        ExecutorService es = Executors.newSingleThreadExecutor();
+        es.submit(new Runnable() {
+            @RequiresApi(api = Build.VERSION_CODES.KITKAT)
+            @Override
+            public void run() {
+
+                startHTTPConnection1(url, method, jsonObject, responseHandler, timeout);
             }
         });
 
@@ -150,6 +163,7 @@ public class RestClient {
                     os.write(out);
                 }
             }
+
             httpResponse = con.getResponseCode();
             InputStream inputStream;
             Scanner scanner;
@@ -227,6 +241,90 @@ public class RestClient {
 
         void onFailure(int statusCode, String response, Throwable throwable) {
             Lg.v(AppConstant.APP_NAME_TAG, AppConstant.APIFAILURE  + response);
+        }
+    }
+    @RequiresApi(api = Build.VERSION_CODES.KITKAT)
+    private static void startHTTPConnection1(String url, String method, JSONObject jsonBody, ResponseHandler responseHandler, int timeout) {
+        HttpURLConnection con = null;
+        int httpResponse = -1;
+        String json = null;
+        try {
+            if (url.contains(AppConstant.HTTPS) || url.contains(AppConstant.HTTP) || url.contains(AppConstant.IMPR)) {
+                con = (HttpURLConnection) new URL(url).openConnection();
+            } else {
+                con = (HttpURLConnection) new URL(BASE_URL + url).openConnection();
+            }
+            con.setUseCaches(false);
+            con.setConnectTimeout(timeout);
+            con.setReadTimeout(timeout);
+            if (jsonBody != null)
+                con.setDoInput(true);
+            if (method != null) {
+                if(method.equalsIgnoreCase(AppConstant.POST)) {
+                    con.setRequestProperty(AppConstant.CONTENT_TYPE, AppConstant.FORM_URL_ENCODED);
+                }
+                else {
+                    con.setRequestProperty(AppConstant.CONTENT_TYPE, AppConstant.FORM_URL_JSON);
+                }
+                con.setRequestMethod(method);
+                con.setDoOutput(true);
+
+            }
+            if (jsonBody != null) {
+                String strJsonBody = jsonBody.toString();
+                byte[] sendBytes = strJsonBody.getBytes(AppConstant.UTF);
+                con.setFixedLengthStreamingMode(sendBytes.length);
+                OutputStream outputStream = con.getOutputStream();
+                outputStream.write(sendBytes);
+            }
+            httpResponse = con.getResponseCode();
+            InputStream inputStream;
+            Scanner scanner;
+            if (httpResponse == HttpURLConnection.HTTP_OK) {
+                if (url.equals(AppConstant.CDN+ DATB.mAppId+AppConstant.DAT))
+                    Lg.d(AppConstant.APP_NAME_TAG, AppConstant.SUCCESS);
+                else
+                    Lg.d(AppConstant.APP_NAME_TAG, AppConstant.SUCCESS);
+                inputStream = con.getInputStream();
+                scanner = new Scanner(inputStream, AppConstant.UTF);
+                json = scanner.useDelimiter("\\A").hasNext() ? scanner.next() : "";
+                scanner.close();
+                if (responseHandler != null) {
+                    callResponseHandlerOnSuccess(responseHandler, json);
+                }
+                else
+                    Lg.w(AppConstant.APP_NAME_TAG, AppConstant.ATTACHREQUEST);
+            } else {
+                if (url.equals(AppConstant.CDN+ DATB.mAppId+AppConstant.DAT))
+                    Lg.d(AppConstant.APP_NAME_TAG, AppConstant.SUCCESS);
+                else
+                    Lg.d(AppConstant.APP_NAME_TAG, AppConstant.FAILURE);
+                inputStream = con.getErrorStream();
+                if (inputStream == null)
+                    inputStream = con.getInputStream();
+                if (inputStream != null) {
+                    scanner = new Scanner(inputStream, AppConstant.UTF);
+                    json = scanner.useDelimiter("\\A").hasNext() ? scanner.next() : "";
+                    scanner.close();
+                }
+                if (responseHandler != null) {
+                    callResponseHandlerOnFailure(responseHandler, httpResponse, json, null);
+                }
+                else
+                    Lg.w(AppConstant.APP_NAME_TAG, AppConstant.ATTACHREQUEST);
+            }
+        } catch (Throwable t) {
+            if (t instanceof java.net.ConnectException || t instanceof java.net.UnknownHostException)
+                Lg.i(AppConstant.APP_NAME_TAG,  AppConstant.EXCEPTIONERROR+ t.getClass().getName());
+            else
+                Lg.i(AppConstant.APP_NAME_TAG,  AppConstant.EXCEPTIONERROR+ t);
+            if (responseHandler != null)
+                callResponseHandlerOnFailure(responseHandler, httpResponse, null, t);
+            else
+                Lg.w(AppConstant.APP_NAME_TAG, AppConstant.ATTACHREQUEST);
+        } finally {
+            if (con != null)
+                con.disconnect();
         }
     }
 }
