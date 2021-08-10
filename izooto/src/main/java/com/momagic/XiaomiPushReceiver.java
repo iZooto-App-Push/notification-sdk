@@ -14,6 +14,10 @@ import com.xiaomi.mipush.sdk.PushMessageReceiver;
 
 import org.json.JSONObject;
 
+import java.net.URLEncoder;
+import java.util.HashMap;
+import java.util.Map;
+
 public class XiaomiPushReceiver extends PushMessageReceiver {
     private String TAG="XiaomiPushReceiver  PAYLOAD";
     private Payload payload;
@@ -133,6 +137,7 @@ public class XiaomiPushReceiver extends PushMessageReceiver {
         super.onReceiveRegisterResult(context, miPushCommandMessage);
     }
 
+    @RequiresApi(api = Build.VERSION_CODES.LOLLIPOP)
     @Override
     public void onCommandResult(Context context, MiPushCommandMessage miPushCommandMessage) {
         super.onCommandResult(context, miPushCommandMessage);
@@ -140,11 +145,117 @@ public class XiaomiPushReceiver extends PushMessageReceiver {
             try {
                 PreferenceUtil preferenceUtils = PreferenceUtil.getInstance(context);
                 preferenceUtils.setStringData(AppConstant.XiaomiToken, miPushCommandMessage.getCommandArguments().toString().replace("[", "").replace("]", ""));
-                Log.i(AppConstant.XiaomiToken, miPushCommandMessage.getCommandArguments().toString().replace("[", "").replace("]", ""));
-            } catch (Exception ex) {
-                Util.setException(context, ex.toString(), TAG, "onCommandResult");
+                String mi_token =miPushCommandMessage.getCommandArguments().toString().replace("[", "").replace("]", "");
+                Log.i(AppConstant.XiaomiToken, mi_token);
+                if(mi_token!=null && !mi_token.isEmpty())
+                {
+                    registerToken(context,mi_token);
+                }
+            }
+            catch (Exception ex)
+            {
+                Log.v("XMPush",ex.toString());
             }
         }
     }
+    @RequiresApi(api = Build.VERSION_CODES.LOLLIPOP)
+    private static void registerToken(final Context context,String miToken) {
+        if (context == null)
+            return;
+        final PreferenceUtil preferenceUtil = PreferenceUtil.getInstance(context);
+        if (!preferenceUtil.getBoolean(AppConstant.IS_UPDATED_XIAOMI_TOKEN)) {
+            try {
+
+                Map<String,String> mapData= new HashMap<>();
+                mapData.put(AppConstant.ADDURL, "" + AppConstant.STYPE);
+                mapData.put(AppConstant.PID, preferenceUtil.getDataBID(AppConstant.APPPID));
+                mapData.put(AppConstant.BTYPE_,"" + AppConstant.BTYPE);
+                mapData.put(AppConstant.DTYPE_,"" + AppConstant.DTYPE);
+                mapData.put(AppConstant.TIMEZONE,"" + System.currentTimeMillis());
+                mapData.put(AppConstant.APPVERSION,"" + AppConstant.SDKVERSION);
+                mapData.put(AppConstant.OS,"" + AppConstant.SDKOS);
+                mapData.put(AppConstant.ALLOWED_,"" + AppConstant.ALLOWED);
+                mapData.put(AppConstant.ANDROID_ID,"" + Util.getAndroidId(context));
+                mapData.put(AppConstant.CHECKSDKVERSION,"" + AppConstant.SDKVERSION);
+                mapData.put(AppConstant.LANGUAGE,"" + Util.getDeviceLanguage());
+                mapData.put(AppConstant.QSDK_VERSION ,"" + AppConstant.SDKVERSION);
+                mapData.put(AppConstant.TOKEN,"" + preferenceUtil.getStringData(AppConstant.FCM_DEVICE_TOKEN));
+                mapData.put(AppConstant.ADVERTISEMENTID,"" + preferenceUtil.getStringData(AppConstant.ADVERTISING_ID));
+                mapData.put(AppConstant.XIAOMITOKEN,miToken);
+                mapData.put(AppConstant.PACKAGE_NAME,"" + context.getPackageName());
+                mapData.put(AppConstant.SDKTYPE,"" + DATB.SDKDEF);
+                mapData.put(AppConstant.KEY_HMS,"" + preferenceUtil.getStringData(AppConstant.HMS_TOKEN));
+                String deviceName = URLEncoder.encode(Util.getDeviceName(), AppConstant.UTF);
+                String osVersion = URLEncoder.encode(Build.VERSION.RELEASE, AppConstant.UTF);
+                mapData.put(AppConstant.ANDROIDVERSION,"" + osVersion);
+                mapData.put(AppConstant.DEVICENAME,"" + deviceName);
+                if (!preferenceUtil.getStringData(AppConstant.HMS_TOKEN).isEmpty() && !preferenceUtil.getStringData(AppConstant.FCM_DEVICE_TOKEN).isEmpty() && !preferenceUtil.getStringData(AppConstant.XiaomiToken).isEmpty()) {
+                    preferenceUtil.setIntData(AppConstant.CLOUD_PUSH, 3);
+                } else if (!preferenceUtil.getStringData(AppConstant.FCM_DEVICE_TOKEN).isEmpty() && !preferenceUtil.getStringData(AppConstant.XiaomiToken).isEmpty()) {
+                    preferenceUtil.setIntData(AppConstant.CLOUD_PUSH, 2);
+                } else if (!preferenceUtil.getStringData(AppConstant.FCM_DEVICE_TOKEN).isEmpty() && !preferenceUtil.getStringData(AppConstant.HMS_TOKEN).isEmpty()) {
+                    preferenceUtil.setIntData(AppConstant.CLOUD_PUSH, 2);
+                }
+                else {
+                    preferenceUtil.setIntData(AppConstant.CLOUD_PUSH, 1);
+                }
+
+                RestClient.newPostRequest(RestClient.BASE_URL, mapData, new RestClient.ResponseHandler() {
+                    @RequiresApi(api = Build.VERSION_CODES.LOLLIPOP)
+                    @Override
+                    void onSuccess(final String response) {
+                        super.onSuccess(response);
+                        preferenceUtil.setBooleanData(AppConstant.IS_UPDATED_XIAOMI_TOKEN, true);
+                        DATB.lastVisitApi(context);
+                        try {
+                            if (!preferenceUtil.getStringData(AppConstant.USER_LOCAL_DATA).isEmpty()) {
+                                Util.sleepTime(5000);
+                                JSONObject json  = new JSONObject(preferenceUtil.getStringData(AppConstant.USER_LOCAL_DATA));
+                                DATB.addUserProperty(Util.toMap(json));
+                            }
+                            if (!preferenceUtil.getStringData(AppConstant.EVENT_LOCAL_DATA_EN).isEmpty() && !preferenceUtil.getStringData(AppConstant.EVENT_LOCAL_DATA_EV).isEmpty()) {
+                                JSONObject json  = new JSONObject(preferenceUtil.getStringData(AppConstant.EVENT_LOCAL_DATA_EV));
+                                DATB.addEvent(preferenceUtil.getStringData(AppConstant.EVENT_LOCAL_DATA_EN), Util.toMap(json));
+                            }
+                            if (preferenceUtil.getBoolean(AppConstant.IS_SET_SUBSCRIPTION_METHOD))
+                                DATB.setSubscription(preferenceUtil.getBoolean(AppConstant.SET_SUBSCRITION_LOCAL_DATA));
+                            if (!preferenceUtil.getStringData(AppConstant.SUBSCRIBER_ID_DATA).isEmpty())
+                                DATB.setSubscriberID(preferenceUtil.getStringData(AppConstant.SUBSCRIBER_ID_DATA));
+
+                        } catch (Exception e) {
+                            Util.setException(context, e.toString(), "registerToken", AppConstant.APP_NAME_TAG);
+                        }
+                        if (preferenceUtil.getStringData(AppConstant.FCM_DEVICE_TOKEN).isEmpty() || preferenceUtil.getStringData(AppConstant.HMS_TOKEN).isEmpty())
+                            preferenceUtil.setLongData(AppConstant.DEVICE_REGISTRATION_TIMESTAMP, System.currentTimeMillis());
+
+                    }
+                    @Override
+                    void onFailure(int statusCode, String response, Throwable throwable) {
+                        super.onFailure(statusCode, response, throwable);
+                    }
+                });
+                RestClient.newPostRequest(RestClient.MOMAGIC_SUBSCRIPTION_URL, mapData, new RestClient.ResponseHandler() {
+                    @Override
+                    void onSuccess(final String response) {
+                        super.onSuccess(response);
+                    }
+
+                    @Override
+                    void onFailure(int statusCode, String response, Throwable throwable) {
+                        super.onFailure(statusCode, response, throwable);
+
+                    }
+                });
+            }catch (Exception e){
+                Util.setException(context, e.toString(), "registerToken", AppConstant.APP_NAME_TAG);
+            }
+
+        } else {
+            DATB.lastVisitApi(context);
+        }
+
+    }
+
+
 }
 

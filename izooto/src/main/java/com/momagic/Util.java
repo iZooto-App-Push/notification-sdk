@@ -29,14 +29,21 @@ import androidx.core.content.ContextCompat;
 import androidx.core.text.HtmlCompat;
 
 
+import org.json.JSONArray;
+import org.json.JSONException;
+import org.json.JSONObject;
+
 import java.io.IOException;
 import java.io.InputStream;
 import java.net.HttpURLConnection;
 import java.net.URL;
 import java.net.URLEncoder;
 import java.text.SimpleDateFormat;
+import java.util.ArrayList;
 import java.util.Date;
 import java.util.HashMap;
+import java.util.Iterator;
+import java.util.List;
 import java.util.Locale;
 import java.util.Map;
 import java.util.regex.Matcher;
@@ -294,14 +301,18 @@ public class Util {
     @RequiresApi(api = Build.VERSION_CODES.LOLLIPOP)
     public static String getDeviceLanguageTag()
     {
-        Locale locale;
-        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.N) {
-            locale = DATB.appContext.getResources().getConfiguration().getLocales().get(0);
-        } else {
-            locale = DATB.appContext.getResources().getConfiguration().locale;
+        if(DATB.appContext!=null) {
+            Locale locale;
+            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.N) {
+                locale = DATB.appContext.getResources().getConfiguration().getLocales().get(0);
+                return locale.getDefault().getDisplayLanguage();
+            } else {
+                return "iz-ln";
+            }
         }
-        // Log.e("lanuguage",locale.getCountry());
-        return locale.getDefault().toLanguageTag();
+        else {
+            return "iz_ln";
+        }
 
     }
     public static String getTime() {
@@ -427,6 +438,50 @@ public class Util {
         }
     }
 
+    public static boolean isNetworkAvailable(Context mContext) {
+        ConnectivityManager connectivity = (ConnectivityManager) mContext.getSystemService(Context.CONNECTIVITY_SERVICE);
+        if (connectivity == null) {
+            return false;
+        } else {
+            NetworkInfo[] info = connectivity.getAllNetworkInfo();
+            if (info != null) {
+                for (int i = 0; i < info.length; i++) {
+                    if (info[i].getState() == NetworkInfo.State.CONNECTED){
+                        return true;
+                    }
+                }
+            }
+        }
+        return false;
+    }
+    public static HashMap<String, Object> toMap(JSONObject jsonobj)  throws JSONException {
+        HashMap<String, Object> map = new HashMap<String, Object>();
+        Iterator<String> keys = jsonobj.keys();
+        while(keys.hasNext()) {
+            String key = keys.next();
+            Object value = jsonobj.get(key);
+            if (value instanceof JSONArray) {
+                value = toList((JSONArray) value);
+            } else if (value instanceof JSONObject) {
+                value = toMap((JSONObject) value);
+            }
+            map.put(key, value);
+        }   return map;
+    }
+
+    public static List<Object> toList(JSONArray array) throws JSONException {
+        List<Object> list = new ArrayList<Object>();
+        for(int i = 0; i < array.length(); i++) {
+            Object value = array.get(i);
+            if (value instanceof JSONArray) {
+                value = toList((JSONArray) value);
+            }
+            else if (value instanceof JSONObject) {
+                value = toMap((JSONObject) value);
+            }
+            list.add(value);
+        }   return list;
+    }
 
 
 }

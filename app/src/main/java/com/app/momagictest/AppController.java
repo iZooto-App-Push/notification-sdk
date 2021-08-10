@@ -9,6 +9,7 @@ import com.momagic.Payload;
 import com.momagic.TokenReceivedListener;
 
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
 
 public class AppController extends Application implements TokenReceivedListener,NotificationHelperListener
@@ -23,6 +24,7 @@ public class AppController extends Application implements TokenReceivedListener,
                 .setNotificationReceiveListener(this)
                 .setTokenReceivedListener(this)
                 .build();
+
 
 
 

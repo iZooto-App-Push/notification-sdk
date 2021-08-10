@@ -1100,7 +1100,6 @@ public class AdMediation {
                    }
                }
            } catch (Exception e) {
-              // Util.setException(DATB.appContext, e.toString(), "AdMediation", "parsejson");
 
            }
        }

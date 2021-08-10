@@ -6,7 +6,6 @@ import android.content.Context;
 import android.content.Intent;
 import android.net.Uri;
 import android.os.Bundle;
-import android.util.Log;
 import org.json.JSONObject;
 import java.net.URLEncoder;
 import java.util.HashMap;
@@ -202,7 +201,6 @@ public class NotificationActionReceiver extends BroadcastReceiver {
     private void lastClickAPI(Context context){
         if(context!=null) {
             final PreferenceUtil preferenceUtil = PreferenceUtil.getInstance(context);
-            String appVersion = Util.getSDKVersion(context);
             preferenceUtil.setStringData(AppConstant.CURRENT_DATE_CLICK, Util.getTime());
             String encodeData = "";
             try {
@@ -224,7 +222,7 @@ public class NotificationActionReceiver extends BroadcastReceiver {
             try {
                 Map<String, String> mapData = new HashMap<>();
                 mapData.put(AppConstant.PID, preferenceUtil.getDataBID(AppConstant.APPPID));
-                mapData.put(AppConstant.VER_, appVersion);
+                mapData.put(AppConstant.VER_, AppConstant.SDKVERSION);
                 mapData.put(AppConstant.ANDROID_ID, "" + Util.getAndroidId(context));
                 mapData.put(AppConstant.VAL, "" + encodeData);
                 mapData.put(AppConstant.ACT, "add");

@@ -58,7 +58,7 @@ public class RestClient {
     static void get(final String url, final ResponseHandler responseHandler) {
         new Thread(new Runnable() {
             public void run() {
-                makeApiCall(url, null, null, responseHandler, GET_TIMEOUT);
+                makeApiCall1(url, null, null, responseHandler, GET_TIMEOUT);
             }
         }).start();
     }
@@ -163,7 +163,6 @@ public class RestClient {
                     os.write(out);
                 }
             }
-
             httpResponse = con.getResponseCode();
             InputStream inputStream;
             Scanner scanner;

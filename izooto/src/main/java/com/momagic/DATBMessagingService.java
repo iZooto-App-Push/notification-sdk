@@ -107,12 +107,9 @@ public class DATBMessagingService extends FirebaseMessagingService {
                     preferenceUtil.setBooleanData(AppConstant.MEDIATION,true);
                 }
                 else {
-                    Log.e("Show3","Notificaiton");
-
                     preferenceUtil.setBooleanData(AppConstant.MEDIATION, false);
                     JSONObject payloadObj = new JSONObject(data);
                     if (payloadObj.optLong(ShortpayloadConstant.CREATEDON) > PreferenceUtil.getInstance(this).getLongValue(AppConstant.DEVICE_REGISTRATION_TIMESTAMP)) {
-                        Log.e("Show4","Notificaiton");
 
                         payload = new Payload();
                         payload.setCreated_Time(payloadObj.optString(ShortpayloadConstant.CREATEDON));
@@ -163,14 +160,12 @@ public class DATBMessagingService extends FirebaseMessagingService {
                         payload.setMaxNotification(payloadObj.optInt(ShortpayloadConstant.MAX_NOTIFICATION));
 
                     } else {
-                        Log.e("Show1","Notificaiton");
 
                         return;
                     }
                 }
             } catch (Exception e) {
                 Util.setException(this, e.toString(), Name, "handleNow");
-                Log.e("Show2","Notificaiton"+e.toString());
 
 
             }

@@ -337,7 +337,6 @@ public class NotificationEventManager {
             }
 
 
-
         } catch (Exception e) {
                  }
     }
@@ -1004,19 +1003,18 @@ private static void receivedNotification(final Payload payload){
     });
 }
 
-    private static boolean isInt(String s)//1234
-    {
-        try
-        {
-           Integer.parseInt(s);//1234//what is use case variable i // Number format exception check kiya tha
-        return true;
-        }
-        catch(NumberFormatException er)
-        {
-//            if(DATB.appContext!=null) {
-//                Util.setException(DATB.appContext, er.toString(), AppConstant.APPName_2, "isInit");
-//            }
+    public static boolean isInt(String s) {
+        if (s.isEmpty())
+            return false;
 
+        if(!s.matches("-?\\d+"))
+            return false;
+
+        try {
+            Integer.parseInt(s); //1234//what is use case variable i // Number format exception check kiya tha
+            return true;
+        } catch(NumberFormatException er) {
+            Util.setException(DATB.appContext, er.toString(), "isInt", AppConstant.APPName_2);
             return false;
         }
 
@@ -1398,7 +1396,7 @@ private static void receivedNotification(final Payload payload){
 
             Map<String, String> mapData = new HashMap<>();
             mapData.put(AppConstant.PID, preferenceUtil.getDataBID(AppConstant.APPPID));
-            mapData.put(AppConstant.VER_, Util.getSDKVersion(DATB.appContext));
+            mapData.put(AppConstant.VER_, AppConstant.SDKVERSION);
             mapData.put(AppConstant.ANDROID_ID, "" + Util.getAndroidId(DATB.appContext));
             mapData.put(AppConstant.VAL, "" + encodeData);
             mapData.put(AppConstant.ACT, "add");

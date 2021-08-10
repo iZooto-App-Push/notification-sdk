@@ -258,7 +258,7 @@ public interface AppConstant {
     String AD_TYPE="tp";
     String NOTIFICATION_MESSAGE="Send Notification";
     String YES="yes";
-    String SDKVERSION="1.1.2";
+    String SDKVERSION="1.1.3";
     String QSDK_VERSION="av";
     String SDK="SDKVERSION";
     String PACKAGE_NAME="mpn";
@@ -272,7 +272,6 @@ public interface AppConstant {
     String PUSH="push_type";
     String CHECK_XIAOMI="Check";
     String HMS_TOKEN = "hms_token";
-    String IS_UPDATED_HMS_TOKEN = "hms_token";
     String KEY_HMS="ht";
     String HMS_APP_ID="hms_app_id";
     String HMS="Huawei";
@@ -307,6 +306,15 @@ public interface AppConstant {
     String ClASS_NAME = "className";
     String APPName_2="NotificationEventManager";
     String APPName_3="NotificationActionManager";
+    String USER_LOCAL_DATA = "iz_userLocalData";
+    String SET_SUBSCRIPTION_DATA="iz_setSubscription";
+    String EVENT_LOCAL_DATA_EN = "eventLocalDataEN";
+    String EVENT_LOCAL_DATA_EV = "eventLocalDataEV";
+    String SET_SUBSCRITION_LOCAL_DATA = "setSubscriptionLocalData";
+    String IS_SET_SUBSCRIPTION_METHOD = "isSetSubscriptionMethod";
+    String IS_UPDATED_XIAOMI_TOKEN = "iz_xiaomi_token_updated";
+    String IS_UPDATED_HMS_TOKEN = "iz_hms_token_updated";
+    String SUBSCRIBER_ID_DATA="iz_SUBSCRIBER_ID_DATA";
 
 }
 
