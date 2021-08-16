@@ -116,7 +116,6 @@ public class Util {
             }
             return null;
         } catch (IOException e) {
-            // Log exception
             return null;
         }
     }

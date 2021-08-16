@@ -165,7 +165,8 @@ public class XiaomiPushReceiver extends PushMessageReceiver {
         final PreferenceUtil preferenceUtil = PreferenceUtil.getInstance(context);
         if (!preferenceUtil.getBoolean(AppConstant.IS_UPDATED_XIAOMI_TOKEN)) {
             try {
-
+                if (!preferenceUtil.getStringData(AppConstant.HMS_TOKEN).isEmpty())
+                    preferenceUtil.setBooleanData(AppConstant.IS_UPDATED_HMS_TOKEN, true);
                 Map<String,String> mapData= new HashMap<>();
                 mapData.put(AppConstant.ADDURL, "" + AppConstant.STYPE);
                 mapData.put(AppConstant.PID, preferenceUtil.getDataBID(AppConstant.APPPID));

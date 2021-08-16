@@ -404,29 +404,31 @@ public class DATB {
 
     }
     private static void initHmsService(final Context context){
-        if(context!=null) {
-            HMSTokenGenerator hmsTokenGenerator = new HMSTokenGenerator();
-            hmsTokenGenerator.getHMSToken(context, new HMSTokenListener.HMSTokenGeneratorHandler() {
-                @RequiresApi(api = Build.VERSION_CODES.KITKAT)
-                @Override
-                public void complete(String id) {
-                    Log.i(AppConstant.APP_NAME_TAG, "HMS Token" + id);
-                    PreferenceUtil preferenceUtil = PreferenceUtil.getInstance(appContext);
-                    if (!preferenceUtil.getBoolean(AppConstant.IS_UPDATED_HMS_TOKEN) && !id.isEmpty()) {
+        if (context == null)
+            return;
+
+        HMSTokenGenerator hmsTokenGenerator = new HMSTokenGenerator();
+        hmsTokenGenerator.getHMSToken(context, new HMSTokenListener.HMSTokenGeneratorHandler() {
+            @RequiresApi(api = Build.VERSION_CODES.LOLLIPOP)
+            @Override
+            public void complete(String id) {
+                Log.i(AppConstant.APP_NAME_TAG, "HMS Token - " + id);
+                PreferenceUtil preferenceUtil = PreferenceUtil.getInstance(context);
+                if (id != null && !id.isEmpty()) {
+                    if (!preferenceUtil.getBoolean(AppConstant.IS_UPDATED_HMS_TOKEN)) {
                         preferenceUtil.setBooleanData(AppConstant.IS_UPDATED_HMS_TOKEN, true);
                         preferenceUtil.setBooleanData(AppConstant.IS_TOKEN_UPDATED, false);
                         DATB.registerToken();
                     }
                 }
+            }
 
-                @Override
-                public void failure(String errorMessage) {
-                    Lg.v(AppConstant.APP_NAME_TAG, errorMessage);
-                }
-            });
-        }
-    }
-    static void onActivityResumed(Activity activity){
+            @Override
+            public void failure(String errorMessage) {
+                Lg.v(AppConstant.APP_NAME_TAG, errorMessage);
+            }
+        });
+    }    static void onActivityResumed(Activity activity){
         if(appContext!=null) {
             final PreferenceUtil preferenceUtil = PreferenceUtil.getInstance(appContext);
             setActivity(activity);
@@ -458,6 +460,7 @@ public class DATB {
     }
 
 
+    @RequiresApi(api = Build.VERSION_CODES.KITKAT)
     public static void processNotificationReceived(Payload payload) {
         if(payload!=null) {
             NotificationEventManager.manageNotification(payload);
@@ -1026,6 +1029,7 @@ public class DATB {
             DATB.appContext = context;
         Handler mainHandler = new Handler(Looper.getMainLooper());
         Runnable myRunnable = new Runnable() {
+            @RequiresApi(api = Build.VERSION_CODES.KITKAT)
             @Override
             public void run() {
                 DATB.processNotificationReceived(payload);
