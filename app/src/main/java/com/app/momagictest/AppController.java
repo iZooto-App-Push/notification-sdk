@@ -25,6 +25,9 @@ public class AppController extends Application implements TokenReceivedListener,
                 .setTokenReceivedListener(this)
                 .build();
 
+    HashMap<String,Object> data = new HashMap<>();
+    data.put("language","Marathi");
+    DATB.addUserProperty(data);
 
 
 

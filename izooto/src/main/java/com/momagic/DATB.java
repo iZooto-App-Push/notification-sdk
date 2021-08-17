@@ -718,12 +718,10 @@ public class DATB {
     private static void addEventAPI(String eventName,HashMap<String,Object> data){
         if(appContext!=null) {
             final PreferenceUtil preferenceUtil = PreferenceUtil.getInstance(appContext);
-            String encodeData = "";
             HashMap<String, Object> filterEventData = checkValidationEvent(data, 1);
             if (filterEventData.size() > 0) {
                 try {
                     JSONObject jsonObject = new JSONObject(filterEventData);
-                    encodeData = URLEncoder.encode(jsonObject.toString(), AppConstant.UTF);
 
                     if (!preferenceUtil.getDataBID(AppConstant.APPPID).isEmpty() && Util.isNetworkAvailable(appContext)) {
                         if (!preferenceUtil.getStringData(AppConstant.FCM_DEVICE_TOKEN).isEmpty() || !preferenceUtil.getStringData(AppConstant.HMS_TOKEN).isEmpty() || !preferenceUtil.getStringData(AppConstant.XiaomiToken).isEmpty()) {
@@ -733,7 +731,7 @@ public class DATB {
                             mapData.put(AppConstant.ACT, eventName);
                             mapData.put(AppConstant.ET_, "evt");
                             mapData.put(AppConstant.ANDROID_ID, "" + Util.getAndroidId(appContext));
-                            mapData.put(AppConstant.VAL, "" + encodeData);
+                            mapData.put(AppConstant.VAL, "" + jsonObject.toString());
 
                             RestClient.newPostRequest(RestClient.EVENT_URL, mapData, new RestClient.ResponseHandler() {
                                 @Override
@@ -792,7 +790,6 @@ public class DATB {
             return;
 
         final PreferenceUtil preferenceUtil = PreferenceUtil.getInstance(appContext);
-        String encodeData = "";
 
         try {
             if (object != null && object.size()>0) {
@@ -807,7 +804,6 @@ public class DATB {
                     HashMap<String, Object> filterUserPropertyData = checkValidationUserProfile(newListUserProfile, 1);
                     if (filterUserPropertyData.size() > 0) {
                         JSONObject jsonObject = new JSONObject(filterUserPropertyData);
-                        encodeData = URLEncoder.encode(jsonObject.toString(), AppConstant.UTF);
 
                         if (!preferenceUtil.getDataBID(AppConstant.APPPID).isEmpty() && Util.isNetworkAvailable(appContext)) {
                             if (!preferenceUtil.getStringData(AppConstant.FCM_DEVICE_TOKEN).isEmpty() || !preferenceUtil.getStringData(AppConstant.HMS_TOKEN).isEmpty() || !preferenceUtil.getStringData(AppConstant.XiaomiToken).isEmpty()) {
@@ -816,7 +812,7 @@ public class DATB {
                                 mapData.put(AppConstant.ACT, "add");
                                 mapData.put(AppConstant.ET_, "" + AppConstant.USERP_);
                                 mapData.put(AppConstant.ANDROID_ID, "" + Util.getAndroidId(appContext));
-                                mapData.put(AppConstant.VAL, "" + encodeData);
+                                mapData.put(AppConstant.VAL, "" + jsonObject.toString());
 
                                 RestClient.newPostRequest(RestClient.PROPERTIES_URL, mapData, new RestClient.ResponseHandler() {
                                     @Override
@@ -1121,22 +1117,17 @@ public class DATB {
            if (topic.size() > 0) {
                final PreferenceUtil preferenceUtil = PreferenceUtil.getInstance(appContext);
                if (!preferenceUtil.getDataBID(AppConstant.APPPID).isEmpty() && !preferenceUtil.getStringData(AppConstant.FCM_DEVICE_TOKEN).isEmpty()) {
-                   String encodeData = "";
                    try {
                        HashMap<String, List<String>> data = new HashMap<>();
                        data.put(AppConstant.TOPIC, topic);
                        JSONObject jsonObject = new JSONObject(data);
-                       encodeData = URLEncoder.encode(jsonObject.toString(), AppConstant.UTF);
-                   } catch (Exception ex) {
-                       ex.printStackTrace();
-                   }
-                   try {
+
                        Map<String, String> mapData = new HashMap<>();
                        mapData.put(AppConstant.PID, preferenceUtil.getDataBID(AppConstant.APPPID));
                        mapData.put(AppConstant.ACT, action);
                        mapData.put(AppConstant.ET_, "" + AppConstant.USERP_);
                        mapData.put(AppConstant.BKEY, "" + Util.getAndroidId(appContext));
-                       mapData.put(AppConstant.VAL, "" + encodeData);
+                       mapData.put(AppConstant.VAL, "" + jsonObject.toString());
                        mapData.put(AppConstant.TOKEN, "" + preferenceUtil.getStringData(AppConstant.FCM_DEVICE_TOKEN));
                        mapData.put(AppConstant.BTYPE_, "" + AppConstant.BTYPE);
                        RestClient.newPostRequest(RestClient.PROPERTIES_URL, mapData, new RestClient.ResponseHandler() {
@@ -1212,22 +1203,18 @@ public class DATB {
             String time = preferenceUtil.getStringData(AppConstant.CURRENT_DATE);
             if (!time.equalsIgnoreCase(getTime())) {
                 preferenceUtil.setStringData(AppConstant.CURRENT_DATE, getTime());
-                String encodeData = "";
                 try {
                     HashMap<String, Object> data = new HashMap<>();
                     data.put(AppConstant.LAST_WEBSITE_VISIT, true);
                     data.put(AppConstant.LANG_, Util.getDeviceLanguageTag());
                     JSONObject jsonObject = new JSONObject(data);
-                    encodeData = URLEncoder.encode(jsonObject.toString(), AppConstant.UTF);
-                } catch (Exception ex) {
-                    ex.printStackTrace();
-                }
 
-                try {
+
+
                     Map<String, String> mapData = new HashMap<>();
                     mapData.put(AppConstant.PID, preferenceUtil.getDataBID(AppConstant.APPPID));
                     mapData.put(AppConstant.BKEY, "" + Util.getAndroidId(appContext));
-                    mapData.put(AppConstant.VAL, "" + encodeData);
+                    mapData.put(AppConstant.VAL, "" + jsonObject.toString());
                     mapData.put(AppConstant.ACT, "add");
                     mapData.put(AppConstant.ISID_, "1");
                     mapData.put(AppConstant.ET_, "" + AppConstant.USERP_);

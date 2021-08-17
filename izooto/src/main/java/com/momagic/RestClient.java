@@ -177,6 +177,7 @@ public class RestClient {
             InputStream inputStream;
             Scanner scanner;
             if (httpResponse == HttpURLConnection.HTTP_OK) {
+
                 if (url.equals(AppConstant.CDN + DATB.mAppId + AppConstant.DAT))
                     Lg.d(AppConstant.APP_NAME_TAG, AppConstant.SUCCESS);
                 else
