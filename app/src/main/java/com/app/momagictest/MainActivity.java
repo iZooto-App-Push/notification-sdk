@@ -40,6 +40,8 @@ public class MainActivity extends AppCompatActivity
         setSupportActionBar(toolbar);
         editText=findViewById(R.id.editText);
         sendSubID=findViewById(R.id.sendSubID);
+        sendSubID.setVisibility(View.GONE);
+        editText.setVisibility(View.GONE);
         sendSubID.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {

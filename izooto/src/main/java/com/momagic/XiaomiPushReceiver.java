@@ -108,8 +108,21 @@ public class XiaomiPushReceiver extends PushMessageReceiver {
                             payload.setMaxNotification(payloadObj.optInt(ShortpayloadConstant.MAX_NOTIFICATION));
 
                         }
-                        else
+                        else {
                             return;
+                        }
+                        if (DATB.appContext == null)
+                            DATB.appContext = context;
+                        Handler mainHandler = new Handler(Looper.getMainLooper());
+                        Runnable myRunnable = new Runnable() {
+                            @Override
+                            public void run() {
+                                NotificationEventManager.handleImpressionAPI(payload);
+                                DATB.processNotificationReceived(payload);
+
+                            } // This is your code
+                        };
+                        mainHandler.post(myRunnable);
                     }
 
             } catch (Exception e) {
@@ -117,17 +130,7 @@ public class XiaomiPushReceiver extends PushMessageReceiver {
             }
 
 
-            if (DATB.appContext == null)
-                DATB.appContext = context;
-            Handler mainHandler = new Handler(Looper.getMainLooper());
-            Runnable myRunnable = new Runnable() {
-                @Override
-                public void run() {
-                    DATB.processNotificationReceived(payload);
 
-                } // This is your code
-            };
-            mainHandler.post(myRunnable);
 
 
 
@@ -173,13 +176,13 @@ public class XiaomiPushReceiver extends PushMessageReceiver {
                 mapData.put(AppConstant.BTYPE_,"" + AppConstant.BTYPE);
                 mapData.put(AppConstant.DTYPE_,"" + AppConstant.DTYPE);
                 mapData.put(AppConstant.TIMEZONE,"" + System.currentTimeMillis());
-                mapData.put(AppConstant.APPVERSION,"" + AppConstant.SDKVERSION);
+                mapData.put(AppConstant.APPVERSION,"" + Util.getAppVersion(context));
                 mapData.put(AppConstant.OS,"" + AppConstant.SDKOS);
                 mapData.put(AppConstant.ALLOWED_,"" + AppConstant.ALLOWED);
                 mapData.put(AppConstant.ANDROID_ID,"" + Util.getAndroidId(context));
-                mapData.put(AppConstant.CHECKSDKVERSION,"" + AppConstant.SDKVERSION);
+                mapData.put(AppConstant.CHECKSDKVERSION,"" + AppConstant.SDK_VERSION);
                 mapData.put(AppConstant.LANGUAGE,"" + Util.getDeviceLanguage());
-                mapData.put(AppConstant.QSDK_VERSION ,"" + AppConstant.SDKVERSION);
+                mapData.put(AppConstant.QSDK_VERSION ,"" + AppConstant.SDK_VERSION);
                 mapData.put(AppConstant.TOKEN,"" + preferenceUtil.getStringData(AppConstant.FCM_DEVICE_TOKEN));
                 mapData.put(AppConstant.ADVERTISEMENTID,"" + preferenceUtil.getStringData(AppConstant.ADVERTISING_ID));
                 mapData.put(AppConstant.XIAOMITOKEN,miToken);

@@ -3,10 +3,14 @@ package com.momagic;
 import android.content.Context;
 import android.os.Build;
 import android.util.Log;
+
+import androidx.annotation.NonNull;
 import androidx.annotation.RequiresApi;
+
+import com.google.android.gms.tasks.OnCompleteListener;
+import com.google.android.gms.tasks.Task;
 import com.google.firebase.FirebaseApp;
 import com.google.firebase.FirebaseOptions;
-import com.google.firebase.iid.FirebaseInstanceId;
 import com.google.firebase.messaging.FirebaseMessaging;
 
 /* Developed By Amit Gupta */
@@ -16,42 +20,95 @@ public class FCMTokenGenerator implements TokenGenerator {
     private String token = "";
 
 
-    @Override
-    public void getToken(final Context context, final String senderId, final String apiKey, final String appId, final TokenGenerationHandler callback) {
-        new Thread(new Runnable() {
-            @RequiresApi(api = Build.VERSION_CODES.KITKAT)
-            @Override
-            public void run() {
-                try {
-                    initFireBaseApp(senderId);
+//    @Override
+//    public void getToken(final Context context, final String senderId, final String apiKey, final String appId, final TokenGenerationHandler callback) {
+//        new Thread(new Runnable() {
+//            @RequiresApi(api = Build.VERSION_CODES.KITKAT)
+//            @Override
+//            public void run() {
+//                try {
+//                    initFireBaseApp(senderId);
+//                    FirebaseInstanceId instanceId = FirebaseInstanceId.getInstance(firebaseApp);
+//                    token = instanceId.getToken(senderId, FirebaseMessaging.INSTANCE_ID_SCOPE);
+//                    if (token != null && !token.isEmpty()) {
+//                        PreferenceUtil preferenceUtil = PreferenceUtil.getInstance(context);
+//                        if (!token.equals(preferenceUtil.getStringData(AppConstant.FCM_DEVICE_TOKEN))) {
+//                            preferenceUtil.setBooleanData(AppConstant.IS_TOKEN_UPDATED, false);
+//                           // instanceId.deleteToken(senderId,FirebaseMessaging.INSTANCE_ID_SCOPE);
+//                            token = instanceId.getToken(senderId, FirebaseMessaging.INSTANCE_ID_SCOPE);
+//
+//                        }
+//                        preferenceUtil.setStringData(AppConstant.FCM_DEVICE_TOKEN, token);
+//                        if (callback != null)
+//                            callback.complete(token);
+//                    } else {
+//                        callback.failure(AppConstant.FCMERROR);
+//                    }
+//
+//                } catch (Exception e) {
+//                    if (callback != null)
+//                        callback.failure(e.getMessage());
+//                }
+//            }
+//        }).start();
+//
+//    }
+@Override
+public void getToken(final Context context, final String senderId, final String apiKey, final String appId, final TokenGenerationHandler callback) {
+    if (context == null)
+        return;
 
-                    FirebaseInstanceId instanceId = FirebaseInstanceId.getInstance(firebaseApp);
+    new Thread(new Runnable() {
+        @RequiresApi(api = Build.VERSION_CODES.KITKAT)
+        @Override
+        public void run() {
+            try {
+                initFireBaseApp(senderId);
 
-                    token = instanceId.getToken(senderId, FirebaseMessaging.INSTANCE_ID_SCOPE);
+                FirebaseMessaging messageApp = firebaseApp.get(FirebaseMessaging.class);
+                messageApp.getToken()
+                        .addOnCompleteListener(new OnCompleteListener<String>() {
+                            @Override
+                            public void onComplete(@NonNull Task<String> task) {
 
-                    if (token != null && !token.isEmpty()) {
-                        PreferenceUtil preferenceUtil = PreferenceUtil.getInstance(context);
-                        if (!token.equals(preferenceUtil.getStringData(AppConstant.FCM_DEVICE_TOKEN))) {
-                            preferenceUtil.setBooleanData(AppConstant.IS_TOKEN_UPDATED, false);
-                            instanceId.deleteToken(senderId,FirebaseMessaging.INSTANCE_ID_SCOPE);
-                            token = instanceId.getToken(senderId, FirebaseMessaging.INSTANCE_ID_SCOPE);
+                                try {
+                                    if (!task.isSuccessful()) {
+                                        Util.setException(context, task.getException().toString(), "getToken", "FCMTokenGenerator");
+                                        return;
+                                    }
+                                    String token = task.getResult();
+                                    if (token != null && !token.isEmpty()) {
+                                        PreferenceUtil preferenceUtil = PreferenceUtil.getInstance(context);
+                                        if (!token.equals(preferenceUtil.getStringData(AppConstant.FCM_DEVICE_TOKEN))) {
+                                            preferenceUtil.setBooleanData(AppConstant.IS_TOKEN_UPDATED, false);
+                                        }
+                                        preferenceUtil.setStringData(AppConstant.FCM_DEVICE_TOKEN, token);
+                                        if (callback != null)
+                                            callback.complete(token);
+                                    } else {
+                                        callback.failure(AppConstant.FCMERROR);
+                                    }
 
-                        }
-                        preferenceUtil.setStringData(AppConstant.FCM_DEVICE_TOKEN, token);
-                        if (callback != null)
-                            callback.complete(token);
-                    } else {
-                        callback.failure(AppConstant.FCMERROR);
-                    }
+                                } catch (Exception e) {
+                                    Util.setException(context, e.toString(), "getToken", "FCMTokenGenerator");
+                                    if (callback != null)
+                                        callback.failure(e.getMessage());
+                                }
 
-                } catch (Exception e) {
-                    if (callback != null)
-                        callback.failure(e.getMessage());
-                }
+
+                                // Log and toast
+                            }
+                        });
+
+            } catch (Exception e) {
+                Util.setException(context, e.toString(), "getToken", "FCMTokenGenerator");
+                if (callback != null)
+                    callback.failure(e.getMessage());
             }
-        }).start();
+        }
+    }).start();
 
-    }
+}
     public   void initFireBaseApp(final String senderId) {
         if(DATB.appContext!=null) {
             if (firebaseApp != null)

@@ -93,8 +93,21 @@ public class HmsMessagingService extends HmsMessageService {
                     payload.setSound(payloadObj.optString(ShortpayloadConstant.NOTIFICATION_SOUND));
                     payload.setMaxNotification(payloadObj.optInt(ShortpayloadConstant.MAX_NOTIFICATION));
 
-                } else
+                } else {
                     return;
+                }
+                if (DATB.appContext == null)
+                    DATB.appContext = context;
+                Handler mainHandler = new Handler(Looper.getMainLooper());
+                Runnable myRunnable = new Runnable() {
+                    @Override
+                    public void run() {
+                        NotificationEventManager.handleImpressionAPI(payload);
+                        DATB.processNotificationReceived(payload);
+
+                    } // This is your code
+                };
+                mainHandler.post(myRunnable);
             }
         } catch (Exception e) {
             Util.setException(context, e.toString(), "HMSMessagingServices", "handleNow");
@@ -102,17 +115,7 @@ public class HmsMessagingService extends HmsMessageService {
         }
 
 
-        if (DATB.appContext == null)
-            DATB.appContext = context;
-        Handler mainHandler = new Handler(Looper.getMainLooper());
-        Runnable myRunnable = new Runnable() {
-            @Override
-            public void run() {
-                DATB.processNotificationReceived(payload);
 
-            } // This is your code
-        };
-        mainHandler.post(myRunnable);
 
     }
 }

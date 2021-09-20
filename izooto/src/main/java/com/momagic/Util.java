@@ -481,6 +481,20 @@ public class Util {
             list.add(value);
         }   return list;
     }
+    static String getAppVersion(Context context)
+    {
+       if(context == null)
+           return "App Version  is not Found";
+        PackageManager pm = context.getPackageManager();
+        String pkgName = context.getPackageName();
+        PackageInfo pkgInfo = null;
+        try {
+            pkgInfo = pm.getPackageInfo(pkgName, 0);
+            return pkgInfo.versionName;
+        } catch (PackageManager.NameNotFoundException e) {
+            return "App Version  is not Found";
+        }
+    }
 
 
 }

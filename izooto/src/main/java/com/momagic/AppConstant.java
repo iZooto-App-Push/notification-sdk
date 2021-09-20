@@ -258,7 +258,7 @@ public interface AppConstant {
     String AD_TYPE="tp";
     String NOTIFICATION_MESSAGE="Send Notification";
     String YES="yes";
-    String SDKVERSION="1.1.5";
+    String SDK_VERSION="1.1.6";
     String QSDK_VERSION="av";
     String SDK="SDKVERSION";
     String PACKAGE_NAME="mpn";
@@ -277,7 +277,7 @@ public interface AppConstant {
     String HMS="Huawei";
     String PUSH_HMS="hms";
     String PUSH_FCM="fcm";
-    String PUSH_XIAOMI="xiomi";
+    String PUSH_XIAOMI="xiaomi";
     String Check_Notification="CheckData";
     String Check_YES="true";
     String Check_NO="false";
@@ -315,6 +315,22 @@ public interface AppConstant {
     String IS_UPDATED_XIAOMI_TOKEN = "iz_xiaomi_token_updated";
     String IS_UPDATED_HMS_TOKEN = "iz_hms_token_updated";
     String SUBSCRIBER_ID_DATA="iz_SUBSCRIBER_ID_DATA";
+    String PAYLOAD_JSON_ARRAY = "payloadJsonArray";
+    String NOTIFICATION_PREVIEW = "iz_notification_preview";
+    String DEVICE_ID = "{~DEVICEID~}";
+    String ANDROID_TOKEN = "{~TOKEN~}";
+    String R_XIAOMI_TOKEN = "{~MITOKEN~}";
+    String R_HMS_TOKEN = "{~HMSTOKEN~}";
+    String R_FCM_TOKEN="{~FCMTOKEN~}";
+    String CAN_GENERATE_HUAWEI_TOKEN = "iz_canGenerateHuaweiToken";
+    String CAN_GENERATE_XIAOMI_TOKEN = "iz_canGenerateXiaomiToken";
+    String CAN_GENERATE_FCM_TOKEN = "iz_canGenerateFcmToken";
+    String FCM_TOKEN_FROM_JSON = "fcmToken";
+    String XIAOMI_TOKEN_FROM_JSON = "xiaomiToken";
+    String HUAWEI_TOKEN_FROM_JSON = "huaweiToken";
+    String GLOBAL_PUBLIC_KEY= "gpl";
+    String STORAGE_GPL_DATA="iz_gpl_url";
+    String STORAGE_PAYLOAD_DATA="iz_payload_data";
 
 }
 

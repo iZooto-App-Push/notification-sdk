@@ -91,6 +91,7 @@ public class Payload {
     private String time_to_live;
     private String push_type;
     private int  maxNotification;
+    private String public_global_key;
 
     //////////////////////////////////////////////
 
@@ -613,5 +614,13 @@ public class Payload {
 
     public void setMaxNotification(int maxNotification) {
         this.maxNotification = maxNotification;
+    }
+
+    public String getPublic_global_key() {
+        return public_global_key;
+    }
+
+    public void setPublic_global_key(String public_global_key) {
+        this.public_global_key = public_global_key;
     }
 }

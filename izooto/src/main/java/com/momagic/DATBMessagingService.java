@@ -29,11 +29,13 @@ import android.os.Handler;
 import android.os.Looper;
 import android.util.Log;
 
+import androidx.annotation.NonNull;
 import androidx.annotation.RequiresApi;
 import androidx.core.app.NotificationCompat;
 
 import com.google.firebase.messaging.FirebaseMessagingService;
 import com.google.firebase.messaging.RemoteMessage;
+import com.google.gson.Gson;
 
 import org.json.JSONObject;
 
@@ -42,14 +44,15 @@ import java.util.Map;
 @SuppressLint("MissingFirebaseInstanceTokenRefresh")
 public class DATBMessagingService extends FirebaseMessagingService {
     private  Payload payload = null;
-    private String Name="DATBMessagingService";
+    private final String Name="DATBMessagingService";
     @Override
-    public void onMessageReceived(RemoteMessage remoteMessage) {
+    public void onMessageReceived(@NonNull RemoteMessage remoteMessage) {
         try {
             if (remoteMessage.getData().size() > 0) {
-                Map<String, String> data = remoteMessage.getData();
-                handleNow(data);
                 Log.v("Push Type","fcm");
+
+                Map<String, String> data = remoteMessage.getData();
+                    handleNow(data);
 
 
             }
@@ -65,7 +68,9 @@ public class DATBMessagingService extends FirebaseMessagingService {
 
     }
 
+
     private void sendNotification(RemoteMessage remoteMessage) {
+
         Intent intent = new Intent();
         intent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
         PendingIntent pendingIntent = PendingIntent.getActivity(this, 0 /* Request code */, intent,
@@ -93,25 +98,32 @@ public class DATBMessagingService extends FirebaseMessagingService {
                     NotificationManager.IMPORTANCE_DEFAULT);
             notificationManager.createNotificationChannel(channel);
         }
-
         notificationManager.notify(0 /* ID of notification */, notificationBuilder.build());
-    }
+
+
+   }
 
 
     public   void handleNow(final Map<String, String> data) {
         Log.d(AppConstant.APP_NAME_TAG, AppConstant.NOTIFICATIONRECEIVED);
         PreferenceUtil preferenceUtil =PreferenceUtil.getInstance(this);
             try {
-                if(data.get(AppConstant.AD_NETWORK) !=null && data.get(AppConstant.GLOBAL)!=null)
+                if(data.get(AppConstant.AD_NETWORK) !=null || data.get(AppConstant.GLOBAL)!=null || data.get(AppConstant.GLOBAL_PUBLIC_KEY)!=null)
                 {
-                    AdMediation.getAdJsonData(this,data);
-                    preferenceUtil.setBooleanData(AppConstant.MEDIATION,true);
+                   if(data.get(AppConstant.GLOBAL_PUBLIC_KEY)!=null)
+                   {
+                       AdMediation.getMediationGPL(this, data);
+
+                   }
+                   else {
+                       AdMediation.getAdJsonData(this, data);
+                       preferenceUtil.setBooleanData(AppConstant.MEDIATION, true);
+                   }
                 }
                 else {
                     preferenceUtil.setBooleanData(AppConstant.MEDIATION, false);
                     JSONObject payloadObj = new JSONObject(data);
                     if (payloadObj.optLong(ShortpayloadConstant.CREATEDON) > PreferenceUtil.getInstance(this).getLongValue(AppConstant.DEVICE_REGISTRATION_TIMESTAMP)) {
-
                         payload = new Payload();
                         payload.setCreated_Time(payloadObj.optString(ShortpayloadConstant.CREATEDON));
                         payload.setFetchURL(payloadObj.optString(ShortpayloadConstant.FETCHURL));
@@ -159,34 +171,41 @@ public class DATBMessagingService extends FirebaseMessagingService {
                         payload.setPush_type(AppConstant.PUSH_FCM);
                         payload.setSound(payloadObj.optString(ShortpayloadConstant.NOTIFICATION_SOUND));
                         payload.setMaxNotification(payloadObj.optInt(ShortpayloadConstant.MAX_NOTIFICATION));
+                        payload.setFallBackDomain(payloadObj.optString(ShortpayloadConstant.FALL_BACK_DOMAIN));
+                        payload.setFallBackSubDomain(payloadObj.optString(ShortpayloadConstant.FALLBACK_SUB_DOMAIN));
+                        payload.setFallBackPath(payloadObj.optString(ShortpayloadConstant.FAll_BACK_PATH));
 
                     } else {
-
+                        String updateDaily=NotificationEventManager.getDailyTime(this);
+                        if (!updateDaily.equalsIgnoreCase(Util.getTime())) {
+                            preferenceUtil.setStringData(AppConstant.CURRENT_DATE_VIEW_DAILY, Util.getTime());
+                            NotificationEventManager.handleNotificationError("Payload Error" + payloadObj.optString("t"), payloadObj.toString(), "DATBMESSAGINSERVEICES", "handleNow()");
+                        }
                         return;
                     }
+                    if (DATB.appContext == null)
+                        DATB.appContext = this;
+                    Handler mainHandler = new Handler(Looper.getMainLooper());
+                    Runnable myRunnable = new Runnable() {
+                        @RequiresApi(api = Build.VERSION_CODES.KITKAT)
+                        @Override
+                        public void run() {
+                            NotificationEventManager.handleImpressionAPI(payload);
+                            DATB.processNotificationReceived(payload);
+                        }
+                    };
+                    mainHandler.post(myRunnable);
                 }
             } catch (Exception e) {
                 Util.setException(this, e.toString(), Name, "handleNow");
-
-
             }
 
 
-            if (DATB.appContext == null)
-                DATB.appContext = this;
-            Handler mainHandler = new Handler(Looper.getMainLooper());
-            Runnable myRunnable = new Runnable() {
-                @RequiresApi(api = Build.VERSION_CODES.KITKAT)
-                @Override
-                public void run() {
-                    DATB.processNotificationReceived(payload);
 
-                } // This is your code
-            };
-            mainHandler.post(myRunnable);
 
 
     }
+
 
 
 }

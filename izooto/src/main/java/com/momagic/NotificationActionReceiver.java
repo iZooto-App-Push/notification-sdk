@@ -54,7 +54,7 @@ public class NotificationActionReceiver extends BroadcastReceiver {
                     try {
                         HashMap<String, String> data = new HashMap<>();
                         data.put(AppConstant.PID, preferenceUtil.getDataBID(AppConstant.APPPID));
-                        data.put(AppConstant.VER_, AppConstant.SDKVERSION);
+                        data.put(AppConstant.VER_, AppConstant.SDK_VERSION);
                         data.put(AppConstant.CID_, cid);
                         data.put(AppConstant.BKEY, Util.getAndroidId(context));
                         data.put(AppConstant.RID, rid);
@@ -218,7 +218,7 @@ public class NotificationActionReceiver extends BroadcastReceiver {
 
                 Map<String, String> mapData = new HashMap<>();
                 mapData.put(AppConstant.PID, preferenceUtil.getDataBID(AppConstant.APPPID));
-                mapData.put(AppConstant.VER_, AppConstant.SDKVERSION);
+                mapData.put(AppConstant.VER_, AppConstant.SDK_VERSION);
                 mapData.put(AppConstant.ANDROID_ID, "" + Util.getAndroidId(context));
                 mapData.put(AppConstant.VAL, "" + jsonObject.toString());
                 mapData.put(AppConstant.ACT, "add");

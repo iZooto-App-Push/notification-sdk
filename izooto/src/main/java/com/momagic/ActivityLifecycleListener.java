@@ -2,7 +2,10 @@ package com.momagic;
 
 import android.app.Activity;
 import android.app.Application;
+import android.content.ComponentName;
+import android.content.pm.PackageManager;
 import android.os.Bundle;
+import android.util.Log;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
@@ -41,12 +44,18 @@ public class ActivityLifecycleListener implements Application.ActivityLifecycleC
 
     @Override
     public void onActivityStopped(@NonNull Activity activity) {
-
+//        ComponentName componentName = new ComponentName(
+//                activity,
+//                DATBMessagingService.class);
+//
+//        activity.getPackageManager().setComponentEnabledSetting(
+//                componentName,
+//                PackageManager.COMPONENT_ENABLED_STATE_ENABLED,
+//                PackageManager.DONT_KILL_APP);
     }
 
     @Override
     public void onActivitySaveInstanceState(@NonNull Activity activity, @NonNull Bundle outState) {
-
     }
 
     @Override

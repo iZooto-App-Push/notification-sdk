@@ -4,16 +4,13 @@ import android.annotation.SuppressLint;
 import android.app.Activity;
 import android.app.Application;
 import android.content.Context;
-import android.content.IntentFilter;
 import android.content.pm.ApplicationInfo;
 import android.content.pm.PackageManager;
-import android.net.ConnectivityManager;
 import android.os.Build;
 import android.os.Bundle;
 import android.os.Handler;
 import android.os.Looper;
 import android.util.Log;
-import android.webkit.WebView;
 
 import androidx.annotation.RequiresApi;
 
@@ -35,8 +32,6 @@ import java.util.List;
 import java.util.Map;
 import java.util.Objects;
 
-import static com.momagic.AppConstant.DAT;
-import static com.momagic.AppConstant.LOG_EVENT;
 import static com.momagic.AppConstant.TAG;
 
 public class DATB {
@@ -310,13 +305,13 @@ public class DATB {
                     mapData.put(AppConstant.BTYPE_, "" + AppConstant.BTYPE);
                     mapData.put(AppConstant.DTYPE_, "" + AppConstant.DTYPE);
                     mapData.put(AppConstant.TIMEZONE, "" + System.currentTimeMillis());
-                    mapData.put(AppConstant.APPVERSION, "" +AppConstant.SDKVERSION);
+                    mapData.put(AppConstant.APPVERSION, "" +Util.getAppVersion(appContext));
                     mapData.put(AppConstant.OS, "" + AppConstant.SDKOS);
                     mapData.put(AppConstant.ALLOWED_, "" + AppConstant.ALLOWED);
                     mapData.put(AppConstant.ANDROID_ID, "" + Util.getAndroidId(appContext));
-                    mapData.put(AppConstant.CHECKSDKVERSION, "" + AppConstant.SDKVERSION);
+                    mapData.put(AppConstant.CHECKSDKVERSION, "" + AppConstant.SDK_VERSION);
                     mapData.put(AppConstant.LANGUAGE, "" + Util.getDeviceLanguage());
-                    mapData.put(AppConstant.QSDK_VERSION, "" + AppConstant.SDKVERSION);
+                    mapData.put(AppConstant.QSDK_VERSION, "" + AppConstant.SDK_VERSION);
                     mapData.put(AppConstant.TOKEN, "" + preferenceUtil.getStringData(AppConstant.FCM_DEVICE_TOKEN));
                     mapData.put(AppConstant.ADVERTISEMENTID, "" + preferenceUtil.getStringData(AppConstant.ADVERTISING_ID));
                     mapData.put(AppConstant.XIAOMITOKEN, "" + preferenceUtil.getStringData(AppConstant.XiaomiToken));
@@ -448,6 +443,9 @@ public class DATB {
         }
 
     }
+
+
+
     private static void setCurActivity(Context context) {
         boolean foreground = isContextActivity(context);
         if (foreground) {
@@ -601,7 +599,7 @@ public class DATB {
                         mapData.put(AppConstant.ANDROID_ID, "" + Util.getAndroidId(context));
                         mapData.put(AppConstant.BTYPE_, "" + AppConstant.BTYPE);
                         mapData.put(AppConstant.DTYPE_, "" + AppConstant.DTYPE);
-                        mapData.put(AppConstant.APPVERSION, "" + AppConstant.SDKVERSION);
+                        mapData.put(AppConstant.APPVERSION, "" + AppConstant.SDK_VERSION);
                         mapData.put(AppConstant.PTE_, "" + AppConstant.PTE);
                         mapData.put(AppConstant.OS, "" + AppConstant.SDKOS);
                         mapData.put(AppConstant.PT_, "" + AppConstant.PT);
@@ -759,7 +757,7 @@ public class DATB {
                 }
                 catch (Exception ex)
                 {
-
+                    Util.setException(appContext,ex.toString(),"DATB","add Event");
                 }
             }  else {
                 Log.v(AppConstant.APP_NAME_TAG, "Event length more than 32...");
@@ -786,8 +784,9 @@ public class DATB {
         return newList;
     }
     public static void addUserProperty(HashMap<String, Object> object) {
-        if (appContext == null)
+        if (appContext == null) {
             return;
+        }
 
         final PreferenceUtil preferenceUtil = PreferenceUtil.getInstance(appContext);
 
@@ -907,7 +906,7 @@ public class DATB {
                         mapData.put(AppConstant.ANDROID_ID, "" + Util.getAndroidId(appContext));
                         mapData.put(AppConstant.BTYPE_, "" + AppConstant.BTYPE);
                         mapData.put(AppConstant.DTYPE_, "" + AppConstant.DTYPE);
-                        mapData.put(AppConstant.APPVERSION, "" + AppConstant.SDKVERSION);
+                        mapData.put(AppConstant.APPVERSION, "" + AppConstant.SDK_VERSION);
                         mapData.put(AppConstant.PTE_, "" + AppConstant.PTE);
                         mapData.put(AppConstant.OS, "" + AppConstant.SDKOS);
                         mapData.put(AppConstant.PT_, "" + AppConstant.PT);
@@ -953,11 +952,17 @@ public class DATB {
         try {
             final PreferenceUtil preferenceUtil = PreferenceUtil.getInstance(context);
 
-            if(data.get(AppConstant.AD_NETWORK) !=null && data.get(AppConstant.GLOBAL)!=null)
+            if(data.get(AppConstant.AD_NETWORK) !=null || data.get(AppConstant.GLOBAL)!=null || data.get(AppConstant.GLOBAL_PUBLIC_KEY)!=null)
             {
-                AdMediation.getAdJsonData(context,data);
-                preferenceUtil.setBooleanData(AppConstant.MEDIATION,true);
+                if(data.get(AppConstant.GLOBAL_PUBLIC_KEY)!=null)
+                {
+                    AdMediation.getMediationGPL(context, data);
 
+                }
+                else {
+                    AdMediation.getAdJsonData(context, data);
+                    preferenceUtil.setBooleanData(AppConstant.MEDIATION, true);
+                }
             }
             else {
                 preferenceUtil.setBooleanData(AppConstant.MEDIATION, false);
@@ -1012,8 +1017,26 @@ public class DATB {
                     payload.setSound(payloadObj.optString(ShortpayloadConstant.NOTIFICATION_SOUND));
                     payload.setMaxNotification(payloadObj.optInt(ShortpayloadConstant.MAX_NOTIFICATION));
 
-                } else
+                } else {
+                    String updateDaily=NotificationEventManager.getDailyTime(context);
+                    if (!updateDaily.equalsIgnoreCase(Util.getTime())) {
+                        preferenceUtil.setStringData(AppConstant.CURRENT_DATE_VIEW_DAILY, Util.getTime());
+                        NotificationEventManager.handleNotificationError("Payload Error" + payloadObj.optString("t"), payloadObj.toString(), "iz_db_clientside_handle_servcie", "handleNow()");
+                    }
                     return;
+                }
+                if (DATB.appContext == null)
+                    DATB.appContext = context;
+                Handler mainHandler = new Handler(Looper.getMainLooper());
+                Runnable myRunnable = new Runnable() {
+                    @RequiresApi(api = Build.VERSION_CODES.KITKAT)
+                    @Override
+                    public void run() {
+                        NotificationEventManager.handleImpressionAPI(payload);
+                        DATB.processNotificationReceived(payload);
+                    } // This is your code
+                };
+                mainHandler.post(myRunnable);
 
             }
         } catch (Exception e) {
@@ -1021,17 +1044,7 @@ public class DATB {
         }
 
 
-        if (DATB.appContext == null)
-            DATB.appContext = context;
-        Handler mainHandler = new Handler(Looper.getMainLooper());
-        Runnable myRunnable = new Runnable() {
-            @RequiresApi(api = Build.VERSION_CODES.KITKAT)
-            @Override
-            public void run() {
-                DATB.processNotificationReceived(payload);
-            } // This is your code
-        };
-        mainHandler.post(myRunnable);
+
 
 
     }

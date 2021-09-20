@@ -1,7 +1,6 @@
 package com.momagic;
 
 
-import android.annotation.SuppressLint;
 import android.os.Build;
 import android.util.Log;
 
@@ -9,29 +8,20 @@ import androidx.annotation.RequiresApi;
 
 import org.json.JSONObject;
 
-import java.io.BufferedReader;
-import java.io.IOException;
 import java.io.InputStream;
-import java.io.InputStreamReader;
 import java.io.OutputStream;
 import java.net.HttpURLConnection;
-import java.net.SocketTimeoutException;
 import java.net.URL;
-import java.net.URLConnection;
 import java.net.URLEncoder;
 import java.nio.charset.StandardCharsets;
 import java.util.Map;
-import java.util.Objects;
 import java.util.Scanner;
-import java.util.StringJoiner;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
-import java.util.concurrent.TimeoutException;
 
 public class RestClient {
 
     public static final String BASE_URL = "https://aevents.izooto.com/app.php";
-    private static final int TIMEOUT = 120000;
     public static final int GET_TIMEOUT = 60000;
     public static final String EVENT_URL="https://et.izooto.com/evt";
     public static final String PROPERTIES_URL="https://prp.izooto.com/prp";
@@ -177,7 +167,6 @@ public class RestClient {
             InputStream inputStream;
             Scanner scanner;
             if (httpResponse == HttpURLConnection.HTTP_OK) {
-
                 if (url.equals(AppConstant.CDN + DATB.mAppId + AppConstant.DAT))
                     Lg.d(AppConstant.APP_NAME_TAG, AppConstant.SUCCESS);
                 else
@@ -264,13 +253,14 @@ public class RestClient {
             } else {
                 con = (HttpURLConnection) new URL(BASE_URL + url).openConnection();
             }
+
             con.setUseCaches(false);
             con.setConnectTimeout(timeout);
             con.setReadTimeout(timeout);
             if (jsonBody != null)
                 con.setDoInput(true);
             if (method != null) {
-                if(method.equalsIgnoreCase(AppConstant.POST)) {
+                if(method.equalsIgnoreCase(AppConstant.POST) && jsonBody==null) {
                     con.setRequestProperty(AppConstant.CONTENT_TYPE, AppConstant.FORM_URL_ENCODED);
                 }
                 else {
@@ -291,6 +281,7 @@ public class RestClient {
             InputStream inputStream;
             Scanner scanner;
             if (httpResponse == HttpURLConnection.HTTP_OK) {
+
                 if (url.equals(AppConstant.CDN+ DATB.mAppId+AppConstant.DAT))
                     Lg.d(AppConstant.APP_NAME_TAG, AppConstant.SUCCESS);
                 else
@@ -305,6 +296,7 @@ public class RestClient {
                 else
                     Lg.w(AppConstant.APP_NAME_TAG, AppConstant.ATTACHREQUEST);
             } else {
+
                 if (url.equals(AppConstant.CDN+ DATB.mAppId+AppConstant.DAT))
                     Lg.d(AppConstant.APP_NAME_TAG, AppConstant.SUCCESS);
                 else

@@ -5,6 +5,7 @@ import android.util.Log;
 
 import androidx.annotation.RequiresApi;
 
+
 import com.google.gson.Gson;
 
 import org.json.JSONArray;
@@ -14,7 +15,6 @@ import org.json.JSONTokener;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
-import java.util.logging.Handler;
 
 public class AdMediation {
     private static Payload payload;
@@ -114,44 +114,56 @@ public class AdMediation {
                            payload.setAdTimeOut(payloadObj.optInt(ShortpayloadConstant.AD_TIME_OUT));
                            payload.setCreated_Time(jsonObject.optString(ShortpayloadConstant.CREATEDON));
                            payload.setPush_type(AppConstant.PUSH_FCM);
+                           NotificationEventManager.handleImpressionAPI(payload);
                            if (payload.getPassive_flag().equalsIgnoreCase("1") && jsonObject.optString(AppConstant.AD_TYPE).equalsIgnoreCase("6")) {
                                passiveList.add(payload);
                            } else {
                                payloadList.add(payload);
                            }
-                       } else {
+                       } else  {
+                           String updateDaily=NotificationEventManager.getDailyTime(context);
+                           if (!updateDaily.equalsIgnoreCase(Util.getTime())) {
+                               preferenceUtil.setStringData(AppConstant.CURRENT_DATE_VIEW_DAILY, Util.getTime());
+                               NotificationEventManager.handleNotificationError("Payload Error" + payloadObj.optString("t"), null, "DATBMESSAGINSERVEICES", "handleNow()");
+                           }
+                           else
+                           {
+                               Log.e("Received","Received1111");
+
+                           }
                            return;
                        }
                    }
-                   if (payloadList.size() > 0) {
-                       if (jsonObject.optString(AppConstant.AD_TYPE).equalsIgnoreCase("4")) {
-                           processPayload(payloadList.get(0), 4, 0);
+                       if (payloadList.size() > 0) {
+                           if (jsonObject.optString(AppConstant.AD_TYPE).equalsIgnoreCase("4")) {
+                               processPayload(payloadList.get(0), 4, 0);
 
-                       }
-                       if (jsonObject.optString(AppConstant.AD_TYPE).equalsIgnoreCase("5")) {
-                           preferenceUtil.setBooleanData("Send", true);
+                           }
+                           if (jsonObject.optString(AppConstant.AD_TYPE).equalsIgnoreCase("5")) {
+                               preferenceUtil.setBooleanData("Send", true);
 
-                           for (int i = 0; i < payloadList.size(); i++) {
-                               if (preferenceUtil.getBoolean("Send")) {
-                                   processPayload(payloadList.get(i), 5, i);
-                                   Thread.sleep(2000);
+                               for (int i = 0; i < payloadList.size(); i++) {
+                                   if (preferenceUtil.getBoolean("Send")) {
+                                       processPayload(payloadList.get(i), 5, i);
+                                       Thread.sleep(2000);
+                                   }
                                }
                            }
+                           if (jsonObject.optString(AppConstant.AD_TYPE).equalsIgnoreCase("6")) {
+
+                               int i = 0;
+                               do {
+                                   processPayload(payloadList.get(i), 6, i);
+                                   Thread.sleep(2000);
+                                   i++;
+
+
+                               } while (i < payloadList.size());
+
+
+                           }
                        }
-                       if (jsonObject.optString(AppConstant.AD_TYPE).equalsIgnoreCase("6")) {
 
-                           int i = 0;
-                           do {
-                               processPayload(payloadList.get(i), 6, i);
-                               Thread.sleep(2000);
-                               i++;
-
-
-                           } while (i < payloadList.size());
-
-
-                       }
-                   }
                }
 
 
@@ -159,6 +171,87 @@ public class AdMediation {
                Util.setException(context, ex.toString(), "AdMediation", "getJSONData");
            }
        }
+    }
+    static  void getMediationGPL(Context context , Map<String,String> data)
+    {
+        if(context==null)
+            return;
+        else
+        {
+            try {
+                JSONObject payloadObj = new JSONObject(data.get(AppConstant.GLOBAL));
+                if(payloadObj.optLong(ShortpayloadConstant.CREATEDON) > PreferenceUtil.getInstance(context).getLongValue(AppConstant.DEVICE_REGISTRATION_TIMESTAMP))
+                {
+                    payload = new Payload();
+                    payload.setCreated_Time(payloadObj.optString(ShortpayloadConstant.CREATEDON));
+                    payload.setFetchURL(payloadObj.optString(ShortpayloadConstant.FETCHURL));
+                    payload.setKey(payloadObj.optString(ShortpayloadConstant.KEY));
+                    payload.setId(payloadObj.optString(ShortpayloadConstant.ID));
+                    payload.setRid(payloadObj.optString(ShortpayloadConstant.RID));
+                    payload.setLink(payloadObj.optString(ShortpayloadConstant.LINK));
+                    payload.setTitle(payloadObj.optString(ShortpayloadConstant.TITLE));
+                    payload.setMessage(payloadObj.optString(ShortpayloadConstant.NMESSAGE));
+                    payload.setIcon(payloadObj.optString(ShortpayloadConstant.ICON));
+                    payload.setReqInt(payloadObj.optInt(ShortpayloadConstant.REQINT));
+                    payload.setTag(payloadObj.optString(ShortpayloadConstant.TAG));
+                    payload.setBanner(payloadObj.optString(ShortpayloadConstant.BANNER));
+                    payload.setAct_num(payloadObj.optInt(ShortpayloadConstant.ACTNUM));
+                    payload.setBadgeicon(payloadObj.optString(ShortpayloadConstant.BADGE_ICON));
+                    payload.setBadgecolor(payloadObj.optString(ShortpayloadConstant.BADGE_COLOR));
+                    payload.setSubTitle(payloadObj.optString(ShortpayloadConstant.SUBTITLE));
+                    payload.setGroup(payloadObj.optInt(ShortpayloadConstant.GROUP));
+                    payload.setBadgeCount(payloadObj.optInt(ShortpayloadConstant.BADGE_COUNT));
+                    // Button 2
+                    payload.setAct1name(payloadObj.optString(ShortpayloadConstant.ACT1NAME));
+                    payload.setAct1link(payloadObj.optString(ShortpayloadConstant.ACT1LINK));
+                    payload.setAct1icon(payloadObj.optString(ShortpayloadConstant.ACT1ICON));
+                    payload.setAct1ID(payloadObj.optString(ShortpayloadConstant.ACT1ID));
+                    // Button 2
+                    payload.setAct2name(payloadObj.optString(ShortpayloadConstant.ACT2NAME));
+                    payload.setAct2link(payloadObj.optString(ShortpayloadConstant.ACT2LINK));
+                    payload.setAct2icon(payloadObj.optString(ShortpayloadConstant.ACT2ICON));
+                    payload.setAct2ID(payloadObj.optString(ShortpayloadConstant.ACT2ID));
+
+                    payload.setInapp(payloadObj.optInt(ShortpayloadConstant.INAPP));
+                    payload.setTrayicon(payloadObj.optString(ShortpayloadConstant.TARYICON));
+                    payload.setSmallIconAccentColor(payloadObj.optString(ShortpayloadConstant.ICONCOLOR));
+                    payload.setSound(payloadObj.optString(ShortpayloadConstant.SOUND));
+                    payload.setLedColor(payloadObj.optString(ShortpayloadConstant.LEDCOLOR));
+                    payload.setLockScreenVisibility(payloadObj.optInt(ShortpayloadConstant.VISIBILITY));
+                    payload.setGroupKey(payloadObj.optString(ShortpayloadConstant.GKEY));
+                    payload.setGroupMessage(payloadObj.optString(ShortpayloadConstant.GMESSAGE));
+                    payload.setFromProjectNumber(payloadObj.optString(ShortpayloadConstant.PROJECTNUMBER));
+                    payload.setCollapseId(payloadObj.optString(ShortpayloadConstant.COLLAPSEID));
+                    payload.setPriority(payloadObj.optInt(ShortpayloadConstant.PRIORITY));
+                    payload.setRawPayload(payloadObj.optString(ShortpayloadConstant.RAWDATA));
+                    payload.setAp(payloadObj.optString(ShortpayloadConstant.ADDITIONALPARAM));
+                    payload.setCfg(payloadObj.optInt(ShortpayloadConstant.CFG));
+                    payload.setPush_type(AppConstant.PUSH_FCM);
+                    payload.setPublic_global_key(data.get(AppConstant.GLOBAL_PUBLIC_KEY));
+                    payload.setSound(payloadObj.optString(ShortpayloadConstant.NOTIFICATION_SOUND));
+                    payload.setMaxNotification(payloadObj.optInt(ShortpayloadConstant.MAX_NOTIFICATION));
+                    payload.setFallBackDomain(payloadObj.optString(ShortpayloadConstant.FALL_BACK_DOMAIN));
+                    payload.setFallBackSubDomain(payloadObj.optString(ShortpayloadConstant.FALLBACK_SUB_DOMAIN));
+                    payload.setFallBackPath(payloadObj.optString(ShortpayloadConstant.FAll_BACK_PATH));
+                    NotificationEventManager.handleImpressionAPI(payload);
+                    globalPayload(payload.getPublic_global_key(),payload);
+                }
+                else  {
+                    String updateDaily=NotificationEventManager.getDailyTime(context);
+                    if (!updateDaily.equalsIgnoreCase(Util.getTime())) {
+                        PreferenceUtil preferenceUtil=PreferenceUtil.getInstance(context);
+                        preferenceUtil.setStringData(AppConstant.CURRENT_DATE_VIEW_DAILY, Util.getTime());
+                        NotificationEventManager.handleNotificationError("Payload Error" + payloadObj.optString("t"), null, "DATBMESSAGINSERVEICES", "handleNow()");
+                    }
+                    return;
+                }
+
+            }
+            catch (Exception ex)
+            {
+             Log.e("Exception ex",ex.toString());
+            }
+        }
     }
 
     public static void getAdNotificationData( Context context,JSONObject data,String pushType)
@@ -254,7 +347,14 @@ public class AdMediation {
                            } else {
                                payloadList.add(payload);
                            }
-                       } else {
+                           NotificationEventManager.handleImpressionAPI(payload);
+
+                       } else{
+                           String updateDaily=NotificationEventManager.getDailyTime(context);
+                           if (!updateDaily.equalsIgnoreCase(Util.getTime())) {
+                               preferenceUtil.setStringData(AppConstant.CURRENT_DATE_VIEW_DAILY, Util.getTime());
+                               NotificationEventManager.handleNotificationError("Payload Error" + payloadObj.optString("t"), null, "DATBMESSAGINSERVEICES", "handleNow()");
+                           }
                            return;
                        }
                    }
@@ -265,22 +365,32 @@ public class AdMediation {
                        }
                        if (jsonObject.optString(AppConstant.AD_TYPE).equalsIgnoreCase("5")) {
                            preferenceUtil.setBooleanData("Send", true);
+                           try {
 
-                           for (int i = 0; i < payloadList.size(); i++) {
-                               if (preferenceUtil.getBoolean("Send")) {
-                                   processPayload(payloadList.get(i), 5, i);
-                                   Thread.sleep(2000);
+                               for (int i = 0; i < payloadList.size(); i++) {
+                                   if (preferenceUtil.getBoolean("Send")) {
+                                       processPayload(payloadList.get(i), 5, i);
+                                       Thread.sleep(2000);
+                                   }
                                }
+                           }catch (Exception ex)
+                           {
+                               Util.setException(context, ex.toString(), "AdMediation", "getAdNotificationData");
                            }
                        }
                        if (jsonObject.optString(AppConstant.AD_TYPE).equalsIgnoreCase("6")) {
 
-                           int i = 0;
-                           do {
-                               processPayload(payloadList.get(i), 6, i);
-                               Thread.sleep(2000);
-                               i++;
-                           } while (i < payloadList.size());
+                           try {
+                               int i = 0;
+                               do {
+                                   processPayload(payloadList.get(i), 6, i);
+                                   Thread.sleep(2000);
+                                   i++;
+                               } while (i < payloadList.size());
+                           }catch (Exception ex)
+                           {
+                               Util.setException(context, ex.toString(), "AdMediation", "getAdNotificationData");
+                           }
                        }
                    }
                }
@@ -292,7 +402,7 @@ public class AdMediation {
        }
     }
     private static void processPayload(final Payload payload, final int adIndex,final int indexValue) {
-        final long start = System.currentTimeMillis(); //fetch start time
+        final long start = System.currentTimeMillis();
         int calculateTime=0;
         int adTime = payload.getAdTimeOut();
         if(adTime!=0)
@@ -340,21 +450,30 @@ public class AdMediation {
                                 ShowFallBackResponse(fallBackURL,payload);
                             }
 
-                            if(failsList.size()-1==5)
+                            if(failsList.size()-1==payloadList.size())
                             {
                                 String fallBackURL = callFallbackAPI(payload);
                                 ShowFallBackResponse(fallBackURL, payload);
 
                             }
+                            else
+                            {
+                                Log.e("Response",response);
+                            }
 
 
                         }
-                        catch (Exception ignored)
+                        catch (Exception ex)
                         {
+                            Log.e("Response",""+ex.toString());
 
                         }
 
                     }
+                }
+                else
+                {
+                    Log.e("Response","Response no");
                 }
 
             }
@@ -373,16 +492,15 @@ public class AdMediation {
                         data.put("t", -2);
                     else
                         data.put("t", -1);
-                    if(adIndex==6)
+                    failsList.add(data);
+
+                    if(failsList.size()==payloadList.size() && adIndex==6)
                     {
-                        parseJson(payload, data, adIndex, indexValue);
+                        String fallBackURL=callFallbackAPI(payload);
+                        ShowFallBackResponse(fallBackURL,payload);
 
                     }
-                    else
-                    {
-                        failsList.add(data);
 
-                    }
 
                     if(adIndex==4)
                     {
@@ -397,6 +515,7 @@ public class AdMediation {
                 }
                 catch (Exception ignored)
                 {
+                    Log.e("Exception ex1",ignored.toString());
                 }
 
 
@@ -458,7 +577,7 @@ public class AdMediation {
                 if (payload.getAct_num() == 1) {
 
                     if (payload.getAct1link() != null) {
-                        payload.setAct1name(payload.getAct1name());
+                        payload.setAct1name(payload.getAct1name().replace("~",""));
                     }
                     if (!payload.getAct1link().startsWith("http://") && !payload.getAct1link().startsWith("https://")) {
                         String url = payload.getAct1link();
@@ -688,8 +807,7 @@ public class AdMediation {
 
     }
 
-    private static String callFallbackAPI(Payload payload) {
-        String Message = "FallBAckAPI";
+     static String callFallbackAPI(Payload payload) {
         String domain = "flbk.izooto.com";
         try {
             if(payload.getFallBackSubDomain()!="") {
@@ -714,7 +832,7 @@ public class AdMediation {
         return "";
     }
     @RequiresApi(api = Build.VERSION_CODES.KITKAT)
-    private static void parseAgain1Json(Payload payload1, JSONObject jsonObject) {
+     static void parseAgain1Json(Payload payload1, JSONObject jsonObject) {
         if(DATB.appContext!=null) {
             String dataValue = "";
             try {
@@ -740,7 +858,7 @@ public class AdMediation {
                 if (payload1.getAct_num() == 1) {
 
                     if (payload1.getAct1link() != null) {
-                        payload1.setAct1name(payload1.getAct1name());
+                        payload1.setAct1name(payload1.getAct1name().replace("~",""));
                     }
                     if (!payload1.getAct1link().startsWith("http://") && !payload1.getAct1link().startsWith("https://")) {
                         String url = payload1.getAct1link();
@@ -813,7 +931,7 @@ public class AdMediation {
                     finalData.put("rid", payload1.getRid());
                     finalData.put("type", payload1.getAd_type());
                     finalData.put("ta", (end - payload1.getStartTime()));
-                    finalData.put("av", AppConstant.SDKVERSION);
+                    finalData.put("av", AppConstant.SDK_VERSION);
                     JSONObject servedObject = new JSONObject();
                     servedObject.put("a", payload1.getAdID());
                     servedObject.put("b", payload1.getCpc());
@@ -827,7 +945,7 @@ public class AdMediation {
                     dataValue = finalData.toString().replaceAll("\\\\", " ");
                     mediationImpression(dataValue);
                     NotificationActionReceiver.medClick = dataValue;
-                    NotificationEventManager.manageNotification(payload1);
+                    NotificationEventManager.showNotification(payload1);
                     Log.v(AppConstant.NOTIFICATION_MESSAGE, AppConstant.YES);
 
                 } else {
@@ -842,8 +960,79 @@ public class AdMediation {
             }
         }
     }
+    static  void globalPayload(String url,Payload payload)
+    {
+        if(url!=null && DATB.appContext != null)
+        {
+            PreferenceUtil preferenceUtil = PreferenceUtil.getInstance(DATB.appContext);
+            if(preferenceUtil.getStringData(AppConstant.STORAGE_GPL_DATA) !=null && !preferenceUtil.getStringData(AppConstant.STORAGE_GPL_DATA).equalsIgnoreCase(url)) {
+                RestClient.get(url, new RestClient.ResponseHandler() {
+                    @RequiresApi(api = Build.VERSION_CODES.KITKAT)
+                    @Override
+                    void onSuccess(String response) {
+                        super.onSuccess(response);
+                        try {
+                            JSONObject jsonObject = new JSONObject(response.replace("\n", ""));
+                            if (jsonObject != null) {
+                                payload.setTitle(jsonObject.optString(ShortpayloadConstant.TITLE).replace("~",""));
+                                payload.setMessage(jsonObject.optString(ShortpayloadConstant.NMESSAGE).replace("~",""));
+                                payload.setLink(jsonObject.optString(ShortpayloadConstant.LINK).replace("~",""));
+                                payload.setIcon(jsonObject.optString(ShortpayloadConstant.ICON).replace("~",""));
+                                payload.setBanner(jsonObject.optString(ShortpayloadConstant.BANNER).replace("~",""));
+                                payload.setAct1name(jsonObject.optString(ShortpayloadConstant.ACT1NAME).replace("~", ""));
+                                payload.setAct1link(jsonObject.optString(ShortpayloadConstant.ACT1LINK));
+                                Log.v(AppConstant.NOTIFICATION_MESSAGE, "YES");
+                                if (payload.getTitle() != null && !payload.getTitle().isEmpty()) {
+                                    NotificationEventManager.receiveAds(payload);
+                                    preferenceUtil.setStringData(AppConstant.STORAGE_GPL_DATA, url);
+                                    Gson gson = new Gson();
+                                    String payloadString = gson.toJson(payload);
+                                    preferenceUtil.setStringData(AppConstant.STORAGE_PAYLOAD_DATA,payloadString);
+                                }
+                                else
+                                {
+                                    if(DATB.appContext==null)
+                                        return;
 
-    private static void ShowFallBackResponse(String fallBackAPI,  final Payload payload) {
+                                    PreferenceUtil preferenceUtil=PreferenceUtil.getInstance(DATB.appContext);
+                                    String cTime = preferenceUtil.getStringData("iz_gplPayload");
+                                    if(!cTime.equalsIgnoreCase(Util.getTime()))
+                                    {
+                                        preferenceUtil.setStringData("iz_gplPayload",Util.getTime());
+                                        NotificationEventManager.handleNotificationError("Payload title is empty",payload.toString(),"NotificationEventManager","ReceviedNotification");
+
+                                    }
+
+                                }
+                            }
+                        } catch (Exception ex) {
+                            Util.setException(DATB.appContext, ex.toString(), "AdMediation", "GlobalPayload");
+
+                        }
+                    }
+
+                    @Override
+                    void onFailure(int statusCode, String response, Throwable throwable) {
+                        super.onFailure(statusCode, response, throwable);
+                    }
+                });
+            }
+            else
+            {
+                String payloadString =preferenceUtil.getStringData(AppConstant.STORAGE_PAYLOAD_DATA);
+                Gson gson = new Gson();
+                Payload payload1 = gson.fromJson(payloadString, Payload.class);
+                payload1.setRid(payload.getRid());
+                payload1.setId(payload.getId());
+                if(payload1.getTitle()!=null && !payload1.getTitle().isEmpty()) {
+                    NotificationEventManager.receiveAds(payload1);
+                }
+            }
+        }
+
+    }
+
+     static void ShowFallBackResponse(String fallBackAPI,  final Payload payload) {
        if(DATB.appContext!=null) {
            RestClient.get(fallBackAPI, new RestClient.ResponseHandler() {
                @RequiresApi(api = Build.VERSION_CODES.KITKAT)
@@ -853,15 +1042,29 @@ public class AdMediation {
                    try {
                        JSONObject jsonObject = new JSONObject(response);
                        if (jsonObject != null) {
-                           payload.setTitle(jsonObject.optString(ShortpayloadConstant.TITLE));
-                           payload.setMessage(jsonObject.optString(ShortpayloadConstant.NMESSAGE));
-                           payload.setLink(jsonObject.optString(ShortpayloadConstant.LINK));
-                           payload.setLink(jsonObject.optString(ShortpayloadConstant.ICON));
-                           payload.setBanner(jsonObject.optString(ShortpayloadConstant.BANNER));
-                           payload.setAct1link(jsonObject.optString(ShortpayloadConstant.ACT1LINK));
+                           payload.setTitle(jsonObject.optString(ShortpayloadConstant.TITLE).replace("~",""));
+                           payload.setMessage(jsonObject.optString(ShortpayloadConstant.NMESSAGE).replace("~",""));
+                           payload.setLink(jsonObject.optString(ShortpayloadConstant.LINK).replace("~",""));
+                           payload.setIcon(jsonObject.optString(ShortpayloadConstant.ICON).replace("~",""));
+                           payload.setBanner(jsonObject.optString(ShortpayloadConstant.BANNER).replace("~",""));
+                           payload.setAct1name(jsonObject.optString(ShortpayloadConstant.ACT1NAME).replace("~",""));
+
+                           payload.setAct1link(jsonObject.optString(ShortpayloadConstant.ACT1LINK).replace("~",""));
+                           payload.setCfg(jsonObject.optInt(ShortpayloadConstant.CFG));
                            payload.setRid(payload.getRid());
-                           NotificationEventManager.manageNotification(payload);
-                           ShowClickAndImpressionData(payload);
+                           if(payload.getTitle() !=null && !payload.getTitle().isEmpty()) {
+                               Log.v(AppConstant.NOTIFICATION_MESSAGE, "YES");
+                               NotificationEventManager.receiveAds(payload);
+                               ShowClickAndImpressionData(payload);
+                           }
+                           else
+                           {
+                               PreferenceUtil preferenceUtil=PreferenceUtil.getInstance(DATB.appContext);
+                               String data=preferenceUtil.getStringData("ShowFALLBACKIMPRESSION");
+                               if(!data.equalsIgnoreCase(Util.getTime()))
+                                   preferenceUtil.setStringData("ShowFALLBACKIMPRESSION",Util.getTime());
+                                   NotificationEventManager.handleNotificationError("Payload -> Title is empty",jsonObject.toString(),"AdMediation","showFallbakcResponse");
+                               }
 
                        }
                    } catch (Exception ex) {
@@ -876,9 +1079,10 @@ public class AdMediation {
                }
            });
        }
+
     }
 
-    private static void ShowClickAndImpressionData(Payload payload) {
+     static void ShowClickAndImpressionData(Payload payload) {
        if(DATB.appContext!=null) {
            try {
                long end = System.currentTimeMillis();
@@ -887,7 +1091,7 @@ public class AdMediation {
                finalData.put("rid", payload.getRid());
                finalData.put("type", payload.getAd_type());
                finalData.put("ta", (end - payload.getStartTime()));
-               finalData.put("av", AppConstant.SDKVERSION);
+               finalData.put("av", AppConstant.SDK_VERSION);
                JSONObject servedObject = new JSONObject();
                servedObject.put("a", 0);
                servedObject.put("b", 0);
@@ -905,7 +1109,6 @@ public class AdMediation {
                String dataValue = finalData.toString().replaceAll("\\\\", " ");
                mediationImpression(dataValue);
                NotificationActionReceiver.medClick = dataValue;
-               Log.v(AppConstant.NOTIFICATION_MESSAGE, AppConstant.YES);
            } catch (Exception ex) {
                Util.setException(DATB.appContext, ex.toString(), "AdMediation", "ShowClickAndImpressionData");
 
@@ -964,7 +1167,7 @@ public class AdMediation {
                     finalData.put("rid", payload1.getRid());
                     finalData.put("type", payload1.getAd_type());
                     finalData.put("ta", (end - payload1.getStartTime()));
-                    finalData.put("av", AppConstant.SDKVERSION);
+                    finalData.put("av", AppConstant.SDK_VERSION);
                     JSONObject servedObject = new JSONObject();
                     servedObject.put("a", payload1.getAdID());
                     servedObject.put("b", payload1.getCpc());
@@ -978,13 +1181,11 @@ public class AdMediation {
                     dataValue = finalData.toString().replaceAll("\\\\", " ");
                     mediationImpression(dataValue);
                     NotificationActionReceiver.medClick = dataValue;
-                    NotificationEventManager.manageNotification(payload1);
+                    NotificationEventManager.receiveAds(payload1);
                     Log.v(AppConstant.NOTIFICATION_MESSAGE, AppConstant.YES);
                 } else {
-
                     String fallBackAPI = callFallbackAPI(payload1);
                     ShowFallBackResponse(fallBackAPI, payload1);
-                    Log.v(AppConstant.NOTIFICATION_MESSAGE, AppConstant.NO);
 
                 }
 
@@ -1047,7 +1248,7 @@ public class AdMediation {
                if (sourceString.startsWith("~"))
                    return sourceString.replace("~", "");
                else {
-                   if (sourceString.contains(".")) {
+                   if (sourceString.contains(".")) {//impressionTracker[o]
                        JSONObject jsonObject1 = null;
                        String[] linkArray = sourceString.split("\\.");
                        if (linkArray.length == 2 || linkArray.length == 3) {
@@ -1095,12 +1296,35 @@ public class AdMediation {
                        }
 
 
-                   } else {
-                       return jsonObject.getString(sourceString);
+                   }
+                   else
+                   {
+                      if(sourceString.contains("["))
+                      {
+                          String[] linkArray1 = sourceString.split("\\[");
+                          if(linkArray1.length>0)
+                          {
+                              String firstData=linkArray1[1];
+                              String [] secondData = firstData.split("\\]");
+                              JSONArray jsonArray = jsonObject.getJSONArray(linkArray1[0]);
+                              return jsonArray.getString(Integer.parseInt(secondData[0]));
+
+                          }
+                          else
+                          {
+                              return jsonObject.getString(sourceString);
+                          }
+
+
+                      }
+                      else {
+                          return jsonObject.getString(sourceString);
+                      }
                    }
                }
-           } catch (Exception e) {
 
+           } catch (Exception e) {
+                Log.e("Exception ex",e.toString());
            }
        }
            return "";

@@ -20,14 +20,14 @@ public class AppController extends Application implements TokenReceivedListener,
     public void onCreate() {
         super.onCreate();
 
-        DATB.initialize(this)
+        DATB.initialize(getApplicationContext())
                 .setNotificationReceiveListener(this)
                 .setTokenReceivedListener(this)
                 .build();
 
     HashMap<String,Object> data = new HashMap<>();
     data.put("language","Marathi");
-    DATB.addUserProperty(data);
+   // DATB.addUserProperty(data);
 
 
 
