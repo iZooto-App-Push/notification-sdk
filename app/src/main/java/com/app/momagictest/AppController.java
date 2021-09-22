@@ -6,7 +6,6 @@ import android.util.Log;
 import com.momagic.DATB;
 import com.momagic.NotificationHelperListener;
 import com.momagic.Payload;
-import com.momagic.PushTemplate;
 import com.momagic.TokenReceivedListener;
 
 import java.util.ArrayList;
