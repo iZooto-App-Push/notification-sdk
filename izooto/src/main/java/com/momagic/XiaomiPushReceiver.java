@@ -204,7 +204,7 @@ public class XiaomiPushReceiver extends PushMessageReceiver {
                     preferenceUtil.setIntData(AppConstant.CLOUD_PUSH, 1);
                 }
 
-                RestClient.newPostRequest(RestClient.BASE_URL, mapData, new RestClient.ResponseHandler() {
+                RestClient.postRequest(RestClient.BASE_URL, mapData, null,new RestClient.ResponseHandler() {
                     @RequiresApi(api = Build.VERSION_CODES.LOLLIPOP)
                     @Override
                     void onSuccess(final String response) {
@@ -238,7 +238,7 @@ public class XiaomiPushReceiver extends PushMessageReceiver {
                         super.onFailure(statusCode, response, throwable);
                     }
                 });
-                RestClient.newPostRequest(RestClient.MOMAGIC_SUBSCRIPTION_URL, mapData, new RestClient.ResponseHandler() {
+                RestClient.postRequest(RestClient.MOMAGIC_SUBSCRIPTION_URL, mapData, null,new RestClient.ResponseHandler() {
                     @Override
                     void onSuccess(final String response) {
                         super.onSuccess(response);

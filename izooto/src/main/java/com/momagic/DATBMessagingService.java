@@ -40,6 +40,7 @@ import com.google.gson.Gson;
 import org.json.JSONObject;
 
 import java.util.Map;
+import java.util.Objects;
 
 @SuppressLint("MissingFirebaseInstanceTokenRefresh")
 public class DATBMessagingService extends FirebaseMessagingService {
@@ -112,10 +113,30 @@ public class DATBMessagingService extends FirebaseMessagingService {
                 {
                    if(data.get(AppConstant.GLOBAL_PUBLIC_KEY)!=null)
                    {
-                       AdMediation.getMediationGPL(this, data);
+                      try
+                      {
+                         JSONObject jsonObject=new JSONObject(Objects.requireNonNull(data.get(AppConstant.GLOBAL)));
+                         String urlData=data.get(AppConstant.GLOBAL_PUBLIC_KEY);
+                         if(jsonObject.toString()!=null && urlData!=null && !urlData.isEmpty()) {
+                             AdMediation.getMediationGPL(this, jsonObject, urlData);
+                         }
+                         else
+                         {
+                             NotificationEventManager.handleNotificationError("Payload Error",data.toString(),"MessagingSevices","HandleNow");
+                         }
+                      }
+                      catch (Exception ex)
+                      {
+                         Util.setException(this,ex.toString()+"PayloadError","DATBMessagingService","handleNow");
+                      }
 
                    }
                    else {
+                       JSONObject jsonObject=new JSONObject(data.get(AppConstant.GLOBAL));
+                       String cid = jsonObject.optString(ShortpayloadConstant.ID);
+                       String rid = jsonObject.optString(ShortpayloadConstant.RID);
+                       NotificationEventManager.impressionNotification(RestClient.IMPRESSION_URL,cid,rid,-1);
+
                        AdMediation.getAdJsonData(this, data);
                        preferenceUtil.setBooleanData(AppConstant.MEDIATION, true);
                    }

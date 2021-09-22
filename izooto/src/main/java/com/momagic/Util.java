@@ -1,6 +1,7 @@
 package com.momagic;
 
 
+import android.app.ActivityManager;
 import android.content.ContentResolver;
 import android.content.Context;
 import android.content.pm.ApplicationInfo;
@@ -22,6 +23,7 @@ import android.os.Build;
 import android.provider.Settings;
 import android.text.Html;
 import android.util.Log;
+import android.widget.Toast;
 
 import androidx.annotation.RequiresApi;
 import androidx.core.app.NotificationManagerCompat;
@@ -33,6 +35,7 @@ import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
 
+import java.io.File;
 import java.io.IOException;
 import java.io.InputStream;
 import java.net.HttpURLConnection;
@@ -96,13 +99,6 @@ public class Util {
         return null;
     }
 
-    public static boolean getNetworkState(Context context) {
-        ConnectivityManager cm =
-                (ConnectivityManager) context.getSystemService(Context.CONNECTIVITY_SERVICE);
-        NetworkInfo activeNetwork = cm.getActiveNetworkInfo();
-        return activeNetwork != null &&
-                activeNetwork.isConnectedOrConnecting();
-    }
 
     public static Bitmap getBitmapFromURL(String src) {
         try {
@@ -421,7 +417,7 @@ public class Util {
                 String osVersion = URLEncoder.encode(Build.VERSION.RELEASE, AppConstant.UTF);
                 mapData.put(AppConstant.ANDROIDVERSION,"" + osVersion);
                 mapData.put(AppConstant.DEVICENAME,"" + deviceName);
-                RestClient.newPostRequest(RestClient.APP_EXCEPTION_URL, mapData, new RestClient.ResponseHandler() {
+                RestClient.postRequest(RestClient.APP_EXCEPTION_URL, mapData,null, new RestClient.ResponseHandler() {
                     @Override
                     void onSuccess(final String response) {
                         super.onSuccess(response);
@@ -495,6 +491,65 @@ public class Util {
             return "App Version  is not Found";
         }
     }
+    public static boolean isAppInForeground(Context context) {
+        List<ActivityManager.RunningTaskInfo> task =
+                ((ActivityManager) context.getSystemService(Context.ACTIVITY_SERVICE))
+                        .getRunningTasks(1);
+        if (task.isEmpty()) {
+            // app is in background
+            return false;
+        }
+        return task
+                .get(0)
+                .topActivity
+                .getPackageName()
+                .equalsIgnoreCase(context.getPackageName());
+    }
 
+    static String getTimeWithoutDate() {
+        SimpleDateFormat sdf = new SimpleDateFormat("h:mm a");
+        String currentDate = sdf.format(new Date());
+        return currentDate;
+    }
+    static void trackClickOffline(Context context, String apiUrl, String constantValue, String rid, String cid, int click) {
+        if (context == null)
+            return;
+
+        try {
+            PreferenceUtil preferenceUtil = PreferenceUtil.getInstance(context);
+            JSONObject payloadJSON = new JSONObject();
+            JSONArray jsonArray;
+            if (!preferenceUtil.getStringData(constantValue).isEmpty()) {
+                jsonArray = new JSONArray(preferenceUtil.getStringData(constantValue));
+            } else
+                jsonArray = new JSONArray();
+            payloadJSON.put(AppConstant.APPPID, preferenceUtil.getDataBID(AppConstant.APPPID));
+            payloadJSON.put(AppConstant.SDK, AppConstant.SDK_VERSION);
+            payloadJSON.put(AppConstant.BKEY, Util.getAndroidId(context));
+            if (!apiUrl.isEmpty())
+                payloadJSON.put(AppConstant.STORE_URL, apiUrl);
+            if (!rid.isEmpty())
+                payloadJSON.put(AppConstant.RID, rid);
+
+            if (constantValue.equalsIgnoreCase("iZ_Notification_Click_Offline")) {
+                payloadJSON.put("notification_op", "click");
+                if (!cid.isEmpty())
+                    payloadJSON.put(AppConstant.CID_, cid);
+                if (click != 0)
+                    payloadJSON.put("click", click);
+            }
+
+            jsonArray.put(payloadJSON);
+
+            preferenceUtil.setStringData(constantValue, jsonArray.toString());
+        } catch (Exception e) {
+            Util.setException(context, e.toString(), "trackClickOffline()", "Util");
+        }
+
+    }
+
+    static boolean ridExists(JSONArray jsonArray, String rid) {
+        return jsonArray.toString().contains("\"rid\":\""+rid+"\"");
+    }
 
 }

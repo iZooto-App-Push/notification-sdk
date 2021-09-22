@@ -79,7 +79,7 @@ public interface AppConstant {
     String PTE_="pte";
     String CID_="cid";
     String RID_="rid";
-    String NOTIFICATION_OP="&op=";
+    String NOTIFICATION_OP="op";
     String ACTION="action";
     String PT_="pt";
     int PT = 0;
@@ -331,7 +331,14 @@ public interface AppConstant {
     String GLOBAL_PUBLIC_KEY= "gpl";
     String STORAGE_GPL_DATA="iz_gpl_url";
     String STORAGE_PAYLOAD_DATA="iz_payload_data";
-
+    String IZ_NOTIFICATION_CLICK_OFFLINE = "iZ_Notification_Click_Offline";
+    String IZ_NOTIFICATION_VIEW_OFFLINE = "iZ_Notification_View_Offline";
+    String IZ_NOTIFICATION_LAST_CLICK_OFFLINE = "iZ_Notification_Last_Click_Offline";
+    String IZ_NOTIFICATION_LAST_VIEW_OFFLINE = "iZ_Notification_Last_View_Offline";
+    String IS_CONSENT_STORED= "iz_isConsentStored";
+    String CAN_STORED_QUEUE= "iz_cantStoredQueue";
+    String STORE_URL = "apiURL";
+    String CHECK_SDK_UPDATE="IZ_SDK_UPDATE";
 }
 
 

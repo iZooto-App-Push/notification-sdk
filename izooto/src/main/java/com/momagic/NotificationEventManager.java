@@ -22,19 +22,16 @@ import android.os.Looper;
 import android.service.notification.StatusBarNotification;
 import android.util.Base64;
 import android.util.Log;
+import android.view.View;
 import android.widget.RemoteViews;
-
 import androidx.annotation.RequiresApi;
 import androidx.core.app.NotificationCompat;
 import androidx.core.app.NotificationManagerCompat;
-
 import com.momagic.shortcutbadger.ShortcutBadger;
-
 import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
 import org.json.JSONTokener;
-
 import java.io.UnsupportedEncodingException;
 import java.util.HashMap;
 import java.util.List;
@@ -435,20 +432,39 @@ public class NotificationEventManager {
 
      static void showNotification(final Payload payload) {
 
-         if (addCheck){
-            receiveAds(payload);
-        }else {
-            if (isAppInForeground(DATB.appContext)){
-                if (DATB.inAppOption==null || DATB.inAppOption.equalsIgnoreCase(AppConstant.NOTIFICATION_)){
-                    receivedNotification(payload);
-                }else if (DATB.inAppOption.equalsIgnoreCase(AppConstant.INAPPALERT)){
-                    showAlert(payload);
-                }
-            }else {
-                receivedNotification(payload);
-            }
-        }
-    }
+         if (addCheck) {
+             receiveAds(payload);
+         }
+//        }else {
+//            if (isAppInForeground(DATB.appContext)){
+//                if (DATB.inAppOption==null || DATB.inAppOption.equalsIgnoreCase(AppConstant.NOTIFICATION_)){
+//                    receivedNotification(payload);
+//                }else if (DATB.inAppOption.equalsIgnoreCase(AppConstant.INAPPALERT)){
+//                    showAlert(payload);
+//                }
+//            }else {
+//                receivedNotification(payload);
+//            }
+//        }
+         {
+             final PreferenceUtil preferenceUtil = PreferenceUtil.getInstance(DATB.appContext);
+             if (Util.isAppInForeground(DATB.appContext)) {
+                 if (DATB.inAppOption == null || DATB.inAppOption.equalsIgnoreCase(AppConstant.NOTIFICATION_)) {
+                     if (payload.getDefaultNotificationPreview() == 1 || preferenceUtil.getIntData(AppConstant.NOTIFICATION_PREVIEW) == PushTemplate.TEXT_OVERLAY)
+                         NotificationPreview.receiveCustomNotification(payload);
+                     else
+                         receivedNotification(payload);
+                 } else if (DATB.inAppOption.equalsIgnoreCase(AppConstant.INAPPALERT)) {
+                     showAlert(payload);
+                 }
+             } else {
+                 if (payload.getDefaultNotificationPreview() == 1 || preferenceUtil.getIntData(AppConstant.NOTIFICATION_PREVIEW) == PushTemplate.TEXT_OVERLAY)
+                     NotificationPreview.receiveCustomNotification(payload);
+                 else
+                     receivedNotification(payload);
+             }
+         }
+     }
      static void receiveAds(final Payload payload){
         final Handler handler = new Handler(Looper.getMainLooper());
         final Runnable notificationRunnable = new Runnable() {
@@ -496,7 +512,7 @@ public class NotificationEventManager {
                 intent = notificationClick(payload, payload.getLink(),payload.getAct1link(),payload.getAct2link(),AppConstant.NO,clickIndex,lastView_Click,100,0);
                 Uri defaultSoundUri = RingtoneManager.getDefaultUri(RingtoneManager.TYPE_NOTIFICATION);
 
-                PendingIntent pendingIntent = PendingIntent.getBroadcast(DATB.appContext, new Random().nextInt(100) /* Request code */, intent,
+                 PendingIntent pendingIntent = PendingIntent.getBroadcast(DATB.appContext, new Random().nextInt(100) /* Request code */, intent,
                         PendingIntent.FLAG_ONE_SHOT);
 
 
@@ -751,21 +767,21 @@ private static void receivedNotification(final Payload payload){
                 if (notificationBanner == null && notificationIcon == null) {
                     if (!payload.getMessage().isEmpty() && payload.getTitle().length() < 46) {
                         collapsedView.setTextViewText(R.id.tv_title, "" + payload.getTitle());
-                        collapsedView.setViewVisibility(R.id.tv_message, 0);
+                        collapsedView.setViewVisibility(R.id.tv_message, View.VISIBLE);
                         collapsedView.setTextViewText(R.id.tv_message, "" + payload.getMessage());
                     } else {
                         collapsedView.setTextViewText(R.id.tv_title, "" + payload.getTitle());
                     }
 
                 } else {
-                    collapsedView.setViewVisibility(R.id.linear_layout_large_icon, 0);
+                    collapsedView.setViewVisibility(R.id.linear_layout_large_icon, View.VISIBLE);
                     if (notificationIcon != null)
                         collapsedView.setImageViewBitmap(R.id.iv_large_icon, Util.makeCornerRounded(notificationIcon));
                     else
                         collapsedView.setImageViewBitmap(R.id.iv_large_icon, Util.makeCornerRounded(notificationBanner));
                     if (!payload.getMessage().isEmpty() && payload.getTitle().length() < 40) {
                         collapsedView.setTextViewText(R.id.tv_title, "" + payload.getTitle());
-                        collapsedView.setViewVisibility(R.id.tv_message, 0);
+                        collapsedView.setViewVisibility(R.id.tv_message, View.VISIBLE);
                         collapsedView.setTextViewText(R.id.tv_message, "" + payload.getMessage());
                     } else {
                         collapsedView.setTextViewText(R.id.tv_title, "" + payload.getTitle());
@@ -774,7 +790,7 @@ private static void receivedNotification(final Payload payload){
             } else {
                 if (!payload.getMessage().isEmpty() && payload.getTitle().length() < 46) {
                     collapsedView.setTextViewText(R.id.tv_title, "" + payload.getTitle());
-                    collapsedView.setViewVisibility(R.id.tv_message, 0);
+                    collapsedView.setViewVisibility(R.id.tv_message, View.VISIBLE);
                     collapsedView.setTextViewText(R.id.tv_message, "" + payload.getMessage());
                 } else
                     collapsedView.setTextViewText(R.id.tv_title, "" + payload.getTitle());
@@ -785,24 +801,24 @@ private static void receivedNotification(final Payload payload){
             if (notificationBanner == null) {
                 expandedView.setTextViewText(R.id.tv_title, "" + payload.getTitle());
                 if (!payload.getMessage().isEmpty()) {
-                    expandedView.setViewVisibility(R.id.tv_message, 0);
+                    expandedView.setViewVisibility(R.id.tv_message, View.VISIBLE);
                     expandedView.setTextViewText(R.id.tv_message, "" + payload.getMessage());
                 }
             } else {
                 if (notificationBanner != null) {
                     if (payload.getAct1name().isEmpty() && payload.getAct2name().isEmpty()) {
-                        expandedView.setViewVisibility(R.id.tv_title_with_banner_with_button, 2);
-                        expandedView.setViewVisibility(R.id.iv_banner, 0);//0 for visible
+                        expandedView.setViewVisibility(R.id.tv_title_with_banner_with_button, View.GONE);
+                        expandedView.setViewVisibility(R.id.iv_banner, View.VISIBLE);//0 for visible
                         expandedView.setImageViewBitmap(R.id.iv_banner, notificationBanner);
 
                         if (!payload.getMessage().isEmpty() && payload.getTitle().length() < 46) {
-                            expandedView.setViewVisibility(R.id.tv_message_with_banner, 0);
+                            expandedView.setViewVisibility(R.id.tv_message_with_banner, View.VISIBLE);
                             expandedView.setTextViewText(R.id.tv_title, "" + payload.getTitle());
                             expandedView.setTextViewText(R.id.tv_message_with_banner, "" + payload.getMessage());
 
                         } else {
                             if (!payload.getMessage().isEmpty()) {
-                                expandedView.setViewVisibility(R.id.tv_message_with_banner_with_button, 0);
+                                expandedView.setViewVisibility(R.id.tv_message_with_banner_with_button, View.VISIBLE);
                                 expandedView.setTextViewText(R.id.tv_title, "" + payload.getTitle());
                                 expandedView.setTextViewText(R.id.tv_message_with_banner_with_button, "" + payload.getMessage());
                             } else
@@ -810,13 +826,13 @@ private static void receivedNotification(final Payload payload){
 
                         }
                     } else {
-                        expandedView.setViewVisibility(R.id.tv_title_with_banner_with_button, 0);
-                        expandedView.setViewVisibility(R.id.tv_title, 2);//2 for gone
-                        expandedView.setViewVisibility(R.id.iv_banner, 0);
+                        expandedView.setViewVisibility(R.id.tv_title_with_banner_with_button, View.VISIBLE);
+                        expandedView.setViewVisibility(R.id.tv_title, View.GONE);//2 for gone
+                        expandedView.setViewVisibility(R.id.iv_banner, View.VISIBLE);
                         expandedView.setTextViewText(R.id.tv_title_with_banner_with_button, "" + payload.getTitle());
                         expandedView.setImageViewBitmap(R.id.iv_banner, notificationBanner);
                         if (!payload.getMessage().isEmpty() && payload.getTitle().length() < 46) {
-                            expandedView.setViewVisibility(R.id.tv_message_with_banner_with_button, 0);
+                            expandedView.setViewVisibility(R.id.tv_message_with_banner_with_button, View.VISIBLE);
                             expandedView.setTextViewText(R.id.tv_message_with_banner_with_button, "" + payload.getMessage());
                         }
                     }
@@ -992,10 +1008,7 @@ private static void receivedNotification(final Payload payload){
                     handleNotificationError("Payload title is empty",payload.toString(),"NotificationEventManager","ReceviedNotification");
 
                 }
-                else
-                {
-                    Log.e("Dataase","Not stored");
-                }
+
 
             }
         }
@@ -1081,19 +1094,19 @@ private static void receivedNotification(final Payload payload){
 
     }
 
-    private static int priorityForImportance(int priority) {
+     static int priorityForImportance(int priority) {
         if (priority > 9)
             return NotificationManagerCompat.IMPORTANCE_MAX;
         if (priority > 7)
             return NotificationManagerCompat.IMPORTANCE_HIGH;
         return NotificationManagerCompat.IMPORTANCE_HIGH;
     }
-    private static int priorityForLessOreo(int priority) {
+     static int priorityForLessOreo(int priority) {
         if (priority > 0)
             return Notification.PRIORITY_HIGH;
         return Notification.PRIORITY_HIGH;
     }
-    private static int setLockScreenVisibility(int visibility) {
+     static int setLockScreenVisibility(int visibility) {
         if (visibility < 0)
             return NotificationCompat.VISIBILITY_SECRET;
         if (visibility == 0)
@@ -1102,7 +1115,7 @@ private static void receivedNotification(final Payload payload){
 
     }
 
-    private static void badgeCountUpdate(int count){
+     static void badgeCountUpdate(int count){
         final PreferenceUtil preferenceUtil = PreferenceUtil.getInstance(DATB.appContext);
         try {
             if (count > 0) {
@@ -1215,7 +1228,7 @@ private static void receivedNotification(final Payload payload){
 
     }
 
-    private static Intent notificationClick(Payload payload, String getLink ,String getLink1, String getLink2, String phone, String finalClickIndex, String lastClick, int notificationId, int button){
+     static Intent notificationClick(Payload payload, String getLink ,String getLink1, String getLink2, String phone, String finalClickIndex, String lastClick, int notificationId, int button){
         String link = getLink;
         String link1 = getLink1;
         String link2 = getLink2;
@@ -1276,42 +1289,73 @@ private static void receivedNotification(final Payload payload){
      static void viewNotificationApi(final Payload payload) {
         if(DATB.appContext!=null) {
 
-            final PreferenceUtil preferenceUtil = PreferenceUtil.getInstance(DATB.appContext);
-            String imprURL;
+            String impURL;
             int dataCfg = Util.getBinaryToDecimal(payload.getCfg());
             if (dataCfg > 0) {
-                imprURL = "https://impr" + dataCfg + ".izooto.com/imp" + dataCfg;
+                impURL = "https://impr" + dataCfg + ".izooto.com/imp" + dataCfg;
             } else
-                imprURL = RestClient.IMPRESSION_URL;
+                impURL = RestClient.IMPRESSION_URL;
 
-            try {
-                HashMap<String, String> data = new HashMap<>();
-                data.put(AppConstant.PID, preferenceUtil.getDataBID(AppConstant.APPPID));
-                data.put(AppConstant.CID_, payload.getId());
-                data.put(AppConstant.BKEY, Util.getAndroidId(DATB.appContext));
-                data.put(AppConstant.RID, payload.getRid());
-                data.put("op", "view");
-                data.put("ct", payload.getPush_type());
-                RestClient.newPostRequest(imprURL, data, new RestClient.ResponseHandler() {
-                    @Override
-                    void onFailure(int statusCode, String response, Throwable throwable) {
-                        super.onFailure(statusCode, response, throwable);
-                    }
+            impressionNotification(impURL, payload.getId(), payload.getRid(), -1);
 
-                    @Override
-                    void onSuccess(String response) {
-                        super.onSuccess(response);
-                    }
-                });
-
-            } catch (Exception ex) {
-                    Util.setException(DATB.appContext, ex.toString(), AppConstant.APPName_2, "viewNotificationAPi");
-                          }
         }
     }
 
+    static void impressionNotification(String impURL, String cid, String rid, int i){
+        if (DATB.appContext == null)
+            return;
 
-    private static String getPhone(String getActLink){
+        try {
+            final PreferenceUtil preferenceUtil = PreferenceUtil.getInstance(DATB.appContext);
+            Map<String, String> mapData = new HashMap<>();
+            mapData.put(AppConstant.PID, preferenceUtil.getDataBID(AppConstant.APPPID));
+            mapData.put(AppConstant.CID_, cid);
+            mapData.put(AppConstant.ANDROID_ID, "" + Util.getAndroidId(DATB.appContext));
+            mapData.put(AppConstant.RID_, "" + rid);
+            mapData.put(AppConstant.NOTIFICATION_OP, "view");
+            mapData.put(AppConstant.PUSH,AppConstant.PUSH_FCM);
+
+            RestClient.postRequest(impURL, mapData,null, new RestClient.ResponseHandler() {
+                @RequiresApi(api = Build.VERSION_CODES.KITKAT)
+                @Override
+                void onSuccess(final String response) {
+                    super.onSuccess(response);
+
+                    try {
+                        if (!preferenceUtil.getStringData(AppConstant.IZ_NOTIFICATION_VIEW_OFFLINE).isEmpty() && i >= 0) {
+                            JSONArray jsonArrayOffline = new JSONArray(preferenceUtil.getStringData(AppConstant.IZ_NOTIFICATION_VIEW_OFFLINE));
+                            jsonArrayOffline.remove(i);
+                            preferenceUtil.setStringData(AppConstant.IZ_NOTIFICATION_VIEW_OFFLINE, jsonArrayOffline.toString());
+                        }
+                    } catch (Exception e) {
+                        Log.e(AppConstant.APP_NAME_TAG, "Success:impURL Exception -- " + e);
+                    }
+                }
+
+                @Override
+                void onFailure(int statusCode, String response, Throwable throwable) {
+                    super.onFailure(statusCode, response, throwable);
+                    try {
+                        if (!preferenceUtil.getStringData(AppConstant.IZ_NOTIFICATION_VIEW_OFFLINE).isEmpty()) {
+                            JSONArray jsonArrayOffline = new JSONArray(preferenceUtil.getStringData(AppConstant.IZ_NOTIFICATION_VIEW_OFFLINE));
+                            if (!Util.ridExists(jsonArrayOffline, rid)) {
+                                Util.trackClickOffline(DATB.appContext, impURL, AppConstant.IZ_NOTIFICATION_VIEW_OFFLINE, rid, cid, 0);
+                            }
+                        } else
+                            Util.trackClickOffline(DATB.appContext, impURL, AppConstant.IZ_NOTIFICATION_VIEW_OFFLINE, rid, cid, 0);
+                    } catch (Exception e) {
+                        Log.e("Response","onFailure impURLException"+e);
+                    }
+                }
+            });
+        } catch (Exception e) {
+            Util.setException(DATB.appContext, e.toString(), "impressionNotificationApi", "NotificationEventManager");
+            Log.e("Exception im -- ", e.toString());
+        }
+
+    }
+
+     static String getPhone(String getActLink){
         String phone;
 
         String checkNumber =decodeURL(getActLink);
@@ -1321,7 +1365,7 @@ private static void receivedNotification(final Payload payload){
             phone = AppConstant.NO;
         return phone;
     }
-    private static int getBadgeIcon(String setBadgeIcon){
+     static int getBadgeIcon(String setBadgeIcon){
             int bIicon;
             if (DATB.icon != 0) {
                 bIicon = DATB.icon;
@@ -1358,7 +1402,7 @@ private static void receivedNotification(final Payload payload){
 
         return bIicon;
     }
-    private static int getBadgeColor(String setColor){
+     static int getBadgeColor(String setColor){
         int iconColor;
         if (setColor.contains("#")){
             try{
@@ -1386,79 +1430,144 @@ private static void receivedNotification(final Payload payload){
         return iconColor;
     }
 
-    private static void lastViewNotificationApi(final Payload payload, String lastViewIndex, String seventhCFG, String ninthCFG){
-       if(DATB.appContext!=null) {
-           final PreferenceUtil preferenceUtil = PreferenceUtil.getInstance(DATB.appContext);
-           String dayDiff1 = Util.dayDifference(Util.getTime(), preferenceUtil.getStringData(AppConstant.CURRENT_DATE_VIEW_WEEKLY));
-           String updateWeekly = preferenceUtil.getStringData(AppConstant.CURRENT_DATE_VIEW_WEEKLY);
-           String updateDaily = preferenceUtil.getStringData(AppConstant.CURRENT_DATE_VIEW_DAILY);
-           String time = preferenceUtil.getStringData(AppConstant.CURRENT_DATE_VIEW);
+    static void lastViewNotificationApi(final Payload payload, String lastViewIndex, String seventhCFG, String ninthCFG){
+       if(DATB.appContext ==null)
+           return;
+        final PreferenceUtil preferenceUtil = PreferenceUtil.getInstance(DATB.appContext);
+        String dayDiff1 = Util.dayDifference(Util.getTime(), preferenceUtil.getStringData(AppConstant.CURRENT_DATE_VIEW_WEEKLY));
+        String updateWeekly = preferenceUtil.getStringData(AppConstant.CURRENT_DATE_VIEW_WEEKLY);
+        String updateDaily = preferenceUtil.getStringData(AppConstant.CURRENT_DATE_VIEW_DAILY);
+        String time = preferenceUtil.getStringData(AppConstant.CURRENT_DATE_VIEW);
+        String limURL;
+        int dataCfg = Util.getBinaryToDecimal(payload.getCfg());
 
-           if (seventhCFG.equalsIgnoreCase("1")) {
+        if (dataCfg > 0){
+            limURL = "https://lim"+ dataCfg + ".izooto.com/lim" + dataCfg;
+        }else
+            limURL = RestClient.LASTNOTIFICATIONVIEWURL;
 
-               if (ninthCFG.equalsIgnoreCase("1")) {
-                   if (!updateDaily.equalsIgnoreCase(Util.getTime())) {
-                       preferenceUtil.setStringData(AppConstant.CURRENT_DATE_VIEW_DAILY, Util.getTime());
-                       lastViewNotification(payload);
-                   }
-               } else {
-                   if (updateWeekly.isEmpty() || Integer.parseInt(dayDiff1) >= 7) {
-                       preferenceUtil.setStringData(AppConstant.CURRENT_DATE_VIEW_WEEKLY, Util.getTime());
-                       lastViewNotification(payload);
-                   }
-               }
-           } else if (lastViewIndex.equalsIgnoreCase("1") && seventhCFG.equalsIgnoreCase("0")) {
-               String dayDiff = Util.dayDifference(Util.getTime(), preferenceUtil.getStringData(AppConstant.CURRENT_DATE_VIEW));
-               if (time.isEmpty() || Integer.parseInt(dayDiff) >= 7) {
-                   preferenceUtil.setStringData(AppConstant.CURRENT_DATE_VIEW, Util.getTime());
-                   lastViewNotification(payload);
-               }
-           }
-       }
+        if (seventhCFG.equalsIgnoreCase("1")){
 
-
-    }
-
-    private static void lastViewNotification(final Payload payload){
-        if(DATB.appContext!=null) {
-            final PreferenceUtil preferenceUtil = PreferenceUtil.getInstance(DATB.appContext);
-            try {
-                HashMap<String, Object> data = new HashMap<>();
-                data.put(AppConstant.LAST_NOTIFICAION_VIEWED, true);
-                JSONObject jsonObject = new JSONObject(data);
-
-            String limURL;
-            int dataCfg = Util.getBinaryToDecimal(payload.getCfg());
-
-            if (dataCfg > 0) {
-                limURL = "https://lim" + dataCfg + ".izooto.com/lim" + dataCfg;
-            } else
-                limURL = RestClient.LASTNOTIFICATIONVIEWURL;
-
-            Map<String, String> mapData = new HashMap<>();
-            mapData.put(AppConstant.PID, preferenceUtil.getDataBID(AppConstant.APPPID));
-            mapData.put(AppConstant.VER_, AppConstant.SDK_VERSION);
-            mapData.put(AppConstant.ANDROID_ID, "" + Util.getAndroidId(DATB.appContext));
-            mapData.put(AppConstant.VAL, "" + jsonObject.toString());
-            mapData.put(AppConstant.ACT, "add");
-            mapData.put(AppConstant.ISID_, "1");
-            mapData.put(AppConstant.ET_, "" + AppConstant.USERP_);
-            RestClient.newPostRequest(limURL, mapData, new RestClient.ResponseHandler() {
-                @Override
-                void onSuccess(final String response) {
-                    super.onSuccess(response);
+            if (ninthCFG.equalsIgnoreCase("1")){
+                if (!updateDaily.equalsIgnoreCase(Util.getTime())){
+                    preferenceUtil.setStringData(AppConstant.CURRENT_DATE_VIEW_DAILY, Util.getTime());
+                    lastViewNotification(limURL, payload.getRid(), payload.getId(), -1);
                 }
-
-                @Override
-                void onFailure(int statusCode, String response, Throwable throwable) {
-                    super.onFailure(statusCode, response, throwable);
+            }else {
+                if (updateWeekly.isEmpty() || Integer.parseInt(dayDiff1) >= 7){
+                    preferenceUtil.setStringData(AppConstant.CURRENT_DATE_VIEW_WEEKLY, Util.getTime());
+                    lastViewNotification(limURL, payload.getRid(), payload.getId(), -1);
                 }
-            });
-            } catch (Exception ex) {
-                Util.setException(DATB.appContext, ex.toString(), AppConstant.APPName_2, "lastViewNotification");
+            }
+        }else if (lastViewIndex.equalsIgnoreCase("1") && seventhCFG.equalsIgnoreCase("0")){
+            String dayDiff = Util.dayDifference(Util.getTime(), preferenceUtil.getStringData(AppConstant.CURRENT_DATE_VIEW));
+            if (time.isEmpty() || Integer.parseInt(dayDiff) >= 7) {
+                preferenceUtil.setStringData(AppConstant.CURRENT_DATE_VIEW, Util.getTime());
+                lastViewNotification(limURL, payload.getRid(), payload.getId(), -1);
             }
         }
+
+
     }
+//     static void lastViewNotification(String limURL, String rid, String cid, int i){
+//        if(DATB.appContext!=null) {
+//            final PreferenceUtil preferenceUtil = PreferenceUtil.getInstance(DATB.appContext);
+//            try {
+//                HashMap<String, Object> data = new HashMap<>();
+//                data.put(AppConstant.LAST_NOTIFICAION_VIEWED, true);
+//                JSONObject jsonObject = new JSONObject(data);
+//
+//            String limURL;
+//            int dataCfg = Util.getBinaryToDecimal(payload.getCfg());
+//
+//            if (dataCfg > 0) {
+//                limURL = "https://lim" + dataCfg + ".izooto.com/lim" + dataCfg;
+//            } else
+//                limURL = RestClient.LASTNOTIFICATIONVIEWURL;
+//
+//            Map<String, String> mapData = new HashMap<>();
+//            mapData.put(AppConstant.PID, preferenceUtil.getDataBID(AppConstant.APPPID));
+//            mapData.put(AppConstant.VER_, AppConstant.SDK_VERSION);
+//            mapData.put(AppConstant.ANDROID_ID, "" + Util.getAndroidId(DATB.appContext));
+//            mapData.put(AppConstant.VAL, "" + jsonObject.toString());
+//            mapData.put(AppConstant.ACT, "add");
+//            mapData.put(AppConstant.ISID_, "1");
+//            mapData.put(AppConstant.ET_, "" + AppConstant.USERP_);
+//            RestClient.newPostRequest(limURL, mapData,null, new RestClient.ResponseHandler() {
+//                @Override
+//                void onSuccess(final String response) {
+//                    super.onSuccess(response);
+//                }
+//
+//                @Override
+//                void onFailure(int statusCode, String response, Throwable throwable) {
+//                    super.onFailure(statusCode, response, throwable);
+//                }
+//            });
+//            } catch (Exception ex) {
+//                Util.setException(DATB.appContext, ex.toString(), AppConstant.APPName_2, "lastViewNotification");
+//            }
+//        }
+//    }
+static void lastViewNotification(String limURL, String rid, String cid, int i){
+    if (DATB.appContext == null)
+        return;
+
+    try {
+        final PreferenceUtil preferenceUtil = PreferenceUtil.getInstance(DATB.appContext);
+
+        String encodeData = "";
+        HashMap<String, Object> data = new HashMap<>();
+        data.put(AppConstant.LAST_NOTIFICAION_VIEWED, true);
+        JSONObject jsonObject = new JSONObject(data);
+//            encodeData = URLEncoder.encode(jsonObject.toString(), AppConstant.UTF);
+
+
+        Map<String,String> mapData= new HashMap<>();
+        mapData.put(AppConstant.PID, preferenceUtil.getDataBID(AppConstant.APPPID));
+        mapData.put(AppConstant.VER_, AppConstant.SDK_VERSION);
+        mapData.put(AppConstant.ANDROID_ID,"" + Util.getAndroidId(DATB.appContext));
+        mapData.put(AppConstant.VAL,"" + jsonObject.toString());
+        mapData.put(AppConstant.ACT,"add");
+        mapData.put(AppConstant.ISID_,"1");
+        mapData.put(AppConstant.ET_,"" + AppConstant.USERP_);
+
+        RestClient.postRequest(limURL, mapData,null, new RestClient.ResponseHandler() {
+            @RequiresApi(api = Build.VERSION_CODES.KITKAT)
+            @Override
+            void onSuccess(final String response) {
+                super.onSuccess(response);
+
+                try {
+                    if (!preferenceUtil.getStringData(AppConstant.IZ_NOTIFICATION_LAST_VIEW_OFFLINE).isEmpty() && i >= 0) {
+                        JSONArray jsonArrayOffline = new JSONArray(preferenceUtil.getStringData(AppConstant.IZ_NOTIFICATION_LAST_VIEW_OFFLINE));
+                        jsonArrayOffline.remove(i);
+                        preferenceUtil.setStringData(AppConstant.IZ_NOTIFICATION_LAST_VIEW_OFFLINE, jsonArrayOffline.toString());
+                    }
+                } catch (Exception e) {
+                    Log.e(AppConstant.APP_NAME_TAG, "Success: limURLException -- " + e );
+                }
+            }
+            @Override
+            void onFailure(int statusCode, String response, Throwable throwable) {
+                super.onFailure(statusCode, response, throwable);
+                try {
+                    if (!preferenceUtil.getStringData(AppConstant.IZ_NOTIFICATION_LAST_VIEW_OFFLINE).isEmpty()) {
+                        JSONArray jsonArrayOffline = new JSONArray(preferenceUtil.getStringData(AppConstant.IZ_NOTIFICATION_LAST_VIEW_OFFLINE));
+                        if (!Util.ridExists(jsonArrayOffline, rid)) {
+                            Util.trackClickOffline(DATB.appContext, limURL, AppConstant.IZ_NOTIFICATION_LAST_VIEW_OFFLINE, rid, cid, 0);
+                        }
+                    } else
+                        Util.trackClickOffline(DATB.appContext, limURL, AppConstant.IZ_NOTIFICATION_LAST_VIEW_OFFLINE, rid, cid, 0);
+                } catch (Exception e) {
+                    Log.e("Response","onFailure limURLException");
+                }
+            }
+        });
+    } catch (Exception e) {
+        Util.setException(DATB.appContext, e.toString(), "lastViewNotification", "NotificationEventManager");
+    }
+}
     /*
      *Set Maximum notification in the tray through getMaximumNotificationInTray() method
      * */
@@ -1502,10 +1611,7 @@ private static void receivedNotification(final Payload payload){
                     viewNotificationApi(payload);
                 }
             }
-            else
-            {
-                Log.e("Value Data","Response");
-            }
+
         }
 
     }
@@ -1522,12 +1628,13 @@ private static void receivedNotification(final Payload payload){
                 data.put("fcm_token",preferenceUtil.getStringData(AppConstant.FCM_DEVICE_TOKEN));
                 data.put("xiaomi_token",preferenceUtil.getStringData(AppConstant.XiaomiToken));
                 data.put("hms_token",preferenceUtil.getStringData(AppConstant.HMS_TOKEN));
-                data.put("error",""+payload);
+                data.put("error",""+errorName);
+                data.put("payloadData",payload);
                 data.put("className",className);
                 data.put("sdk_version",AppConstant.SDK_VERSION);
                 data.put("methodName",methodName);
 
-                RestClient.newPostRequest(RestClient.IMPRESSION_URL, data, new RestClient.ResponseHandler() {
+                RestClient.postRequest(RestClient.IMPRESSION_URL, data,null, new RestClient.ResponseHandler() {
                     @Override
                     void onFailure(int statusCode, String response, Throwable throwable) {
                         super.onFailure(statusCode, response, throwable);
@@ -1552,7 +1659,6 @@ private static void receivedNotification(final Payload payload){
             return preferenceUtil.getStringData(AppConstant.CURRENT_DATE_VIEW_DAILY);
         }
     }
-
 
 
 

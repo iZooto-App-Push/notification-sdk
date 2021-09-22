@@ -57,7 +57,12 @@ public class FCMTokenGenerator implements TokenGenerator {
 public void getToken(final Context context, final String senderId, final String apiKey, final String appId, final TokenGenerationHandler callback) {
     if (context == null)
         return;
-
+    PreferenceUtil preferenceUtil = PreferenceUtil.getInstance(context);
+    if (preferenceUtil.getBoolean(AppConstant.CAN_GENERATE_FCM_TOKEN)) {
+        if (callback != null)
+            callback.complete(preferenceUtil.getStringData(AppConstant.FCM_DEVICE_TOKEN));
+        return;
+    }
     new Thread(new Runnable() {
         @RequiresApi(api = Build.VERSION_CODES.KITKAT)
         @Override
@@ -79,8 +84,9 @@ public void getToken(final Context context, final String senderId, final String 
                                     String token = task.getResult();
                                     if (token != null && !token.isEmpty()) {
                                         PreferenceUtil preferenceUtil = PreferenceUtil.getInstance(context);
-                                        if (!token.equals(preferenceUtil.getStringData(AppConstant.FCM_DEVICE_TOKEN))) {
+                                        if (!token.equals(preferenceUtil.getStringData(AppConstant.FCM_DEVICE_TOKEN)) || !AppConstant.SDK_VERSION.equals(preferenceUtil.getStringData(AppConstant.CHECK_SDK_UPDATE))) {
                                             preferenceUtil.setBooleanData(AppConstant.IS_TOKEN_UPDATED, false);
+                                            preferenceUtil.setStringData(AppConstant.CHECK_SDK_UPDATE,AppConstant.SDK_VERSION);
                                         }
                                         preferenceUtil.setStringData(AppConstant.FCM_DEVICE_TOKEN, token);
                                         if (callback != null)

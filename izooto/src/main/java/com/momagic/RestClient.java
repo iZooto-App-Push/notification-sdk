@@ -2,18 +2,15 @@ package com.momagic;
 
 
 import android.os.Build;
-import android.util.Log;
-
 import androidx.annotation.RequiresApi;
-
 import org.json.JSONObject;
-
 import java.io.InputStream;
 import java.io.OutputStream;
 import java.net.HttpURLConnection;
 import java.net.URL;
 import java.net.URLEncoder;
 import java.nio.charset.StandardCharsets;
+import java.util.Locale;
 import java.util.Map;
 import java.util.Scanner;
 import java.util.concurrent.ExecutorService;
@@ -49,7 +46,7 @@ public class RestClient {
     static void get(final String url, final ResponseHandler responseHandler) {
         new Thread(new Runnable() {
             public void run() {
-                makeApiCall1(url, null, null, responseHandler, GET_TIMEOUT);
+                makeApiCall(url, null, null,null, responseHandler, GET_TIMEOUT);
             }
         }).start();
     }
@@ -57,161 +54,161 @@ public class RestClient {
         new Thread(new Runnable() {
             public void run() {
                 if(timeOut==0)
-                makeApiCall(url, null, null, responseHandler, GET_TIMEOUT);
+                makeApiCall(url, null, null,null, responseHandler, GET_TIMEOUT);
                 else
-                    makeApiCall(url, null, null, responseHandler,timeOut);
+                    makeApiCall(url, null, null,null, responseHandler,timeOut);
             }
         }).start();
     }
 
-    static void postRequest(final String url,final ResponseHandler responseHandler)
-    {
-        new Thread(new Runnable() {
-            @Override
-            public void run() {
-                makeApiCall(url,AppConstant.POST,null,responseHandler,GET_TIMEOUT);
-            }
-        }).start();
-    }
-    static void postRequest1(final String url, final JSONObject jsonObject, final ResponseHandler responseHandler)
-
-    {
-        new Thread(new Runnable() {
-            @Override
-            public void run() {
-                makeApiCall1(url,AppConstant.POST,jsonObject,responseHandler,GET_TIMEOUT);
-            }
-        }).start();
-    }
-    static void newPostRequest(final String url, final Map<String,String> data, final ResponseHandler responseHandler) {
+    static void postRequest(final String url, final Map<String,String> data,JSONObject jsonObject, final ResponseHandler responseHandler) {
         new Thread(new Runnable() {
             @RequiresApi(api = Build.VERSION_CODES.KITKAT)
             @Override
             public void run() {
-                makeApiCall(url, AppConstant.POST, data, responseHandler, GET_TIMEOUT);
+                makeApiCall(url, AppConstant.POST, data,jsonObject, responseHandler, GET_TIMEOUT);
             }
         }).start();
     }
-    public static void makeApiCall(final String url, final String method, final Map<String,String> data, final ResponseHandler responseHandler, final int timeout) {
+    public static void makeApiCall(final String url, final String method, final Map<String,String> data,JSONObject jsonObject, final ResponseHandler responseHandler, final int timeout) {
         ExecutorService es = Executors.newSingleThreadExecutor();
         es.submit(new Runnable() {
             @RequiresApi(api = Build.VERSION_CODES.KITKAT)
             @Override
             public void run() {
 
-                startHTTPConnection(url, method, data, responseHandler, timeout);
+                startHTTPConnection(url, method, data, jsonObject ,responseHandler, timeout);
             }
         });
 
     }
-    public static void makeApiCall1(final String url, final String method,  final JSONObject jsonObject, final ResponseHandler responseHandler, final int timeout) {
-        ExecutorService es = Executors.newSingleThreadExecutor();
-        es.submit(new Runnable() {
-            @RequiresApi(api = Build.VERSION_CODES.KITKAT)
-            @Override
-            public void run() {
 
-                startHTTPConnection1(url, method, jsonObject, responseHandler, timeout);
-            }
-        });
-
-    }
     @RequiresApi(api = Build.VERSION_CODES.KITKAT)
-    private static void startHTTPConnection(String url, String method, final Map<String,String> data, ResponseHandler responseHandler, int timeout) {
+    private static void startHTTPConnection(String url, String method, final Map<String,String> data,JSONObject jsonBody, ResponseHandler responseHandler, int timeout) {
         HttpURLConnection con = null;
         int httpResponse = -1;
         String json = null;
         StringBuilder postData=null;
-        try {
-            if (data != null) {
-                 postData = new StringBuilder();
-                for (Map.Entry<String, String> param : data.entrySet()) {
-                    if (postData.length() != 0) {
-                        postData.append('&');
-                    }
-                    postData.append(URLEncoder.encode(param.getKey(), AppConstant.UTF));
-                    postData.append('=');
-                    postData.append(URLEncoder.encode(param.getValue(),AppConstant.UTF));
-                    }
+        int retry = 0;
+        boolean delay = false;
+        do {
+            if (delay) {
+                Util.sleepTime(2000);
             }
-            if (url.contains(AppConstant.HTTPS) || url.contains(AppConstant.HTTP) || url.contains(AppConstant.IMPR)) {
-                con = (HttpURLConnection) new URL(url).openConnection();
-            } else {
-                con = (HttpURLConnection) new URL(BASE_URL + url).openConnection();
-            }
-            con.setUseCaches(false);
-            con.setConnectTimeout(timeout);
-            con.setReadTimeout(timeout);
-            if (method != null) {
-                con.setRequestMethod(AppConstant.POST);
-                con.setDoOutput(true);
-                   if(postData!=null) {
-                       byte[] out = postData.toString().getBytes(StandardCharsets.UTF_8);
-                       int length = out.length;
-                       con.setFixedLengthStreamingMode(length);
-                       con.setRequestProperty(AppConstant.CONTENT_TYPE, AppConstant.FORM_URL_ENCODED);
-                       con.setRequestProperty(AppConstant.CHARSET_, AppConstant.UTF_);
-                       con.setRequestProperty(AppConstant.CONTENT_L, Integer.toString(length));
-                       con.setInstanceFollowRedirects(false);
-                       con.setUseCaches(false);
-                       con.connect();
-
-                       try (OutputStream os = con.getOutputStream()) {
-                           os.write(out);
-                       }
-                   }
-
-
-            }
-            httpResponse = con.getResponseCode();
-            InputStream inputStream;
-            Scanner scanner;
-            if (httpResponse == HttpURLConnection.HTTP_OK) {
-                if (url.equals(AppConstant.CDN + DATB.mAppId + AppConstant.DAT))
-                    Lg.d(AppConstant.APP_NAME_TAG, AppConstant.SUCCESS);
-                else
-                    Lg.d(AppConstant.APP_NAME_TAG, AppConstant.SUCCESS);
-                inputStream = con.getInputStream();
-                scanner = new Scanner(inputStream, AppConstant.UTF);
-                json = scanner.useDelimiter("\\A").hasNext() ? scanner.next() : "";
-                scanner.close();
-                if (responseHandler != null) {
-                    callResponseHandlerOnSuccess(responseHandler, json);
+            try {
+                if (url.contains(AppConstant.HTTPS) || url.contains(AppConstant.HTTP) || url.contains(AppConstant.IMPR)) {
+                    con = (HttpURLConnection) new URL(url).openConnection();
+                } else {
+                    con = (HttpURLConnection) new URL(BASE_URL + url).openConnection();
                 }
-                else
-                    Lg.w(AppConstant.APP_NAME_TAG, AppConstant.ATTACHREQUEST);
-            } else {
-                if (url.equals(AppConstant.CDN + DATB.mAppId + AppConstant.DAT))
-                    Lg.d(AppConstant.APP_NAME_TAG, AppConstant.SUCCESS);
-                else
-                    Lg.d(AppConstant.APP_NAME_TAG, AppConstant.FAILURE);
-                inputStream = con.getErrorStream();
-                if (inputStream == null)
+                if (data != null) {
+                    postData = new StringBuilder();
+                    for (Map.Entry<String, String> param : data.entrySet()) {
+                        if (postData.length() != 0) {
+                            postData.append('&');
+                        }
+                        postData.append(URLEncoder.encode(param.getKey(), AppConstant.UTF));
+                        postData.append('=');
+                        postData.append(URLEncoder.encode(param.getValue(), AppConstant.UTF));
+                    }
+                }
+                con.setUseCaches(false);
+                con.setConnectTimeout(timeout);
+                con.setReadTimeout(timeout);
+                if (jsonBody != null) {
+                    con.setDoInput(true);
+                }
+                if (method != null) {
+                    if (method.equalsIgnoreCase(AppConstant.POST) && jsonBody == null) {
+                        con.setRequestProperty(AppConstant.CONTENT_TYPE, AppConstant.FORM_URL_ENCODED);
+                    } else {
+                        con.setRequestProperty(AppConstant.CONTENT_TYPE, AppConstant.FORM_URL_JSON);
+                    }
+                    con.setRequestMethod(method);
+                    con.setDoOutput(true);
+
+                }
+                if (method != null) {
+                    if (postData != null) {
+                        byte[] out = postData.toString().getBytes(StandardCharsets.UTF_8);
+                        int length = out.length;
+                        con.setFixedLengthStreamingMode(length);
+                        con.setRequestProperty(AppConstant.CONTENT_TYPE, AppConstant.FORM_URL_ENCODED);
+                        con.setRequestProperty(AppConstant.CHARSET_, AppConstant.UTF_);
+                        con.setRequestProperty(AppConstant.CONTENT_L, Integer.toString(length));
+                        con.setInstanceFollowRedirects(false);
+                        con.setUseCaches(false);
+                        con.connect();
+
+                        try (OutputStream os = con.getOutputStream()) {
+                            os.write(out);
+                        }
+                    }
+                }
+                if (jsonBody != null) {
+                    String strJsonBody = jsonBody.toString();
+                    byte[] sendBytes = strJsonBody.getBytes(AppConstant.UTF);
+                    con.setFixedLengthStreamingMode(sendBytes.length);
+                    OutputStream outputStream = con.getOutputStream();
+                    outputStream.write(sendBytes);
+                }
+
+                httpResponse = con.getResponseCode();
+                InputStream inputStream;
+                Scanner scanner;
+                if (httpResponse == HttpURLConnection.HTTP_OK) {
+                    if (url.equals(AppConstant.CDN + DATB.mAppId + AppConstant.DAT))
+                        Lg.d(AppConstant.APP_NAME_TAG, AppConstant.SUCCESS);
+                    else
+                        Lg.d(AppConstant.APP_NAME_TAG, AppConstant.SUCCESS);
                     inputStream = con.getInputStream();
-                if (inputStream != null) {
                     scanner = new Scanner(inputStream, AppConstant.UTF);
                     json = scanner.useDelimiter("\\A").hasNext() ? scanner.next() : "";
                     scanner.close();
+                    if (responseHandler != null) {
+                        callResponseHandlerOnSuccess(responseHandler, json);
+                    } else
+                        Lg.w(AppConstant.APP_NAME_TAG, AppConstant.ATTACHREQUEST);
+                } else {
+                    retry++;
+                    delay = true;
+                    if (retry >= 4) {
+                        if (url.equals(AppConstant.CDN + DATB.mAppId + AppConstant.DAT))
+                            Lg.d(AppConstant.APP_NAME_TAG, AppConstant.SUCCESS);
+                        else
+                            Lg.d(AppConstant.APP_NAME_TAG, AppConstant.FAILURE);
+                        inputStream = con.getErrorStream();
+                        if (inputStream == null)
+                            inputStream = con.getInputStream();
+                        if (inputStream != null) {
+                            scanner = new Scanner(inputStream, AppConstant.UTF);
+                            json = scanner.useDelimiter("\\A").hasNext() ? scanner.next() : "";
+                            scanner.close();
+                        }
+                        if (responseHandler != null) {
+                            callResponseHandlerOnFailure(responseHandler, httpResponse, json, null);
+                        } else
+                            Lg.w(AppConstant.APP_NAME_TAG, AppConstant.ATTACHREQUEST);
+                    }
                 }
-                if (responseHandler != null) {
-                    callResponseHandlerOnFailure(responseHandler, httpResponse, json, null);
+            } catch (Throwable t) {
+                retry++;
+                delay = true;
+                if (retry >= 4) {
+                    if (t instanceof java.net.ConnectException || t instanceof java.net.UnknownHostException)
+                        Lg.i(AppConstant.APP_NAME_TAG, AppConstant.EXCEPTIONERROR + t.getClass().getName());
+                    else
+                        Lg.i(AppConstant.APP_NAME_TAG, AppConstant.EXCEPTIONERROR + t);
+                    if (responseHandler != null)
+                        callResponseHandlerOnFailure(responseHandler, httpResponse, null, t);
+                    else
+                        Lg.w(AppConstant.APP_NAME_TAG, AppConstant.ATTACHREQUEST);
                 }
-                else
-                    Lg.w(AppConstant.APP_NAME_TAG, AppConstant.ATTACHREQUEST);
+            } finally {
+                if (con != null)
+                    con.disconnect();
             }
-        } catch (Throwable t) {
-            if (t instanceof java.net.ConnectException || t instanceof java.net.UnknownHostException)
-                Lg.i(AppConstant.APP_NAME_TAG,  AppConstant.EXCEPTIONERROR+ t.getClass().getName());
-            else
-                Lg.i(AppConstant.APP_NAME_TAG,  AppConstant.EXCEPTIONERROR+ t);
-            if (responseHandler != null)
-                callResponseHandlerOnFailure(responseHandler, httpResponse, null, t);
-            else
-                Lg.w(AppConstant.APP_NAME_TAG, AppConstant.ATTACHREQUEST);
-        } finally {
-            if (con != null)
-                con.disconnect();
-        }
+        }while (retry < 4 && httpResponse != 200);
     }
 
     private static void callResponseHandlerOnSuccess(final ResponseHandler handler, final String response) {
@@ -242,91 +239,5 @@ public class RestClient {
             Lg.v(AppConstant.APP_NAME_TAG, AppConstant.APIFAILURE  + response);
         }
     }
-    @RequiresApi(api = Build.VERSION_CODES.KITKAT)
-    private static void startHTTPConnection1(String url, String method, JSONObject jsonBody, ResponseHandler responseHandler, int timeout) {
-        HttpURLConnection con = null;
-        int httpResponse = -1;
-        String json = null;
-        try {
-            if (url.contains(AppConstant.HTTPS) || url.contains(AppConstant.HTTP) || url.contains(AppConstant.IMPR)) {
-                con = (HttpURLConnection) new URL(url).openConnection();
-            } else {
-                con = (HttpURLConnection) new URL(BASE_URL + url).openConnection();
-            }
 
-            con.setUseCaches(false);
-            con.setConnectTimeout(timeout);
-            con.setReadTimeout(timeout);
-            if (jsonBody != null)
-                con.setDoInput(true);
-            if (method != null) {
-                if(method.equalsIgnoreCase(AppConstant.POST) && jsonBody==null) {
-                    con.setRequestProperty(AppConstant.CONTENT_TYPE, AppConstant.FORM_URL_ENCODED);
-                }
-                else {
-                    con.setRequestProperty(AppConstant.CONTENT_TYPE, AppConstant.FORM_URL_JSON);
-                }
-                con.setRequestMethod(method);
-                con.setDoOutput(true);
-
-            }
-            if (jsonBody != null) {
-                String strJsonBody = jsonBody.toString();
-                byte[] sendBytes = strJsonBody.getBytes(AppConstant.UTF);
-                con.setFixedLengthStreamingMode(sendBytes.length);
-                OutputStream outputStream = con.getOutputStream();
-                outputStream.write(sendBytes);
-            }
-            httpResponse = con.getResponseCode();
-            InputStream inputStream;
-            Scanner scanner;
-            if (httpResponse == HttpURLConnection.HTTP_OK) {
-
-                if (url.equals(AppConstant.CDN+ DATB.mAppId+AppConstant.DAT))
-                    Lg.d(AppConstant.APP_NAME_TAG, AppConstant.SUCCESS);
-                else
-                    Lg.d(AppConstant.APP_NAME_TAG, AppConstant.SUCCESS);
-                inputStream = con.getInputStream();
-                scanner = new Scanner(inputStream, AppConstant.UTF);
-                json = scanner.useDelimiter("\\A").hasNext() ? scanner.next() : "";
-                scanner.close();
-                if (responseHandler != null) {
-                    callResponseHandlerOnSuccess(responseHandler, json);
-                }
-                else
-                    Lg.w(AppConstant.APP_NAME_TAG, AppConstant.ATTACHREQUEST);
-            } else {
-
-                if (url.equals(AppConstant.CDN+ DATB.mAppId+AppConstant.DAT))
-                    Lg.d(AppConstant.APP_NAME_TAG, AppConstant.SUCCESS);
-                else
-                    Lg.d(AppConstant.APP_NAME_TAG, AppConstant.FAILURE);
-                inputStream = con.getErrorStream();
-                if (inputStream == null)
-                    inputStream = con.getInputStream();
-                if (inputStream != null) {
-                    scanner = new Scanner(inputStream, AppConstant.UTF);
-                    json = scanner.useDelimiter("\\A").hasNext() ? scanner.next() : "";
-                    scanner.close();
-                }
-                if (responseHandler != null) {
-                    callResponseHandlerOnFailure(responseHandler, httpResponse, json, null);
-                }
-                else
-                    Lg.w(AppConstant.APP_NAME_TAG, AppConstant.ATTACHREQUEST);
-            }
-        } catch (Throwable t) {
-            if (t instanceof java.net.ConnectException || t instanceof java.net.UnknownHostException)
-                Lg.i(AppConstant.APP_NAME_TAG,  AppConstant.EXCEPTIONERROR+ t.getClass().getName());
-            else
-                Lg.i(AppConstant.APP_NAME_TAG,  AppConstant.EXCEPTIONERROR+ t);
-            if (responseHandler != null)
-                callResponseHandlerOnFailure(responseHandler, httpResponse, null, t);
-            else
-                Lg.w(AppConstant.APP_NAME_TAG, AppConstant.ATTACHREQUEST);
-        } finally {
-            if (con != null)
-                con.disconnect();
-        }
-    }
 }

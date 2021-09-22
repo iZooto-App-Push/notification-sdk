@@ -6,6 +6,7 @@ import android.util.Log;
 import com.momagic.DATB;
 import com.momagic.NotificationHelperListener;
 import com.momagic.Payload;
+import com.momagic.PushTemplate;
 import com.momagic.TokenReceivedListener;
 
 import java.util.ArrayList;
@@ -28,6 +29,7 @@ public class AppController extends Application implements TokenReceivedListener,
     HashMap<String,Object> data = new HashMap<>();
     data.put("language","Marathi");
    // DATB.addUserProperty(data);
+      //  DATB.setDefaultTemplate(PushTemplate.DEFAULT);
 
 
 

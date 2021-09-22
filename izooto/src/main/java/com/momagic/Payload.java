@@ -92,6 +92,7 @@ public class Payload {
     private String push_type;
     private int  maxNotification;
     private String public_global_key;
+    private int defaultNotificationPreview;
 
     //////////////////////////////////////////////
 
@@ -622,5 +623,13 @@ public class Payload {
 
     public void setPublic_global_key(String public_global_key) {
         this.public_global_key = public_global_key;
+    }
+
+    public int getDefaultNotificationPreview() {
+        return defaultNotificationPreview;
+    }
+
+    public void setDefaultNotificationPreview(int defaultNotificationPreview) {
+        this.defaultNotificationPreview = defaultNotificationPreview;
     }
 }

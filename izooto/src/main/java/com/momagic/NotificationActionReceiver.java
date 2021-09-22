@@ -1,11 +1,18 @@
 package com.momagic;
 
+import android.annotation.SuppressLint;
 import android.app.NotificationManager;
 import android.content.BroadcastReceiver;
 import android.content.Context;
 import android.content.Intent;
 import android.net.Uri;
+import android.os.Build;
 import android.os.Bundle;
+import android.util.Log;
+
+import androidx.annotation.RequiresApi;
+
+import org.json.JSONArray;
 import org.json.JSONObject;
 import java.net.URLEncoder;
 import java.util.HashMap;
@@ -31,6 +38,7 @@ public class NotificationActionReceiver extends BroadcastReceiver {
     public  static  String medClick="";
     private String pushType;
     private int cfg;
+    @SuppressLint("MissingPermission")
     @Override
     public void onReceive(Context context, Intent intent) {
         if(context!=null) {
@@ -50,49 +58,8 @@ public class NotificationActionReceiver extends BroadcastReceiver {
                     } else {
                         clkURL = RestClient.NOTIFICATIONCLICK;
                     }
+                    notificationClickAPI(context, clkURL, cid, rid, btnCount, -1);
 
-                    try {
-                        HashMap<String, String> data = new HashMap<>();
-                        data.put(AppConstant.PID, preferenceUtil.getDataBID(AppConstant.APPPID));
-                        data.put(AppConstant.VER_, AppConstant.SDK_VERSION);
-                        data.put(AppConstant.CID_, cid);
-                        data.put(AppConstant.BKEY, Util.getAndroidId(context));
-                        data.put(AppConstant.RID, rid);
-                        data.put("op", "click");
-                        data.put("ct", pushType);
-                        if (btnCount != 0)
-                            data.put("btn", "" + btnCount);
-
-                        RestClient.newPostRequest(RestClient.MOMAGIC_CLICK, data, new RestClient.ResponseHandler() {
-                            @Override
-                            void onFailure(int statusCode, String response, Throwable throwable) {
-                                super.onFailure(statusCode, response, throwable);
-                            }
-
-                            @Override
-                            void onSuccess(String response) {
-                                super.onSuccess(response);
-                            }
-                        });
-                        if (clkURL != null) {
-                            RestClient.newPostRequest(clkURL, data, new RestClient.ResponseHandler() {
-                                @Override
-                                void onFailure(int statusCode, String response, Throwable throwable) {
-                                    super.onFailure(statusCode, response, throwable);
-                                }
-
-                                @Override
-                                void onSuccess(String response) {
-                                    super.onSuccess(response);
-
-                                }
-                            });
-                        }
-
-
-                    } catch (Exception ex) {
-                        Util.setException(context, ex.toString(), AppConstant.APPName_3, "getBundleData");
-                    }
 
                     String lastEighthIndex = "0";
                     String lastTenthIndex = "0";
@@ -110,26 +77,28 @@ public class NotificationActionReceiver extends BroadcastReceiver {
                         String updateWeekly = preferenceUtil.getStringData(AppConstant.CURRENT_DATE_CLICK_WEEKLY);
                         String updateDaily = preferenceUtil.getStringData(AppConstant.CURRENT_DATE_CLICK_DAILY);
                         String time = preferenceUtil.getStringData(AppConstant.CURRENT_DATE_CLICK);
+                        String lciURL;
 
+                        if (dataCfg > 0){
+                            lciURL = "https://lci" +dataCfg + ".izooto.com/lci" + dataCfg;
+                        }else
+                            lciURL = RestClient.LASTNOTIFICATIONCLICKURL;
                         if (lastEighthIndex.equalsIgnoreCase("1")) {
 
                             if (lastTenthIndex.equalsIgnoreCase("1")) {
                                 if (!updateDaily.equalsIgnoreCase(Util.getTime())) {
                                     preferenceUtil.setStringData(AppConstant.CURRENT_DATE_CLICK_DAILY, Util.getTime());
-                                    lastClickAPI(context);
-                                }
+                                    lastClickAPI(context, lciURL, rid, -1);                                }
                             } else {
                                 if (updateWeekly.isEmpty() || Integer.parseInt(dayDiff1) >= 7) {
                                     preferenceUtil.setStringData(AppConstant.CURRENT_DATE_CLICK_WEEKLY, Util.getTime());
-                                    lastClickAPI(context);
-                                }
+                                    lastClickAPI(context, lciURL, rid, -1);                                }
                             }
                         } else if (lastClickIndex.equalsIgnoreCase("1") && lastEighthIndex.equalsIgnoreCase("0")) {
                             String dayDiff = Util.dayDifference(Util.getTime(), preferenceUtil.getStringData(AppConstant.CURRENT_DATE_CLICK));
                             if (time.isEmpty() || Integer.parseInt(dayDiff) >= 7) {
                                 preferenceUtil.setStringData(AppConstant.CURRENT_DATE_CLICK, Util.getTime());
-                                lastClickAPI(context);
-                            }
+                                lastClickAPI(context, lciURL, rid, -1);                            }
                         }
 
                     }
@@ -198,49 +167,66 @@ public class NotificationActionReceiver extends BroadcastReceiver {
             }
         }
     }
-    private void lastClickAPI(Context context){
-        if(context!=null) {
-            final PreferenceUtil preferenceUtil = PreferenceUtil.getInstance(context);
-            preferenceUtil.setStringData(AppConstant.CURRENT_DATE_CLICK, Util.getTime());
-            try {
-                HashMap<String, Object> data = new HashMap<>();
-                data.put(AppConstant.LAST_NOTIFICAION_CLICKED, true);
-                JSONObject jsonObject = new JSONObject(data);
 
+static void lastClickAPI(Context context, String lciURL, String rid, int i){
+    if (context == null)
+        return;
 
-            String lciURL;
-            int dataCfg = Util.getBinaryToDecimal(cfg);
+    try {
+        final PreferenceUtil preferenceUtil = PreferenceUtil.getInstance(context);
+        preferenceUtil.setStringData(AppConstant.CURRENT_DATE_CLICK, Util.getTime());
+        HashMap<String, Object> data = new HashMap<>();
+        data.put(AppConstant.LAST_NOTIFICAION_CLICKED, true);
+        JSONObject jsonObject = new JSONObject(data);
 
-            if (dataCfg > 0) {
-                lciURL = "https://lci" + dataCfg + ".izooto.com/lci" + dataCfg;
-            } else
-                lciURL = RestClient.LASTNOTIFICATIONCLICKURL;
+        Map<String,String> mapData= new HashMap<>();
+        mapData.put(AppConstant.PID, preferenceUtil.getDataBID(AppConstant.APPPID));
+        mapData.put(AppConstant.VER_, AppConstant.SDK_VERSION);
+        mapData.put(AppConstant.ANDROID_ID,"" + Util.getAndroidId(context));
+        mapData.put(AppConstant.VAL,"" + jsonObject.toString());
+        mapData.put(AppConstant.ACT,"add");
+        mapData.put(AppConstant.ISID_,"1");
+        mapData.put(AppConstant.ET_,"" + AppConstant.USERP_);
 
-                Map<String, String> mapData = new HashMap<>();
-                mapData.put(AppConstant.PID, preferenceUtil.getDataBID(AppConstant.APPPID));
-                mapData.put(AppConstant.VER_, AppConstant.SDK_VERSION);
-                mapData.put(AppConstant.ANDROID_ID, "" + Util.getAndroidId(context));
-                mapData.put(AppConstant.VAL, "" + jsonObject.toString());
-                mapData.put(AppConstant.ACT, "add");
-                mapData.put(AppConstant.ISID_, "1");
-                mapData.put(AppConstant.ET_, "" + AppConstant.USERP_);
-                RestClient.newPostRequest(lciURL, mapData, new RestClient.ResponseHandler() {
-                    @Override
-                    void onSuccess(final String response) {
-                        super.onSuccess(response);
+        RestClient.postRequest(lciURL, mapData,null, new RestClient.ResponseHandler() {
+            @RequiresApi(api = Build.VERSION_CODES.KITKAT)
+            @Override
+            void onSuccess(final String response) {
+                super.onSuccess(response);
+                Log.e("Response","Success lciURL");
+                try {
+                    if (!preferenceUtil.getStringData(AppConstant.IZ_NOTIFICATION_LAST_CLICK_OFFLINE).isEmpty() && i >= 0) {
+                        JSONArray jsonArrayOffline = new JSONArray(preferenceUtil.getStringData(AppConstant.IZ_NOTIFICATION_LAST_CLICK_OFFLINE));
+                        jsonArrayOffline.remove(i);
+                        preferenceUtil.setStringData(AppConstant.IZ_NOTIFICATION_LAST_CLICK_OFFLINE, jsonArrayOffline.toString());
                     }
-
-                    @Override
-                    void onFailure(int statusCode, String response, Throwable throwable) {
-                        super.onFailure(statusCode, response, throwable);
-                    }
-                });
-            } catch (Exception ex) {
-                Util.setException(context, ex.toString(), AppConstant.APPName_3, "lastClickAPI");
+                } catch (Exception e) {
+                    Log.e(AppConstant.APP_NAME_TAG, "Success: clkURLException -- " + e );
+                }
             }
-        }
+            @Override
+            void onFailure(int statusCode, String response, Throwable throwable) {
+                super.onFailure(statusCode, response, throwable);
+                Log.e("Response","onFailure lciURL");
+                try {
+                    if (!preferenceUtil.getStringData(AppConstant.IZ_NOTIFICATION_LAST_CLICK_OFFLINE).isEmpty()) {
+                        JSONArray jsonArrayOffline = new JSONArray(preferenceUtil.getStringData(AppConstant.IZ_NOTIFICATION_LAST_CLICK_OFFLINE));
+                        if (!Util.ridExists(jsonArrayOffline, rid)) {
+                            Util.trackClickOffline(context, lciURL, AppConstant.IZ_NOTIFICATION_LAST_CLICK_OFFLINE, rid, "0", 0);
+                        }
+                    } else
+                        Util.trackClickOffline(context, lciURL, AppConstant.IZ_NOTIFICATION_LAST_CLICK_OFFLINE, rid, "0", 0);
+                } catch (Exception e) {
+                    Log.e("Response", "onFailure  ");
+                }
+
+            }
+        });
+    } catch (Exception e) {
+        Util.setException(context, e.toString(), "lastClickAPI", "NotificationActionReceiver");
     }
 
+}
     private void getBundleData(Context context, Intent intent) {
         if(context!=null) {
             try {
@@ -299,7 +285,7 @@ public class NotificationActionReceiver extends BroadcastReceiver {
         try {
             if(!medClick.isEmpty()) {
                 JSONObject jsonObject = new JSONObject(medClick);
-                RestClient.postRequest1(RestClient.MEDIATION_CLICKS, jsonObject, new RestClient.ResponseHandler() {
+                RestClient.postRequest(RestClient.MEDIATION_CLICKS, null,jsonObject, new RestClient.ResponseHandler() {
                     @Override
                     void onSuccess(String response) {
                         super.onSuccess(response);
@@ -334,5 +320,99 @@ public class NotificationActionReceiver extends BroadcastReceiver {
             });
         }
     }
+    static void notificationClickAPI(Context context, String clkURL, String cid, String rid, int btnCount, int i) {
+        if (context == null)
+            return;
 
+        try {
+            final PreferenceUtil preferenceUtil = PreferenceUtil.getInstance(context);
+            Map<String,String> mapData= new HashMap<>();
+            mapData.put(AppConstant.PID, preferenceUtil.getDataBID(AppConstant.APPPID));
+            mapData.put(AppConstant.VER_, AppConstant.SDK_VERSION);
+            mapData.put(AppConstant.CID_, cid);
+            mapData.put(AppConstant.ANDROID_ID,"" + Util.getAndroidId(context));
+            mapData.put(AppConstant.RID_,"" + rid);
+            mapData.put(AppConstant.PUSH, AppConstant.PUSH_FCM);
+            mapData.put("op","click");
+            if (btnCount != 0)
+                mapData.put("btn","" + btnCount);
+            RestClient.postRequest(clkURL, mapData,null, new RestClient.ResponseHandler() {
+                @RequiresApi(api = Build.VERSION_CODES.KITKAT)
+                @Override
+                void onSuccess(final String response) {
+                    super.onSuccess(response);
+                    Log.e("Response","Success clkURL");
+
+                    try {
+                        if (!preferenceUtil.getStringData(AppConstant.IZ_NOTIFICATION_CLICK_OFFLINE).isEmpty() && i >= 0) {
+                            JSONArray jsonArrayOffline = new JSONArray(preferenceUtil.getStringData(AppConstant.IZ_NOTIFICATION_CLICK_OFFLINE));
+                            jsonArrayOffline.remove(i);
+                            preferenceUtil.setStringData(AppConstant.IZ_NOTIFICATION_CLICK_OFFLINE, jsonArrayOffline.toString());
+
+                        }
+                    } catch (Exception e) {
+                        Log.e(AppConstant.APP_NAME_TAG, "Success: clkURLException -- " + e );
+                    }
+
+                }
+                @Override
+                void onFailure(int statusCode, String response, Throwable throwable) {
+                    super.onFailure(statusCode, response, throwable);
+                    try {
+                        if (!preferenceUtil.getStringData(AppConstant.IZ_NOTIFICATION_CLICK_OFFLINE).isEmpty()) {
+                            JSONArray jsonArrayOffline = new JSONArray(preferenceUtil.getStringData(AppConstant.IZ_NOTIFICATION_CLICK_OFFLINE));
+                            if (!Util.ridExists(jsonArrayOffline, rid)) {
+                                Util.trackClickOffline(context, clkURL, AppConstant.IZ_NOTIFICATION_CLICK_OFFLINE, rid, cid, btnCount);
+                            }
+                        } else
+                            Util.trackClickOffline(context, clkURL, AppConstant.IZ_NOTIFICATION_CLICK_OFFLINE, rid, cid, btnCount);
+                    } catch (Exception e) {
+                        Log.e("TAG", "onFailure: clkURLException"+e );
+                    }
+                }
+            });
+
+
+
+
+
+            RestClient.postRequest(RestClient.MOMAGIC_CLICK, mapData,null, new RestClient.ResponseHandler() {
+                @Override
+                void onFailure(int statusCode, String response, Throwable throwable) {
+                    super.onFailure(statusCode, response, throwable);
+                    try {
+                        if (!preferenceUtil.getStringData(AppConstant.IZ_NOTIFICATION_CLICK_OFFLINE).isEmpty()) {
+                            JSONArray jsonArrayOffline = new JSONArray(preferenceUtil.getStringData(AppConstant.IZ_NOTIFICATION_CLICK_OFFLINE));
+                            if (!Util.ridExists(jsonArrayOffline, rid)) {
+                                Util.trackClickOffline(context, clkURL, AppConstant.IZ_NOTIFICATION_CLICK_OFFLINE, rid, cid, btnCount);
+                            }
+                        } else
+                            Util.trackClickOffline(context, clkURL, AppConstant.IZ_NOTIFICATION_CLICK_OFFLINE, rid, cid, btnCount);
+                    } catch (Exception e) {
+                        Log.e("TAG", "onFailure: clkURLException"+e );
+                    }
+                }
+
+                @RequiresApi(api = Build.VERSION_CODES.KITKAT)
+                @Override
+                void onSuccess(String response) {
+                    super.onSuccess(response);
+                    try {
+                        if (!preferenceUtil.getStringData(AppConstant.IZ_NOTIFICATION_CLICK_OFFLINE).isEmpty() && i >= 0) {
+                            JSONArray jsonArrayOffline = new JSONArray(preferenceUtil.getStringData(AppConstant.IZ_NOTIFICATION_CLICK_OFFLINE));
+                            jsonArrayOffline.remove(i);
+                            preferenceUtil.setStringData(AppConstant.IZ_NOTIFICATION_CLICK_OFFLINE, jsonArrayOffline.toString());
+
+                        }
+                    } catch (Exception e) {
+                        Log.e(AppConstant.APP_NAME_TAG, "Success: clkURLException -- " + e );
+                    }
+                }
+            });
+
+
+        } catch (Exception e) {
+            Util.setException(context, e.toString(), "notificationClickAPI", "NotificationActionReceiver");
+        }
+    }
 }
