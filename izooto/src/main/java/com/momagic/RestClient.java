@@ -2,6 +2,8 @@ package com.momagic;
 
 
 import android.os.Build;
+import android.util.Log;
+
 import androidx.annotation.RequiresApi;
 import org.json.JSONObject;
 import java.io.InputStream;

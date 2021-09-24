@@ -1,14 +1,10 @@
 package com.momagic;
+import android.annotation.SuppressLint;
 import android.content.Context;
 import android.os.Build;
 import android.util.Log;
 
 import androidx.annotation.RequiresApi;
-import androidx.annotation.UiThread;
-
-
-import com.google.gson.Gson;
-
 import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
@@ -115,7 +111,6 @@ public class AdMediation {
                            payload.setAdTimeOut(payloadObj.optInt(ShortpayloadConstant.AD_TIME_OUT));
                            payload.setCreated_Time(jsonObject.optString(ShortpayloadConstant.CREATEDON));
                            payload.setPush_type(AppConstant.PUSH_FCM);
-                          // NotificationEventManager.handleImpressionAPI(payload);
                            if (payload.getPassive_flag().equalsIgnoreCase("1") && jsonObject.optString(AppConstant.AD_TYPE).equalsIgnoreCase("6")) {
                                passiveList.add(payload);
                            } else {
@@ -174,6 +169,7 @@ public class AdMediation {
             return;
         else
         {
+
             try {
                 if (payloadObj != null && url != null && !url.isEmpty()) {
                     if (payloadObj.optLong(ShortpayloadConstant.CREATEDON) > PreferenceUtil.getInstance(context).getLongValue(AppConstant.DEVICE_REGISTRATION_TIMESTAMP)) {
@@ -230,7 +226,7 @@ public class AdMediation {
                         payload.setFallBackDomain(payloadObj.optString(ShortpayloadConstant.FALL_BACK_DOMAIN));
                         payload.setFallBackSubDomain(payloadObj.optString(ShortpayloadConstant.FALLBACK_SUB_DOMAIN));
                         payload.setFallBackPath(payloadObj.optString(ShortpayloadConstant.FAll_BACK_PATH));
-                        NotificationEventManager.handleImpressionAPI(payload);
+                       // NotificationEventManager.handleImpressionAPI(payload);
                         globalPayload(payload.getPublic_global_key(), payload);
                     } else {
                         String updateDaily = NotificationEventManager.getDailyTime(context);
@@ -981,7 +977,7 @@ public class AdMediation {
                     JSONArray jsonArray = new JSONArray(successList);
                     finalData.put("bids", jsonArray);
                     dataValue = finalData.toString().replaceAll("\\\\", " ");
-                    mediationImpression(dataValue);
+                    mediationImpression(dataValue,0);
                     NotificationActionReceiver.medClick = dataValue;
                     NotificationEventManager.showNotification(payload1);
                     Log.v(AppConstant.NOTIFICATION_MESSAGE, AppConstant.YES);
@@ -1168,7 +1164,7 @@ public class AdMediation {
                JSONArray jsonArray = new JSONArray(successList);
                finalData.put("bids", jsonArray);
                String dataValue = finalData.toString().replaceAll("\\\\", " ");
-               mediationImpression(dataValue);
+               mediationImpression(dataValue,0);
                NotificationActionReceiver.medClick = dataValue;
            } catch (Exception ex) {
                PreferenceUtil preferenceUtil=PreferenceUtil.getInstance(DATB.appContext);
@@ -1247,7 +1243,7 @@ public class AdMediation {
                     JSONArray jsonArray = new JSONArray(failsList);
                     finalData.put("bids", jsonArray);
                     dataValue = finalData.toString().replaceAll("\\\\", " ");
-                    mediationImpression(dataValue);
+                    mediationImpression(dataValue,0);
                     NotificationActionReceiver.medClick = dataValue;
                     NotificationEventManager.receiveAds(payload1);
                     Log.v(AppConstant.NOTIFICATION_MESSAGE, AppConstant.YES);
@@ -1264,19 +1260,34 @@ public class AdMediation {
         }
     }
 
-    private static void mediationImpression(String finalData) {
+     static void mediationImpression(String finalData,int impNUmber) {
         if(DATB.appContext!=null) {
             try {
                 JSONObject jsonObject = new JSONObject(finalData);
                 RestClient.postRequest(RestClient.MEDIATION_IMPRESSION,null, jsonObject, new RestClient.ResponseHandler() {
+                    @SuppressLint("NewApi")
                     @Override
                     void onSuccess(String response) {
                         super.onSuccess(response);
+                        PreferenceUtil preferenceUtil=PreferenceUtil.getInstance(DATB.appContext);
+                        if (!preferenceUtil.getStringData(AppConstant.STORE_MEDIATION_RECORDS).isEmpty() && impNUmber >= 0) {
+                           try {
+                               JSONArray jsonArrayOffline = new JSONArray(preferenceUtil.getStringData(AppConstant.STORE_MEDIATION_RECORDS));
+                               jsonArrayOffline.remove(impNUmber);
+                               preferenceUtil.setStringData(AppConstant.STORE_MEDIATION_RECORDS, jsonArrayOffline.toString());
+                           }
+                           catch (Exception ex)
+                           {
+                               Log.e("Exception",ex.toString());
+                           }
+                        }
                     }
 
                     @Override
                     void onFailure(int statusCode, String response, Throwable throwable) {
                         super.onFailure(statusCode, response, throwable);
+                        Util.trackMediation_Impression_Click(DATB.appContext,AppConstant.MED_IMPRESION,jsonObject.toString());
+
 
                     }
                 });

@@ -339,6 +339,13 @@ public interface AppConstant {
     String CAN_STORED_QUEUE= "iz_cantStoredQueue";
     String STORE_URL = "apiURL";
     String CHECK_SDK_UPDATE="IZ_SDK_UPDATE";
+    String STORE_MEDIATION_RECORDS="iz_mediation_records";
+    String STORE_MED_API="iz_api_name";
+    String STORE_MED_DATA="iz_mediationData";
+    String MED_IMPRESION="iz_impression";
+    String MED_CLICK="iz_mClick";
+    String IZ_ADD_TOPIC_OFFLINE = "iz_add_topic_offline";
+    String IZ_REMOVE_TOPIC_OFFLINE = "iz_remove_topic_offline";
 }
 
 

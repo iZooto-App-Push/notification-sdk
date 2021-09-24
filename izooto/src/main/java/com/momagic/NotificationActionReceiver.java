@@ -14,7 +14,6 @@ import androidx.annotation.RequiresApi;
 
 import org.json.JSONArray;
 import org.json.JSONObject;
-import java.net.URLEncoder;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -112,6 +111,7 @@ public class NotificationActionReceiver extends BroadcastReceiver {
                 if (AdMediation.clicksData.size() > 0) {
                     for (int i = 0; i < AdMediation.clicksData.size(); i++) {
                         if (i == AdMediation.clicksData.size()) {
+                            break;
                         }
                         callRandomClick(AdMediation.clicksData.get(i));
                     }
@@ -119,7 +119,7 @@ public class NotificationActionReceiver extends BroadcastReceiver {
                 }
             }
             if (medClick != "") {
-                callMediationClicks(medClick);
+                callMediationClicks(medClick,0);
             }
 
 
@@ -151,9 +151,24 @@ public class NotificationActionReceiver extends BroadcastReceiver {
                 } else {
                     try {
                         if (phoneNumber.equalsIgnoreCase(AppConstant.NO)) {
-                            Intent browserIntent = new Intent(Intent.ACTION_VIEW, Uri.parse(mUrl));
-                            browserIntent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TASK);
-                            context.startActivity(browserIntent);
+                            if(mUrl!=null && !mUrl.isEmpty()) {
+                                if (!mUrl.startsWith("http://") && !mUrl.startsWith("https://")) {
+                                    String  url = "https://" + mUrl;
+                                    Intent browserIntent = new Intent(Intent.ACTION_VIEW, Uri.parse(url));
+                                    browserIntent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TASK);
+                                    context.startActivity(browserIntent);
+                                }
+                                else {
+                                    Intent browserIntent = new Intent(Intent.ACTION_VIEW, Uri.parse(mUrl));
+                                    browserIntent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TASK);
+                                    context.startActivity(browserIntent);
+                                }
+                            }
+                            else
+                            {
+                                Util.setException(context, "URL is not defined"+mUrl, AppConstant.APPName_3, "onReceived");
+
+                            }
                         } else {
                             Intent browserIntent = new Intent(Intent.ACTION_DIAL, Uri.parse(phoneNumber));
                             browserIntent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TASK);
@@ -193,7 +208,6 @@ static void lastClickAPI(Context context, String lciURL, String rid, int i){
             @Override
             void onSuccess(final String response) {
                 super.onSuccess(response);
-                Log.e("Response","Success lciURL");
                 try {
                     if (!preferenceUtil.getStringData(AppConstant.IZ_NOTIFICATION_LAST_CLICK_OFFLINE).isEmpty() && i >= 0) {
                         JSONArray jsonArrayOffline = new JSONArray(preferenceUtil.getStringData(AppConstant.IZ_NOTIFICATION_LAST_CLICK_OFFLINE));
@@ -281,19 +295,36 @@ static void lastClickAPI(Context context, String lciURL, String rid, int i){
             }
         }
     }
-    private void callMediationClicks(final String medClick) {
+    static void callMediationClicks(final String medClick,int cNUmber) {
         try {
             if(!medClick.isEmpty()) {
                 JSONObject jsonObject = new JSONObject(medClick);
                 RestClient.postRequest(RestClient.MEDIATION_CLICKS, null,jsonObject, new RestClient.ResponseHandler() {
+                    @SuppressLint("NewApi")
                     @Override
                     void onSuccess(String response) {
                         super.onSuccess(response);
-                        NotificationActionReceiver.medClick = "";
+                        PreferenceUtil preferenceUtil=PreferenceUtil.getInstance(DATB.appContext);
+                        if (!preferenceUtil.getStringData(AppConstant.STORE_MEDIATION_RECORDS).isEmpty() && cNUmber >= 0) {
+                            try {
+                                JSONArray jsonArrayOffline = new JSONArray(preferenceUtil.getStringData(AppConstant.STORE_MEDIATION_RECORDS));
+                                jsonArrayOffline.remove(cNUmber);
+                                preferenceUtil.setStringData(AppConstant.STORE_MEDIATION_RECORDS, jsonArrayOffline.toString());
+                            }
+                            catch (Exception ex)
+                            {
+                                Log.e("Exception",ex.toString());
+                            }
+                        }
+                        else {
+                            NotificationActionReceiver.medClick = "";
+                        }
                     }
                     @Override
                     void onFailure(int statusCode, String response, Throwable throwable) {
                         super.onFailure(statusCode, response, throwable);
+                        Util.trackMediation_Impression_Click(DATB.appContext,AppConstant.MED_CLICK,medClick);
+
 
                     }
                 });
@@ -315,6 +346,7 @@ static void lastClickAPI(Context context, String lciURL, String rid, int i){
                 @Override
                 void onFailure(int statusCode, String response, Throwable throwable) {
                     super.onFailure(statusCode, response, throwable);
+
 
                 }
             });
@@ -341,8 +373,6 @@ static void lastClickAPI(Context context, String lciURL, String rid, int i){
                 @Override
                 void onSuccess(final String response) {
                     super.onSuccess(response);
-                    Log.e("Response","Success clkURL");
-
                     try {
                         if (!preferenceUtil.getStringData(AppConstant.IZ_NOTIFICATION_CLICK_OFFLINE).isEmpty() && i >= 0) {
                             JSONArray jsonArrayOffline = new JSONArray(preferenceUtil.getStringData(AppConstant.IZ_NOTIFICATION_CLICK_OFFLINE));
@@ -371,11 +401,6 @@ static void lastClickAPI(Context context, String lciURL, String rid, int i){
                     }
                 }
             });
-
-
-
-
-
             RestClient.postRequest(RestClient.MOMAGIC_CLICK, mapData,null, new RestClient.ResponseHandler() {
                 @Override
                 void onFailure(int statusCode, String response, Throwable throwable) {

@@ -103,7 +103,7 @@ public class HmsMessagingService extends HmsMessageService {
                     @Override
                     public void run() {
                         NotificationEventManager.handleImpressionAPI(payload);
-                        DATB.processNotificationReceived(payload);
+                        DATB.processNotificationReceived(context,payload);
 
                     } // This is your code
                 };

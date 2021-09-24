@@ -33,15 +33,12 @@ import androidx.annotation.NonNull;
 import androidx.annotation.RequiresApi;
 import androidx.core.app.NotificationCompat;
 
+import com.google.android.datatransport.cct.internal.LogEvent;
 import com.google.firebase.messaging.FirebaseMessagingService;
 import com.google.firebase.messaging.RemoteMessage;
-import com.google.gson.Gson;
-
 import org.json.JSONObject;
-
 import java.util.Map;
 import java.util.Objects;
-
 @SuppressLint("MissingFirebaseInstanceTokenRefresh")
 public class DATBMessagingService extends FirebaseMessagingService {
     private  Payload payload = null;
@@ -51,14 +48,12 @@ public class DATBMessagingService extends FirebaseMessagingService {
         try {
             if (remoteMessage.getData().size() > 0) {
                 Log.v("Push Type","fcm");
-
                 Map<String, String> data = remoteMessage.getData();
                     handleNow(data);
-
-
             }
             if (remoteMessage.getNotification() != null) {
                 sendNotification(remoteMessage);
+
             }
         }
         catch (Exception ex)
@@ -118,6 +113,9 @@ public class DATBMessagingService extends FirebaseMessagingService {
                          JSONObject jsonObject=new JSONObject(Objects.requireNonNull(data.get(AppConstant.GLOBAL)));
                          String urlData=data.get(AppConstant.GLOBAL_PUBLIC_KEY);
                          if(jsonObject.toString()!=null && urlData!=null && !urlData.isEmpty()) {
+                             String cid = jsonObject.optString(ShortpayloadConstant.ID);
+                             String rid = jsonObject.optString(ShortpayloadConstant.RID);
+                             NotificationEventManager.impressionNotification(RestClient.IMPRESSION_URL,cid,rid,-1);
                              AdMediation.getMediationGPL(this, jsonObject, urlData);
                          }
                          else
@@ -127,18 +125,24 @@ public class DATBMessagingService extends FirebaseMessagingService {
                       }
                       catch (Exception ex)
                       {
-                         Util.setException(this,ex.toString()+"PayloadError","DATBMessagingService","handleNow");
+                         Util.setException(this,ex.toString()+"PayloadError"+data.toString(),"DATBMessagingService","handleNow");
                       }
 
                    }
                    else {
-                       JSONObject jsonObject=new JSONObject(data.get(AppConstant.GLOBAL));
-                       String cid = jsonObject.optString(ShortpayloadConstant.ID);
-                       String rid = jsonObject.optString(ShortpayloadConstant.RID);
-                       NotificationEventManager.impressionNotification(RestClient.IMPRESSION_URL,cid,rid,-1);
+                       try {
+                           JSONObject jsonObject = new JSONObject(data.get(AppConstant.GLOBAL));
+                           String cid = jsonObject.optString(ShortpayloadConstant.ID);
+                           String rid = jsonObject.optString(ShortpayloadConstant.RID);
+                           NotificationEventManager.impressionNotification(RestClient.IMPRESSION_URL, cid, rid, -1);
+                           AdMediation.getAdJsonData(this, data);
+                           preferenceUtil.setBooleanData(AppConstant.MEDIATION, true);
+                       }
+                       catch (Exception ex)
+                       {
+                           Util.setException(this,ex.toString()+"PayloadError"+data.toString(),"DATBMessagingService","handleNow");
 
-                       AdMediation.getAdJsonData(this, data);
-                       preferenceUtil.setBooleanData(AppConstant.MEDIATION, true);
+                       }
                    }
                 }
                 else {
@@ -212,7 +216,7 @@ public class DATBMessagingService extends FirebaseMessagingService {
                         @Override
                         public void run() {
                             NotificationEventManager.handleImpressionAPI(payload);
-                            DATB.processNotificationReceived(payload);
+                            DATB.processNotificationReceived(DATB.appContext,payload);
                         }
                     };
                     mainHandler.post(myRunnable);

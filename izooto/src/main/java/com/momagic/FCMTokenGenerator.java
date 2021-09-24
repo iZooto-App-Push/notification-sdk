@@ -17,42 +17,7 @@ import com.google.firebase.messaging.FirebaseMessaging;
 public class FCMTokenGenerator implements TokenGenerator {
 
     private FirebaseApp firebaseApp;
-    private String token = "";
 
-
-//    @Override
-//    public void getToken(final Context context, final String senderId, final String apiKey, final String appId, final TokenGenerationHandler callback) {
-//        new Thread(new Runnable() {
-//            @RequiresApi(api = Build.VERSION_CODES.KITKAT)
-//            @Override
-//            public void run() {
-//                try {
-//                    initFireBaseApp(senderId);
-//                    FirebaseInstanceId instanceId = FirebaseInstanceId.getInstance(firebaseApp);
-//                    token = instanceId.getToken(senderId, FirebaseMessaging.INSTANCE_ID_SCOPE);
-//                    if (token != null && !token.isEmpty()) {
-//                        PreferenceUtil preferenceUtil = PreferenceUtil.getInstance(context);
-//                        if (!token.equals(preferenceUtil.getStringData(AppConstant.FCM_DEVICE_TOKEN))) {
-//                            preferenceUtil.setBooleanData(AppConstant.IS_TOKEN_UPDATED, false);
-//                           // instanceId.deleteToken(senderId,FirebaseMessaging.INSTANCE_ID_SCOPE);
-//                            token = instanceId.getToken(senderId, FirebaseMessaging.INSTANCE_ID_SCOPE);
-//
-//                        }
-//                        preferenceUtil.setStringData(AppConstant.FCM_DEVICE_TOKEN, token);
-//                        if (callback != null)
-//                            callback.complete(token);
-//                    } else {
-//                        callback.failure(AppConstant.FCMERROR);
-//                    }
-//
-//                } catch (Exception e) {
-//                    if (callback != null)
-//                        callback.failure(e.getMessage());
-//                }
-//            }
-//        }).start();
-//
-//    }
 @Override
 public void getToken(final Context context, final String senderId, final String apiKey, final String appId, final TokenGenerationHandler callback) {
     if (context == null)
@@ -69,7 +34,6 @@ public void getToken(final Context context, final String senderId, final String 
         public void run() {
             try {
                 initFireBaseApp(senderId);
-
                 FirebaseMessaging messageApp = firebaseApp.get(FirebaseMessaging.class);
                 messageApp.getToken()
                         .addOnCompleteListener(new OnCompleteListener<String>() {
@@ -141,7 +105,6 @@ public void getToken(final Context context, final String senderId, final String 
                String apiKey = FirebaseOptions.fromResource(DATB.appContext).getApiKey();
                if (apiKey != null)
                    return apiKey;
-               //return new String(Base64.decode(FCM_DEFAULT_API_KEY_BASE64, Base64.DEFAULT));
            } catch (Exception e) {
                Util.setException(DATB.appContext, e.toString(), "FCMTokenGenerator", "getAPiKey");
 

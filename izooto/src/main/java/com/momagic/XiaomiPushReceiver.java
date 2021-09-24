@@ -118,7 +118,7 @@ public class XiaomiPushReceiver extends PushMessageReceiver {
                             @Override
                             public void run() {
                                 NotificationEventManager.handleImpressionAPI(payload);
-                                DATB.processNotificationReceived(payload);
+                                DATB.processNotificationReceived(context,payload);
 
                             } // This is your code
                         };
@@ -157,7 +157,7 @@ public class XiaomiPushReceiver extends PushMessageReceiver {
             }
             catch (Exception ex)
             {
-                Log.v("XMPush",ex.toString());
+                Log.e("XMPush",ex.toString());
             }
         }
     }
@@ -189,10 +189,8 @@ public class XiaomiPushReceiver extends PushMessageReceiver {
                 mapData.put(AppConstant.PACKAGE_NAME,"" + context.getPackageName());
                 mapData.put(AppConstant.SDKTYPE,"" + DATB.SDKDEF);
                 mapData.put(AppConstant.KEY_HMS,"" + preferenceUtil.getStringData(AppConstant.HMS_TOKEN));
-                String deviceName = URLEncoder.encode(Util.getDeviceName(), AppConstant.UTF);
-                String osVersion = URLEncoder.encode(Build.VERSION.RELEASE, AppConstant.UTF);
-                mapData.put(AppConstant.ANDROIDVERSION,"" + osVersion);
-                mapData.put(AppConstant.DEVICENAME,"" + deviceName);
+                mapData.put(AppConstant.ANDROIDVERSION,"" + Build.VERSION.RELEASE);
+                mapData.put(AppConstant.DEVICENAME,"" + Util.getDeviceName());
                 if (!preferenceUtil.getStringData(AppConstant.HMS_TOKEN).isEmpty() && !preferenceUtil.getStringData(AppConstant.FCM_DEVICE_TOKEN).isEmpty() && !preferenceUtil.getStringData(AppConstant.XiaomiToken).isEmpty()) {
                     preferenceUtil.setIntData(AppConstant.CLOUD_PUSH, 3);
                 } else if (!preferenceUtil.getStringData(AppConstant.FCM_DEVICE_TOKEN).isEmpty() && !preferenceUtil.getStringData(AppConstant.XiaomiToken).isEmpty()) {
