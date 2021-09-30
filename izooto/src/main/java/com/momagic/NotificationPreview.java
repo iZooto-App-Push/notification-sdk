@@ -134,6 +134,8 @@ public class NotificationPreview {
                                  .setVisibility(lockScreenVisibility)
                                  .setCustomContentView(collapsedView)
                                  .setCustomBigContentView(expandedView)
+                                 .setColor(Color.RED)
+
                                  .setAutoCancel(true);
 
 
@@ -244,9 +246,9 @@ public class NotificationPreview {
 //                }else
                          notificationManager.notify(notificaitionId, notificationBuilder.build());
 
-                         if (impressionIndex.equalsIgnoreCase("1")) {
-                             NotificationEventManager.viewNotificationApi(payload);
-                         }
+//                         if (impressionIndex.equalsIgnoreCase("1")) {
+//                             NotificationEventManager.viewNotificationApi(payload);
+//                         }
                          if (lastViewIndex.equalsIgnoreCase("1") || lastSeventhIndex.equalsIgnoreCase("1")) {
                              NotificationEventManager.lastViewNotificationApi(payload, lastViewIndex, lastSeventhIndex, lastNinthIndex);
                          }

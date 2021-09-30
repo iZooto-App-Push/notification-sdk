@@ -60,18 +60,15 @@ public void getToken(final Context context, final String senderId, final String 
                                     }
 
                                 } catch (Exception e) {
-                                    Util.setException(context, e.toString(), "getToken", "FCMTokenGenerator");
+                                    Util.setException(context, e.getMessage(), "getToken", "FCMTokenGenerator");
                                     if (callback != null)
                                         callback.failure(e.getMessage());
                                 }
-
-
-                                // Log and toast
                             }
                         });
 
             } catch (Exception e) {
-                Util.setException(context, e.toString(), "getToken", "FCMTokenGenerator");
+                Util.setException(context, e.getMessage(), "getToken", "FCMTokenGenerator");
                 if (callback != null)
                     callback.failure(e.getMessage());
             }

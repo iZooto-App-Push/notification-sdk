@@ -431,37 +431,33 @@ public class NotificationEventManager {
     }
 
      static void showNotification(final Payload payload) {
+         if(DATB.appContext==null)
+             return;
 
          if (addCheck) {
              receiveAds(payload);
          }
-//        }else {
-//            if (isAppInForeground(DATB.appContext)){
-//                if (DATB.inAppOption==null || DATB.inAppOption.equalsIgnoreCase(AppConstant.NOTIFICATION_)){
-//                    receivedNotification(payload);
-//                }else if (DATB.inAppOption.equalsIgnoreCase(AppConstant.INAPPALERT)){
-//                    showAlert(payload);
-//                }
-//            }else {
-//                receivedNotification(payload);
-//            }
-//        }
-         {
-             final PreferenceUtil preferenceUtil = PreferenceUtil.getInstance(DATB.appContext);
+      else
+       {
+        final PreferenceUtil preferenceUtil = PreferenceUtil.getInstance(DATB.appContext);
              if (Util.isAppInForeground(DATB.appContext)) {
                  if (DATB.inAppOption == null || DATB.inAppOption.equalsIgnoreCase(AppConstant.NOTIFICATION_)) {
-                     if (payload.getDefaultNotificationPreview() == 1 || preferenceUtil.getIntData(AppConstant.NOTIFICATION_PREVIEW) == PushTemplate.TEXT_OVERLAY)
+                     if (PushTemplate.TEXT_OVERLAY==payload.getDefaultNotificationPreview()|| preferenceUtil.getIntData(AppConstant.NOTIFICATION_PREVIEW) == PushTemplate.TEXT_OVERLAY) {
                          NotificationPreview.receiveCustomNotification(payload);
-                     else
+                     }
+                     else {
                          receivedNotification(payload);
+                     }
                  } else if (DATB.inAppOption.equalsIgnoreCase(AppConstant.INAPPALERT)) {
                      showAlert(payload);
                  }
              } else {
-                 if (payload.getDefaultNotificationPreview() == 1 || preferenceUtil.getIntData(AppConstant.NOTIFICATION_PREVIEW) == PushTemplate.TEXT_OVERLAY)
+                 if (PushTemplate.TEXT_OVERLAY==payload.getDefaultNotificationPreview() || preferenceUtil.getIntData(AppConstant.NOTIFICATION_PREVIEW) == PushTemplate.TEXT_OVERLAY) {
                      NotificationPreview.receiveCustomNotification(payload);
-                 else
+                 }
+                 else {
                      receivedNotification(payload);
+                 }
              }
          }
      }
@@ -524,6 +520,8 @@ public class NotificationEventManager {
                         .setStyle(new NotificationCompat.BigTextStyle().bigText(payload.getMessage()))
                         .setDefaults(NotificationCompat.DEFAULT_LIGHTS | NotificationCompat.DEFAULT_SOUND).setVibrate(new long[]{1000, 1000})
                         .setSound(defaultSoundUri)
+                        .setColor(Color.RED)
+                        .setColorized(true)
                         .setVisibility(lockScreenVisibility)
                         .setAutoCancel(true);
 
@@ -561,11 +559,12 @@ public class NotificationEventManager {
                     notificationBuilder.setSubText(payload.getSubTitle());
 
                 }
-                if (payload.getBadgecolor()!=null&&!payload.getBadgecolor().isEmpty()){
-                    notificationBuilder.setColor(badgeColor);
-                }
-                if(payload.getLedColor()!=null && !payload.getLedColor().isEmpty())
-                    notificationBuilder.setColor(Color.parseColor(payload.getLedColor()));
+//                if (payload.getBadgecolor()!=null&&!payload.getBadgecolor().isEmpty()){
+//                    notificationBuilder.setColor(badgeColor);
+//                }
+//                if(payload.getLedColor()!=null && !payload.getLedColor().isEmpty()) {
+//                    notificationBuilder.setColor(Color.parseColor(payload.getLedColor()));
+//                }
                 if (notificationIcon != null)
                     notificationBuilder.setLargeIcon(notificationIcon);
                 else if (notificationBanner != null)
@@ -655,8 +654,9 @@ public class NotificationEventManager {
                 if (payload.getCollapseId()!=null && !payload.getCollapseId().isEmpty()){
                     int notifyId = Util.convertStringToDecimal(payload.getCollapseId());
                     notificationManager.notify(notifyId, notificationBuilder.build());
-                }else
+                }else {
                     notificationManager.notify(notificaitionId, notificationBuilder.build());
+                }
                 try {
 
 //                    if(impressionIndex.equalsIgnoreCase("1")) {
@@ -698,9 +698,6 @@ public class NotificationEventManager {
                     }
                     handler.post(notificationRunnable);
                 } catch (Exception e) {
-                    if(DATB.appContext!=null) {
-                        Util.setException(DATB.appContext, e.toString(), AppConstant.APPName_2, "receiveAds");
-                    }
                     handler.post(notificationRunnable);
                 }
             }
@@ -1325,7 +1322,7 @@ private static void receivedNotification(final Payload payload){
                         if (!preferenceUtil.getStringData(AppConstant.IZ_NOTIFICATION_VIEW_OFFLINE).isEmpty() && i >= 0) {
                             JSONArray jsonArrayOffline = new JSONArray(preferenceUtil.getStringData(AppConstant.IZ_NOTIFICATION_VIEW_OFFLINE));
                             jsonArrayOffline.remove(i);
-                            preferenceUtil.setStringData(AppConstant.IZ_NOTIFICATION_VIEW_OFFLINE, jsonArrayOffline.toString());
+                            preferenceUtil.setStringData(AppConstant.IZ_NOTIFICATION_VIEW_OFFLINE, null);
                         }
                     } catch (Exception e) {
                         Log.e(AppConstant.APP_NAME_TAG, "Success:impURL Exception -- " + e);
@@ -1515,8 +1512,6 @@ static void lastViewNotification(String limURL, String rid, String cid, int i){
 
     try {
         final PreferenceUtil preferenceUtil = PreferenceUtil.getInstance(DATB.appContext);
-
-        String encodeData = "";
         HashMap<String, Object> data = new HashMap<>();
         data.put(AppConstant.LAST_NOTIFICAION_VIEWED, true);
         JSONObject jsonObject = new JSONObject(data);
@@ -1542,7 +1537,7 @@ static void lastViewNotification(String limURL, String rid, String cid, int i){
                     if (!preferenceUtil.getStringData(AppConstant.IZ_NOTIFICATION_LAST_VIEW_OFFLINE).isEmpty() && i >= 0) {
                         JSONArray jsonArrayOffline = new JSONArray(preferenceUtil.getStringData(AppConstant.IZ_NOTIFICATION_LAST_VIEW_OFFLINE));
                         jsonArrayOffline.remove(i);
-                        preferenceUtil.setStringData(AppConstant.IZ_NOTIFICATION_LAST_VIEW_OFFLINE, jsonArrayOffline.toString());
+                        preferenceUtil.setStringData(AppConstant.IZ_NOTIFICATION_LAST_VIEW_OFFLINE, null);
                     }
                 } catch (Exception e) {
                     Log.e(AppConstant.APP_NAME_TAG, "Success: limURLException -- " + e );

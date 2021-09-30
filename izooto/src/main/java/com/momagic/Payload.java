@@ -93,6 +93,7 @@ public class Payload {
     private int  maxNotification;
     private String public_global_key;
     private int defaultNotificationPreview;
+    private String notification_bg_color;
 
     //////////////////////////////////////////////
 
@@ -631,5 +632,13 @@ public class Payload {
 
     public void setDefaultNotificationPreview(int defaultNotificationPreview) {
         this.defaultNotificationPreview = defaultNotificationPreview;
+    }
+
+    public String getNotification_bg_color() {
+        return notification_bg_color;
+    }
+
+    public void setNotification_bg_color(String notification_bg_color) {
+        this.notification_bg_color = notification_bg_color;
     }
 }

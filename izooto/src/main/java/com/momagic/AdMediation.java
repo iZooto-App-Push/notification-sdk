@@ -1274,7 +1274,7 @@ public class AdMediation {
                            try {
                                JSONArray jsonArrayOffline = new JSONArray(preferenceUtil.getStringData(AppConstant.STORE_MEDIATION_RECORDS));
                                jsonArrayOffline.remove(impNUmber);
-                               preferenceUtil.setStringData(AppConstant.STORE_MEDIATION_RECORDS, jsonArrayOffline.toString());
+                               preferenceUtil.setStringData(AppConstant.STORE_MEDIATION_RECORDS, null);
                            }
                            catch (Exception ex)
                            {

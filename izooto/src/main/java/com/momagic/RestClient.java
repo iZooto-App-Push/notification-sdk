@@ -159,6 +159,12 @@ public class RestClient {
                 InputStream inputStream;
                 Scanner scanner;
                 if (httpResponse == HttpURLConnection.HTTP_OK) {
+                    Log.e("Response",url);
+                    if(data!=null)
+                        Log.e("Response",data.toString());
+                    if(jsonBody!=null)
+                        Log.e("Response",jsonBody.toString());
+
                     if (url.equals(AppConstant.CDN + DATB.mAppId + AppConstant.DAT))
                         Lg.d(AppConstant.APP_NAME_TAG, AppConstant.SUCCESS);
                     else

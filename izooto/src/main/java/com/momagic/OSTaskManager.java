@@ -27,7 +27,7 @@ public class OSTaskManager {
     static final String SET_FIREBASE_ANALYTICS = "setFirebaseAnalytics()";
     static final String ADD_TAG = "addTag()";
     static final String REMOVE_TAG = "removeTag()";
-    static final String SET_CUSTOM_TEMPLATE = "setDefaultTemplate()";
+    static final String SET_CUSTOM_TEMPLATE = "setCustomTemplate()";
     static final String SET_SUBSCRIBER_ID="setSubscriberID()";
     static final HashSet<String> METHODS_ADD_IN_QUEUE_FOR = new HashSet<>(Arrays.asList(
             ADD_USERPROPERTY,
@@ -72,6 +72,7 @@ public class OSTaskManager {
         task.taskId = lastTaskId.incrementAndGet();
 
         if (pendingTaskExecutor == null) {
+            Log.d(AppConstant.APP_NAME_TAG, "Adding a task to the pending queue with ID:" + task.taskId);
             // The tasks haven't been executed yet...add them to the waiting queue
             taskQueueWaitingForInit.add(task);
         } else if (!pendingTaskExecutor.isShutdown()) {
@@ -88,7 +89,7 @@ public class OSTaskManager {
     }
 
     /**
-     * Called by iZooto.initHanlder() as last step on the initHandler
+     * Called by DATB.initHanlder() as last step on the initHandler
      * Run available pending tasks on an Executor
      */
     void startPendingTasks() {

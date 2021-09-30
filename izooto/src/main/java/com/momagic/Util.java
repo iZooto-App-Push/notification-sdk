@@ -105,7 +105,6 @@ public class Util {
 
 
     private static Bitmap getBitMap(String src) {
-
          try {
              return BitmapFactory.decodeStream(new URL(src).openConnection().getInputStream());
          } catch (Throwable t) {
@@ -116,23 +115,17 @@ public class Util {
      static Bitmap getBitmapFromURL(String name) {
         if (name == null)
             return null;
-        String trimmedName = name.trim();
-
-        if (trimmedName.startsWith("http://") || trimmedName.startsWith("https://"))
+         String trimmedName = name.trim();
+         trimmedName = trimmedName.replace("///", "/");
+         trimmedName = trimmedName.replace("//", "/");
+         trimmedName = trimmedName.replace("http:/", "https://");
+         trimmedName = trimmedName.replace("https:/", "https://");
+        if (trimmedName.startsWith("http://") || trimmedName.startsWith("https://")) {
             return getBitMap(trimmedName);
-
+        }
         return null;
 
     }
-//    private static Bitmap getBitmapFromURL(String location) {
-//        try {
-//            return BitmapFactory.decodeStream(new URL(location).openConnection().getInputStream());
-//        } catch (Throwable t) {
-//            Log.e(AppConstant.APP_NAME_TAG,t.getMessage());
-//        }
-//
-//        return null;
-//    }
     public static String getAndroidId(Context mContext) {
         String android_id = Settings.Secure.getString(mContext.getContentResolver(), Settings.Secure.ANDROID_ID);
         System.out.print("android_id" + android_id);

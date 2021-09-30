@@ -60,6 +60,8 @@ public interface ShortpayloadConstant {
     String TIME_TO_LIVE="tl";
     String NOTIFICATION_SOUND="su";
     String MAX_NOTIFICATION="mn";
+    String TEXTOVERLAY="nt";
+    String BGCOLOR="nbc";
 
 
 

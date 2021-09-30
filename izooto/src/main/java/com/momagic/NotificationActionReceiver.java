@@ -13,8 +13,10 @@ import android.util.Log;
 import androidx.annotation.RequiresApi;
 
 import org.json.JSONArray;
+import org.json.JSONException;
 import org.json.JSONObject;
 import java.util.HashMap;
+import java.util.Iterator;
 import java.util.Map;
 
 public class NotificationActionReceiver extends BroadcastReceiver {
@@ -212,7 +214,7 @@ static void lastClickAPI(Context context, String lciURL, String rid, int i){
                     if (!preferenceUtil.getStringData(AppConstant.IZ_NOTIFICATION_LAST_CLICK_OFFLINE).isEmpty() && i >= 0) {
                         JSONArray jsonArrayOffline = new JSONArray(preferenceUtil.getStringData(AppConstant.IZ_NOTIFICATION_LAST_CLICK_OFFLINE));
                         jsonArrayOffline.remove(i);
-                        preferenceUtil.setStringData(AppConstant.IZ_NOTIFICATION_LAST_CLICK_OFFLINE, jsonArrayOffline.toString());
+                        preferenceUtil.setStringData(AppConstant.IZ_NOTIFICATION_LAST_CLICK_OFFLINE, null);
                     }
                 } catch (Exception e) {
                     Log.e(AppConstant.APP_NAME_TAG, "Success: clkURLException -- " + e );
@@ -309,7 +311,7 @@ static void lastClickAPI(Context context, String lciURL, String rid, int i){
                             try {
                                 JSONArray jsonArrayOffline = new JSONArray(preferenceUtil.getStringData(AppConstant.STORE_MEDIATION_RECORDS));
                                 jsonArrayOffline.remove(cNUmber);
-                                preferenceUtil.setStringData(AppConstant.STORE_MEDIATION_RECORDS, jsonArrayOffline.toString());
+                                preferenceUtil.setStringData(AppConstant.STORE_MEDIATION_RECORDS, null);
                             }
                             catch (Exception ex)
                             {
@@ -368,17 +370,19 @@ static void lastClickAPI(Context context, String lciURL, String rid, int i){
             mapData.put("op","click");
             if (btnCount != 0)
                 mapData.put("btn","" + btnCount);
+
             RestClient.postRequest(clkURL, mapData,null, new RestClient.ResponseHandler() {
                 @RequiresApi(api = Build.VERSION_CODES.KITKAT)
                 @Override
                 void onSuccess(final String response) {
                     super.onSuccess(response);
                     try {
-                        if (!preferenceUtil.getStringData(AppConstant.IZ_NOTIFICATION_CLICK_OFFLINE).isEmpty() && i >= 0) {
-                            JSONArray jsonArrayOffline = new JSONArray(preferenceUtil.getStringData(AppConstant.IZ_NOTIFICATION_CLICK_OFFLINE));
-                            jsonArrayOffline.remove(i);
-                            preferenceUtil.setStringData(AppConstant.IZ_NOTIFICATION_CLICK_OFFLINE, jsonArrayOffline.toString());
+                        JSONArray jsonArrayOffline;
 
+                        if (!preferenceUtil.getStringData(AppConstant.IZ_NOTIFICATION_CLICK_OFFLINE).isEmpty() && i>=0) {
+                             jsonArrayOffline = new JSONArray(preferenceUtil.getStringData(AppConstant.IZ_NOTIFICATION_CLICK_OFFLINE));
+                            jsonArrayOffline.remove(i);
+                            preferenceUtil.setStringData(AppConstant.IZ_NOTIFICATION_CLICK_OFFLINE, null);
                         }
                     } catch (Exception e) {
                         Log.e(AppConstant.APP_NAME_TAG, "Success: clkURLException -- " + e );
@@ -394,8 +398,9 @@ static void lastClickAPI(Context context, String lciURL, String rid, int i){
                             if (!Util.ridExists(jsonArrayOffline, rid)) {
                                 Util.trackClickOffline(context, clkURL, AppConstant.IZ_NOTIFICATION_CLICK_OFFLINE, rid, cid, btnCount);
                             }
-                        } else
+                        } else {
                             Util.trackClickOffline(context, clkURL, AppConstant.IZ_NOTIFICATION_CLICK_OFFLINE, rid, cid, btnCount);
+                        }
                     } catch (Exception e) {
                         Log.e("TAG", "onFailure: clkURLException"+e );
                     }
@@ -439,5 +444,21 @@ static void lastClickAPI(Context context, String lciURL, String rid, int i){
         } catch (Exception e) {
             Util.setException(context, e.toString(), "notificationClickAPI", "NotificationActionReceiver");
         }
+    }
+    public static Map<String,String> jsonToMap(String t) throws JSONException {
+
+        HashMap<String, String> map = new HashMap<String, String>();
+        JSONObject jObject = new JSONObject(t);
+        Iterator<?> keys = jObject.keys();
+
+        while( keys.hasNext() ){
+            String key = (String)keys.next();
+            String value = jObject.getString(key);
+            map.put(key, value);
+
+        }
+
+        System.out.println("json : "+jObject);
+        return map;
     }
 }

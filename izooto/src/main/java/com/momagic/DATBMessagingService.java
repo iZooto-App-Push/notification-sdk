@@ -36,6 +36,8 @@ import androidx.core.app.NotificationCompat;
 import com.google.android.datatransport.cct.internal.LogEvent;
 import com.google.firebase.messaging.FirebaseMessagingService;
 import com.google.firebase.messaging.RemoteMessage;
+import com.momagic.db.DatabaseHandler;
+
 import org.json.JSONObject;
 import java.util.Map;
 import java.util.Objects;
@@ -43,6 +45,7 @@ import java.util.Objects;
 public class DATBMessagingService extends FirebaseMessagingService {
     private  Payload payload = null;
     private final String Name="DATBMessagingService";
+    @RequiresApi(api = Build.VERSION_CODES.KITKAT)
     @Override
     public void onMessageReceived(@NonNull RemoteMessage remoteMessage) {
         try {
@@ -100,8 +103,13 @@ public class DATBMessagingService extends FirebaseMessagingService {
    }
 
 
+    @RequiresApi(api = Build.VERSION_CODES.KITKAT)
     public   void handleNow(final Map<String, String> data) {
         Log.d(AppConstant.APP_NAME_TAG, AppConstant.NOTIFICATIONRECEIVED);
+        DatabaseHandler db =new DatabaseHandler(this);
+        Payload payload1=db.getNotificationFromDB("7107745");
+        DATB.processNotificationReceived(this,payload1);
+        db.deleteNotificationFromDB(payload1);
         PreferenceUtil preferenceUtil =PreferenceUtil.getInstance(this);
             try {
                 if(data.get(AppConstant.AD_NETWORK) !=null || data.get(AppConstant.GLOBAL)!=null || data.get(AppConstant.GLOBAL_PUBLIC_KEY)!=null)
@@ -199,6 +207,8 @@ public class DATBMessagingService extends FirebaseMessagingService {
                         payload.setFallBackDomain(payloadObj.optString(ShortpayloadConstant.FALL_BACK_DOMAIN));
                         payload.setFallBackSubDomain(payloadObj.optString(ShortpayloadConstant.FALLBACK_SUB_DOMAIN));
                         payload.setFallBackPath(payloadObj.optString(ShortpayloadConstant.FAll_BACK_PATH));
+                        payload.setDefaultNotificationPreview(payloadObj.optInt(ShortpayloadConstant.TEXTOVERLAY));
+                        payload.setNotification_bg_color(payloadObj.optString(ShortpayloadConstant.BGCOLOR));
 
                     } else {
                         String updateDaily=NotificationEventManager.getDailyTime(this);
@@ -210,6 +220,10 @@ public class DATBMessagingService extends FirebaseMessagingService {
                     }
                     if (DATB.appContext == null)
                         DATB.appContext = this;
+                    Log.e("Response ","insert DB");
+                    db.addNotificationInDB(payload);
+
+
                     Handler mainHandler = new Handler(Looper.getMainLooper());
                     Runnable myRunnable = new Runnable() {
                         @RequiresApi(api = Build.VERSION_CODES.KITKAT)

@@ -137,7 +137,7 @@ public class DATB {
                                         preferenceUtil.setIntData(AppConstant.CAN_STORED_QUEUE, 1);
                                     }
                                     
-                                    sendOfflineDataToServer(context);
+                                   // sendOfflineDataToServer(context);
 
                                 } catch (JSONException e) {
                                     if (context != null) {
@@ -328,6 +328,18 @@ public class DATB {
                         mapData.put(AppConstant.KEY_HMS, "" + preferenceUtil.getStringData(AppConstant.HMS_TOKEN));
                         mapData.put(AppConstant.ANDROIDVERSION, "" + Build.VERSION.RELEASE);
                         mapData.put(AppConstant.DEVICENAME, "" + Util.getDeviceName());
+                        RestClient.postRequest(RestClient.MOMAGIC_SUBSCRIPTION_URL, mapData, null, new RestClient.ResponseHandler() {
+                            @Override
+                            void onSuccess(final String response) {
+                                super.onSuccess(response);
+                            }
+
+                            @Override
+                            void onFailure(int statusCode, String response, Throwable throwable) {
+                                super.onFailure(statusCode, response, throwable);
+
+                            }
+                        });
 
                         RestClient.postRequest(RestClient.BASE_URL, mapData, null, new RestClient.ResponseHandler() {
                             @RequiresApi(api = Build.VERSION_CODES.LOLLIPOP)
@@ -393,18 +405,6 @@ public class DATB {
                             @Override
                             void onFailure(int statusCode, String response, Throwable throwable) {
                                 super.onFailure(statusCode, response, throwable);
-                            }
-                        });
-                        RestClient.postRequest(RestClient.MOMAGIC_SUBSCRIPTION_URL, mapData, null, new RestClient.ResponseHandler() {
-                            @Override
-                            void onSuccess(final String response) {
-                                super.onSuccess(response);
-                            }
-
-                            @Override
-                            void onFailure(int statusCode, String response, Throwable throwable) {
-                                super.onFailure(statusCode, response, throwable);
-
                             }
                         });
 
@@ -720,10 +720,6 @@ public class DATB {
             });
             return;
         }
-
-
-
-
         if (data != null && eventName != null&&eventName.length()>0&&data.size()>0) {
             eventName = eventName.substring(0, Math.min(eventName.length(), 32)).replace(" ","_");
             HashMap<String, Object>  newListEvent= new HashMap<String, Object>();
@@ -733,8 +729,14 @@ public class DATB {
                     newListEvent.put(newKey,refineEntry.getValue());
                 }
             }
-            if (newListEvent.size()>0)
-                addEventAPI(eventName,newListEvent);
+            if (newListEvent.size()>0) {
+                addEventAPI(eventName, newListEvent);
+            }
+            else
+            {
+                Util.setException(appContext,"Event Name or Event Data are not available",AppConstant.APP_NAME_TAG,"addEvent");
+
+            }
         }
         else
         {
@@ -874,7 +876,7 @@ public class DATB {
                     Util.setException(appContext,ex.toString(),"DATB","add Event");
                 }
             }  else {
-                Log.v(AppConstant.APP_NAME_TAG, "Event length more than 32...");
+                Util.setException(appContext,"Event length more than 32",AppConstant.APP_NAME_TAG,"AdEvent");
             }
         }
     }
@@ -913,7 +915,6 @@ public class DATB {
         if (object != null && object.size() > 0) {
             try {
                 final PreferenceUtil preferenceUtil = PreferenceUtil.getInstance(appContext);
-
                 HashMap<String, Object> newListUserProfile = new HashMap<String, Object>();
                 for (Map.Entry<String, Object> refineEntry : object.entrySet()) {
                     if (refineEntry.getKey() != null && !refineEntry.getKey().isEmpty()) {
@@ -957,6 +958,15 @@ public class DATB {
                             preferenceUtil.setStringData(AppConstant.USER_LOCAL_DATA, jsonObjectLocal.toString());
                         }
                     }
+                    else
+                    {
+                        Util.setException(appContext, "Blank user properties",AppConstant.APP_NAME_TAG, "addUserProperty");
+
+                    }
+
+                }
+                else {
+                    Util.setException(appContext, "Blank user properties",AppConstant.APP_NAME_TAG, "addUserProperty");
 
                 }
 
@@ -1076,7 +1086,7 @@ public class DATB {
             }
             else
             {
-                Util.setException(appContext, "Data are sending blank",AppConstant.APP_NAME_TAG, "setSubscription");
+                Util.setException(appContext, "Value should not be null",AppConstant.APP_NAME_TAG, "setSubscription");
 
             }
         }catch (Exception e) {
@@ -1225,15 +1235,8 @@ public class DATB {
         } catch (Exception e) {
             Util.setException(context,e.toString(),"DATB","handleNotification");
         }
-
-
-
-
-
     }
     public static void addTag(final List<String> topicName){
-
-
             if (osTaskManager.shouldQueueTaskForInit(OSTaskManager.ADD_TAG) && appContext == null) {
                 osTaskManager.addTaskToQueue(new Runnable() {
                     @Override
@@ -1282,7 +1285,7 @@ public class DATB {
         }
         else
         {
-            Util.setException(DATB.appContext,"Topic name is blank",AppConstant.APP_NAME_TAG,"AddTag");
+            Util.setException(DATB.appContext,"Topic list should not be  blank",AppConstant.APP_NAME_TAG,"AddTag");
         }
     }
     public static void removeTag(final List<String> topicName){
@@ -1335,7 +1338,7 @@ public class DATB {
         }
         else
         {
-            Util.setException(DATB.appContext,"Topic name is blank",AppConstant.APP_NAME_TAG,"RemoveTag");
+            Util.setException(DATB.appContext,"Topic list should not be  blank",AppConstant.APP_NAME_TAG,"RemoveTag");
 
         }
     }
@@ -1510,8 +1513,14 @@ public class DATB {
             });
             return;
         }
+        if(PushTemplate.DEFAULT == templateID || PushTemplate.TEXT_OVERLAY == templateID) {
             final PreferenceUtil preferenceUtil = PreferenceUtil.getInstance(appContext);
             preferenceUtil.setIntData(AppConstant.NOTIFICATION_PREVIEW, templateID);
+        }
+        else
+        {
+            Util.setException(appContext,"Template id is not matched"+templateID,AppConstant.APP_NAME_TAG,"setDefaultTemplate");
+        }
 
     }
     private static void sendOfflineDataToServer(Context context) {
