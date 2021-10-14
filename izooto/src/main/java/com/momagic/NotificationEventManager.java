@@ -41,7 +41,7 @@ import java.util.SortedMap;
 import java.util.TreeMap;
 
 public class NotificationEventManager {
-    private static Bitmap notificationIcon, notificationBanner;//,act1Icon,act2Icon;
+    public static Bitmap notificationIcon, notificationBanner;//,act1Icon,act2Icon;
     private static int icon;
     private static  int badgeColor;
     private static int priority,lockScreenVisibility;
@@ -57,6 +57,7 @@ public class NotificationEventManager {
             allCloudPush(payload);
         }
         else{
+            Log.e("URL",payload.getFetchURL());
             addCheck = true;
             allAdPush(payload);
         }
@@ -71,6 +72,7 @@ public class NotificationEventManager {
                     if (preferenceUtil.getBoolean(AppConstant.MEDIATION)) {
                         showNotification(payload);
                     } else {
+
                         processPayload(payload);
                     }
 
@@ -260,12 +262,15 @@ public class NotificationEventManager {
      static void processPayload(final Payload payload) {
 
        if(payload!=null) {
-           RestClient.get(payload.getFetchURL(), new RestClient.ResponseHandler() {
+           String fetchURL=fetchURL(payload.getFetchURL());
+           RestClient.get(fetchURL, new RestClient.ResponseHandler() {
+               @RequiresApi(api = Build.VERSION_CODES.KITKAT)
                @Override
                void onSuccess(String response) {
                    super.onSuccess(response);
                    if (response != null) {
                        try {
+                           DebugFileManager.createExternalStoragePublic(DATB.appContext,"FetcherPayload",response);
                            Object json = new JSONTokener(response).nextValue();
                            if (json instanceof JSONObject) {
                                JSONObject jsonObject = new JSONObject(response);
@@ -278,9 +283,7 @@ public class NotificationEventManager {
                                parseJson(payload, jsonObject);
                            }
                        } catch (JSONException e) {
-                           if (DATB.appContext != null) {
-                               Util.setException(DATB.appContext, e.toString(), AppConstant.APPName_2, "adPush");
-                           }
+                          Log.e("Exception ex",e.toString());
                        }
                    }
                }
@@ -299,6 +302,7 @@ public class NotificationEventManager {
     }
 
 
+     @RequiresApi(api = Build.VERSION_CODES.KITKAT)
      static void parseJson(Payload payload, JSONObject jsonObject) {
         try {
             payload.setLink(getParsedValue(jsonObject, payload.getLink()));
@@ -312,7 +316,8 @@ public class NotificationEventManager {
             payload.setTitle(getParsedValue(jsonObject, payload.getTitle()));
             payload.setMessage(getParsedValue(jsonObject, payload.getMessage()));
             payload.setIcon(getParsedValue(jsonObject, payload.getIcon()));
-            payload.setAct1name(getParsedValue(jsonObject,payload.getAct1name()));
+            payload.setAct1name(payload.getAct1name());
+
             payload.setAct1link(getParsedValue(jsonObject,payload.getAct1link()));
             if (!payload.getAct1link().startsWith("http://") && !payload.getAct1link().startsWith("https://")) {
                 String url = payload.getAct1link();
@@ -320,6 +325,7 @@ public class NotificationEventManager {
                 payload.setAct1link(url);
 
             }
+
             payload.setAp("");
             payload.setInapp(0);
             if(payload.getTitle()!=null && !payload.getTitle().equalsIgnoreCase("")) {
@@ -424,8 +430,6 @@ public class NotificationEventManager {
             }
         } catch (Exception e) {
             Log.e("Exception",e.toString());
-
-
         }
         return "";
     }
@@ -467,9 +471,7 @@ public class NotificationEventManager {
             @RequiresApi(api = Build.VERSION_CODES.O)
             @Override
             public void run() {
-
                 String clickIndex = "0";
-                String impressionIndex ="0";
                 String lastSeventhIndex = "0";
                 String lastNinthIndex = "0";
 
@@ -477,7 +479,6 @@ public class NotificationEventManager {
                 String data=Util.getIntegerToBinary(payload.getCfg());
                 if(data!=null && !data.isEmpty()) {
                     clickIndex = String.valueOf(data.charAt(data.length() - 2));
-                    impressionIndex = String.valueOf(data.charAt(data.length() - 1));
                     lastView_Click = String.valueOf(data.charAt(data.length() - 3));
                     lastSeventhIndex = String.valueOf(data.charAt(data.length() - 7));
                     lastNinthIndex = String.valueOf(data.charAt(data.length() - 9));
@@ -485,7 +486,6 @@ public class NotificationEventManager {
                 else
                 {
                     clickIndex = "0";
-                    impressionIndex="0";
                     lastView_Click = "0";
                     lastSeventhIndex = "0";
                     lastNinthIndex = "0";
@@ -501,7 +501,9 @@ public class NotificationEventManager {
                 int SUMMARY_ID = 0;
                 Intent intent = null;
 
+
                 icon = getBadgeIcon(payload.getBadgeicon());
+
                 badgeColor = getBadgeColor(payload.getBadgecolor());
                 lockScreenVisibility = setLockScreenVisibility(payload.getLockScreenVisibility());
 
@@ -559,12 +561,12 @@ public class NotificationEventManager {
                     notificationBuilder.setSubText(payload.getSubTitle());
 
                 }
-//                if (payload.getBadgecolor()!=null&&!payload.getBadgecolor().isEmpty()){
-//                    notificationBuilder.setColor(badgeColor);
-//                }
-//                if(payload.getLedColor()!=null && !payload.getLedColor().isEmpty()) {
-//                    notificationBuilder.setColor(Color.parseColor(payload.getLedColor()));
-//                }
+                if (payload.getBadgecolor()!=null&&!payload.getBadgecolor().isEmpty()){
+                    notificationBuilder.setColor(badgeColor);
+                }
+                if(payload.getLedColor()!=null && !payload.getLedColor().isEmpty()) {
+                    notificationBuilder.setColor(Color.parseColor(payload.getLedColor()));
+                }
                 if (notificationIcon != null)
                     notificationBuilder.setLargeIcon(notificationIcon);
                 else if (notificationBanner != null)
@@ -594,7 +596,7 @@ public class NotificationEventManager {
                     PendingIntent pendingIntent1 = PendingIntent.getBroadcast(DATB.appContext, new Random().nextInt(100), btn1, PendingIntent.FLAG_UPDATE_CURRENT);
                     NotificationCompat.Action action1 =
                             new NotificationCompat.Action.Builder(
-                                    0,  payload.getAct1name(),
+                                    0,  payload.getAct1name().replace("~",""),
                                     pendingIntent1).build();
                     notificationBuilder.addAction(action1);
 
@@ -603,13 +605,12 @@ public class NotificationEventManager {
 
 
                 if (payload.getAct2name() != null && !payload.getAct2name().isEmpty()) {
-//                    btn2.setAction(AppConstant.ACTION_BTN_TWO);
                     String phone = getPhone(payload.getAct2link());
                     Intent btn2 = notificationClick(payload,payload.getAct2link(),payload.getLink(),payload.getAct1link(),phone,clickIndex,lastView_Click,notificaitionId,2);
                     PendingIntent pendingIntent2 = PendingIntent.getBroadcast(DATB.appContext, new Random().nextInt(100), btn2, PendingIntent.FLAG_UPDATE_CURRENT);
                     NotificationCompat.Action action2 =
                             new NotificationCompat.Action.Builder(
-                                    0,payload.getAct2name(),
+                                    0,payload.getAct2name().replace("~",""),
                                     pendingIntent2).build();
                     notificationBuilder.addAction(action2);
                 }
@@ -682,8 +683,6 @@ public class NotificationEventManager {
             }
 
         };
-
-
         new AppExecutors().networkIO().execute(new Runnable() {
             @Override
             public void run() {
@@ -714,7 +713,6 @@ private static void receivedNotification(final Payload payload){
         public void run() {
 
             String clickIndex = "0";
-            String impressionIndex = "0";
             String lastSeventhIndex = "0";
             String lastNinthIndex = "0";
 
@@ -722,13 +720,11 @@ private static void receivedNotification(final Payload payload){
             String data = Util.getIntegerToBinary(payload.getCfg());
             if (data != null && !data.isEmpty()) {
                 clickIndex = String.valueOf(data.charAt(data.length() - 2));
-                impressionIndex = String.valueOf(data.charAt(data.length() - 1));
                 lastView_Click = String.valueOf(data.charAt(data.length() - 3));
                 lastSeventhIndex = String.valueOf(data.charAt(data.length() - 7));
                 lastNinthIndex = String.valueOf(data.charAt(data.length() - 9));
             } else {
                 clickIndex = "0";
-                impressionIndex = "0";
                 lastView_Click = "0";
                 lastSeventhIndex = "0";
                 lastNinthIndex = "0";
@@ -743,8 +739,11 @@ private static void receivedNotification(final Payload payload){
             Notification summaryNotification = null;
             int SUMMARY_ID = 0;
             Intent intent = null;
+            if(payload.getBadgeicon().isEmpty())
+                icon = getBadgeIcon(payload.getBadgeicon());
+            else
 
-            icon = getBadgeIcon(payload.getBadgeicon());
+
             badgeColor = getBadgeColor(payload.getBadgecolor());
             lockScreenVisibility = setLockScreenVisibility(payload.getLockScreenVisibility());
 
@@ -860,8 +859,11 @@ private static void receivedNotification(final Payload payload){
             }
 
             if (!(Build.VERSION.SDK_INT >= Build.VERSION_CODES.O)) {
-                if (payload.getPriority() == 0)
-                    notificationBuilder.setPriority(Notification.PRIORITY_HIGH);
+                if (payload.getPriority() == 0) {
+                    priority = NotificationManagerCompat.IMPORTANCE_HIGH;
+                    notificationBuilder.setPriority(priority);
+                }
+                //notificationBuilder.setPriority(Notification.PRIORITY_HIGH);
                 else {
                     priority = priorityForLessOreo(payload.getPriority());
                     notificationBuilder.setPriority(priority);
@@ -924,7 +926,7 @@ private static void receivedNotification(final Payload payload){
                 PendingIntent pendingIntent1 = PendingIntent.getBroadcast(DATB.appContext, new Random().nextInt(100), btn1, PendingIntent.FLAG_UPDATE_CURRENT);
                 NotificationCompat.Action action1 =
                         new NotificationCompat.Action.Builder(
-                                R.drawable.transparent_image, payload.getAct1name(),
+                                R.drawable.transparent_image, payload.getAct1name().replace("~",""),
                                 pendingIntent1).build();
                 notificationBuilder.addAction(action1);
             }
@@ -937,7 +939,7 @@ private static void receivedNotification(final Payload payload){
                 PendingIntent pendingIntent2 = PendingIntent.getBroadcast(DATB.appContext, new Random().nextInt(100), btn2, PendingIntent.FLAG_UPDATE_CURRENT);
                 NotificationCompat.Action action2 =
                         new NotificationCompat.Action.Builder(
-                                R.drawable.transparent_image, payload.getAct2name(),
+                                R.drawable.transparent_image, payload.getAct2name().replace("~",""),
                                 pendingIntent2).build();
                 notificationBuilder.addAction(action2);
             }
@@ -970,9 +972,6 @@ private static void receivedNotification(final Payload payload){
                     notificationManager.notify(notificaitionId, notificationBuilder.build());
                 try {
 
-//                if(impressionIndex.equalsIgnoreCase("1")) {
-//                    viewNotificationApi(payload);
-//                }
                     if (lastView_Click.equalsIgnoreCase("1") || lastSeventhIndex.equalsIgnoreCase("1")) {
                         lastViewNotificationApi(payload, lastView_Click, lastSeventhIndex, lastNinthIndex);
                     }
@@ -986,7 +985,6 @@ private static void receivedNotification(final Payload payload){
                 } catch (Exception e) {
                     e.printStackTrace();
                 }
-
                 notificationBanner = null;
                 notificationIcon = null;
 
@@ -1029,12 +1027,13 @@ private static void receivedNotification(final Payload payload){
                 handler.post(notificationRunnable);
             } catch (Exception e) {
                 if(DATB.appContext!=null) {
-                    Util.setException(DATB.appContext, e.toString(), AppConstant.APPName_2, "ReceiveNotificaiton");
+                    Util.setException(DATB.appContext, e.toString(), AppConstant.APPName_2, "ReceiveNotification");
                 }
                 handler.post(notificationRunnable);
             }
         }
     });
+
 }
 
     public static boolean isInt(String s) {
@@ -1096,11 +1095,9 @@ private static void receivedNotification(final Payload payload){
             return NotificationManagerCompat.IMPORTANCE_MAX;
         if (priority > 7)
             return NotificationManagerCompat.IMPORTANCE_HIGH;
-        return NotificationManagerCompat.IMPORTANCE_HIGH;
+        return NotificationManagerCompat.IMPORTANCE_MAX;
     }
      static int priorityForLessOreo(int priority) {
-        if (priority > 0)
-            return Notification.PRIORITY_HIGH;
         return Notification.PRIORITY_HIGH;
     }
      static int setLockScreenVisibility(int visibility) {
@@ -1159,7 +1156,6 @@ private static void receivedNotification(final Payload payload){
                     }
 
                     String clickIndex = "0";
-                    String impressionIndex ="0";
                     String lastSeventhIndex = "0";
                     String lastNinthIndex = "0";
 
@@ -1167,7 +1163,6 @@ private static void receivedNotification(final Payload payload){
                     String data=Util.getIntegerToBinary(payload.getCfg());
                     if(data!=null && !data.isEmpty()) {
                         clickIndex = String.valueOf(data.charAt(data.length() - 2));
-                        impressionIndex = String.valueOf(data.charAt(data.length() - 1));
                         lastView_Click = String.valueOf(data.charAt(data.length() - 3));
                         lastSeventhIndex = String.valueOf(data.charAt(data.length() - 7));
                         lastNinthIndex = String.valueOf(data.charAt(data.length() - 9));
@@ -1175,7 +1170,6 @@ private static void receivedNotification(final Payload payload){
                     else
                     {
                         clickIndex = "0";
-                        impressionIndex="0";
                         lastView_Click = "0";
                         lastSeventhIndex = "0";
                         lastNinthIndex = "0";
@@ -1363,7 +1357,8 @@ private static void receivedNotification(final Payload payload){
         return phone;
     }
      static int getBadgeIcon(String setBadgeIcon){
-            int bIicon;
+
+             int bIicon;
             if (DATB.icon != 0) {
                 bIicon = DATB.icon;
             } else {
@@ -1396,6 +1391,7 @@ private static void receivedNotification(final Payload payload){
                 }
 
             }
+
 
         return bIicon;
     }
@@ -1466,46 +1462,7 @@ private static void receivedNotification(final Payload payload){
 
 
     }
-//     static void lastViewNotification(String limURL, String rid, String cid, int i){
-//        if(DATB.appContext!=null) {
-//            final PreferenceUtil preferenceUtil = PreferenceUtil.getInstance(DATB.appContext);
-//            try {
-//                HashMap<String, Object> data = new HashMap<>();
-//                data.put(AppConstant.LAST_NOTIFICAION_VIEWED, true);
-//                JSONObject jsonObject = new JSONObject(data);
-//
-//            String limURL;
-//            int dataCfg = Util.getBinaryToDecimal(payload.getCfg());
-//
-//            if (dataCfg > 0) {
-//                limURL = "https://lim" + dataCfg + ".izooto.com/lim" + dataCfg;
-//            } else
-//                limURL = RestClient.LASTNOTIFICATIONVIEWURL;
-//
-//            Map<String, String> mapData = new HashMap<>();
-//            mapData.put(AppConstant.PID, preferenceUtil.getDataBID(AppConstant.APPPID));
-//            mapData.put(AppConstant.VER_, AppConstant.SDK_VERSION);
-//            mapData.put(AppConstant.ANDROID_ID, "" + Util.getAndroidId(DATB.appContext));
-//            mapData.put(AppConstant.VAL, "" + jsonObject.toString());
-//            mapData.put(AppConstant.ACT, "add");
-//            mapData.put(AppConstant.ISID_, "1");
-//            mapData.put(AppConstant.ET_, "" + AppConstant.USERP_);
-//            RestClient.newPostRequest(limURL, mapData,null, new RestClient.ResponseHandler() {
-//                @Override
-//                void onSuccess(final String response) {
-//                    super.onSuccess(response);
-//                }
-//
-//                @Override
-//                void onFailure(int statusCode, String response, Throwable throwable) {
-//                    super.onFailure(statusCode, response, throwable);
-//                }
-//            });
-//            } catch (Exception ex) {
-//                Util.setException(DATB.appContext, ex.toString(), AppConstant.APPName_2, "lastViewNotification");
-//            }
-//        }
-//    }
+
 static void lastViewNotification(String limURL, String rid, String cid, int i){
     if (DATB.appContext == null)
         return;
@@ -1515,9 +1472,6 @@ static void lastViewNotification(String limURL, String rid, String cid, int i){
         HashMap<String, Object> data = new HashMap<>();
         data.put(AppConstant.LAST_NOTIFICAION_VIEWED, true);
         JSONObject jsonObject = new JSONObject(data);
-//            encodeData = URLEncoder.encode(jsonObject.toString(), AppConstant.UTF);
-
-
         Map<String,String> mapData= new HashMap<>();
         mapData.put(AppConstant.PID, preferenceUtil.getDataBID(AppConstant.APPPID));
         mapData.put(AppConstant.VER_, AppConstant.SDK_VERSION);
@@ -1652,6 +1606,21 @@ static void lastViewNotification(String limURL, String rid, String cid, int i){
         else {
             final PreferenceUtil preferenceUtil = PreferenceUtil.getInstance(context);
             return preferenceUtil.getStringData(AppConstant.CURRENT_DATE_VIEW_DAILY);
+        }
+    }
+
+    static String fetchURL(String url)
+    {
+        if(url!=null)
+        {
+            if(url.contains(AppConstant.ACCOUNT_ID)|| url.contains(AppConstant.ADID)|| url.contains(AppConstant.DEVICE_ID))
+                url=url.replace(AppConstant.ACCOUNT_ID,PreferenceUtil.getInstance(DATB.appContext).getDataBID(AppConstant.APPPID)).replace(AppConstant.ADID,PreferenceUtil.getInstance(DATB.appContext).getStringData(AppConstant.ADVERTISING_ID)).replace(AppConstant.DEVICE_ID,Util.getAndroidId(DATB.appContext));
+            return url;
+
+        }
+        else
+        {
+            return url;
         }
     }
 

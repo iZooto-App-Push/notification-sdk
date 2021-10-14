@@ -52,7 +52,7 @@ public class XiaomiPushReceiver extends PushMessageReceiver {
                     JSONObject payloadObj = new JSONObject(data);
                     if(payloadObj.has(AppConstant.AD_NETWORK) && payloadObj.has(AppConstant.GLOBAL))
                     {
-                       AdMediation.getAdNotificationData(context,payloadObj,AppConstant.PUSH_XIAOMI);
+                       AdMediation.getMediationData(context,payloadObj,AppConstant.PUSH_XIAOMI);
                         preferenceUtil.setBooleanData(AppConstant.MEDIATION,true);
                     }
                     else {

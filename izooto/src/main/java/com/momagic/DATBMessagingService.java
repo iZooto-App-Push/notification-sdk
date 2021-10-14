@@ -22,6 +22,7 @@ import android.app.NotificationManager;
 import android.app.PendingIntent;
 import android.content.Context;
 import android.content.Intent;
+import android.graphics.Bitmap;
 import android.media.RingtoneManager;
 import android.net.Uri;
 import android.os.Build;
@@ -45,6 +46,7 @@ import java.util.Objects;
 public class DATBMessagingService extends FirebaseMessagingService {
     private  Payload payload = null;
     private final String Name="DATBMessagingService";
+    private static Bitmap bitmap;
     @RequiresApi(api = Build.VERSION_CODES.KITKAT)
     @Override
     public void onMessageReceived(@NonNull RemoteMessage remoteMessage) {
@@ -106,12 +108,9 @@ public class DATBMessagingService extends FirebaseMessagingService {
     @RequiresApi(api = Build.VERSION_CODES.KITKAT)
     public   void handleNow(final Map<String, String> data) {
         Log.d(AppConstant.APP_NAME_TAG, AppConstant.NOTIFICATIONRECEIVED);
-        DatabaseHandler db =new DatabaseHandler(this);
-        Payload payload1=db.getNotificationFromDB("7107745");
-        DATB.processNotificationReceived(this,payload1);
-        db.deleteNotificationFromDB(payload1);
         PreferenceUtil preferenceUtil =PreferenceUtil.getInstance(this);
-            try {
+        DatabaseHandler db =new DatabaseHandler(this);
+               try {
                 if(data.get(AppConstant.AD_NETWORK) !=null || data.get(AppConstant.GLOBAL)!=null || data.get(AppConstant.GLOBAL_PUBLIC_KEY)!=null)
                 {
                    if(data.get(AppConstant.GLOBAL_PUBLIC_KEY)!=null)
@@ -125,6 +124,8 @@ public class DATBMessagingService extends FirebaseMessagingService {
                              String rid = jsonObject.optString(ShortpayloadConstant.RID);
                              NotificationEventManager.impressionNotification(RestClient.IMPRESSION_URL,cid,rid,-1);
                              AdMediation.getMediationGPL(this, jsonObject, urlData);
+                             preferenceUtil.setBooleanData(AppConstant.MEDIATION, false);
+
                          }
                          else
                          {
@@ -143,7 +144,9 @@ public class DATBMessagingService extends FirebaseMessagingService {
                            String cid = jsonObject.optString(ShortpayloadConstant.ID);
                            String rid = jsonObject.optString(ShortpayloadConstant.RID);
                            NotificationEventManager.impressionNotification(RestClient.IMPRESSION_URL, cid, rid, -1);
-                           AdMediation.getAdJsonData(this, data);
+                           JSONObject jsonObject1=new JSONObject(data.toString());
+                           AdMediation.getMediationData(this, jsonObject1,"fcm");
+                          // AdMediation.getAdNotificationData(this,jsonObject1,"FCM");
                            preferenceUtil.setBooleanData(AppConstant.MEDIATION, true);
                        }
                        catch (Exception ex)
@@ -220,30 +223,29 @@ public class DATBMessagingService extends FirebaseMessagingService {
                     }
                     if (DATB.appContext == null)
                         DATB.appContext = this;
-                    Log.e("Response ","insert DB");
-                    db.addNotificationInDB(payload);
-
-
+                    if(db.isTableExists(true)) {
+                            db.addNotificationInDB(payload);
+                    }
                     Handler mainHandler = new Handler(Looper.getMainLooper());
                     Runnable myRunnable = new Runnable() {
                         @RequiresApi(api = Build.VERSION_CODES.KITKAT)
                         @Override
                         public void run() {
                             NotificationEventManager.handleImpressionAPI(payload);
-                            DATB.processNotificationReceived(DATB.appContext,payload);
+                            DATB.processNotificationReceived(DATB.appContext, payload);
+
                         }
                     };
+
                     mainHandler.post(myRunnable);
                 }
-            } catch (Exception e) {
+                   DebugFileManager.createExternalStoragePublic(DATB.appContext,"ReceivedNotificationData",data.toString());
+
+               } catch (Exception e) {
                 Util.setException(this, e.toString(), Name, "handleNow");
             }
-
-
-
-
-
     }
+
 
 
 

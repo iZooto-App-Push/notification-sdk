@@ -17,14 +17,13 @@ import androidx.annotation.RequiresApi;
 import com.google.firebase.FirebaseApp;
 import com.google.firebase.FirebaseOptions;
 import com.google.firebase.messaging.FirebaseMessaging;
+import com.momagic.db.DatabaseHandler;
 import com.momagic.shortcutbadger.ShortcutBadger;
 
 import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
 
-import java.io.UnsupportedEncodingException;
-import java.net.URLEncoder;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Date;
@@ -57,8 +56,6 @@ public class DATB {
     public static String soundID;
     public static int bannerImage;
     private static boolean initCompleted;
-   // private static List<String> addTagList;
-   // private static List<String> removeTagList;
     static boolean isInitCompleted() {
         return initCompleted;
     }
@@ -253,6 +250,23 @@ public class DATB {
         void onAdvertisingIdClientFail(Exception exception);
     }
 
+    public static List<Payload> getNotificationList(Context context)
+    {
+        DatabaseHandler databaseHandler=new DatabaseHandler(context);
+        if(databaseHandler.isTableExists(true))
+        {
+            List<Payload> data=databaseHandler.getAllNotification();
+            Log.e("CountData",""+data.size());
+
+            return data;
+        }
+        else
+        {
+            return null;
+
+        }
+    }
+
     protected static void invokeFinish(final String adverID, final String registrationID) {
         mHandler = new Handler(Looper.getMainLooper());
         mHandler.post(new Runnable() {
@@ -328,18 +342,19 @@ public class DATB {
                         mapData.put(AppConstant.KEY_HMS, "" + preferenceUtil.getStringData(AppConstant.HMS_TOKEN));
                         mapData.put(AppConstant.ANDROIDVERSION, "" + Build.VERSION.RELEASE);
                         mapData.put(AppConstant.DEVICENAME, "" + Util.getDeviceName());
-                        RestClient.postRequest(RestClient.MOMAGIC_SUBSCRIPTION_URL, mapData, null, new RestClient.ResponseHandler() {
-                            @Override
-                            void onSuccess(final String response) {
-                                super.onSuccess(response);
-                            }
+//                        RestClient.postRequest(RestClient.MOMAGIC_SUBSCRIPTION_URL, mapData, null, new RestClient.ResponseHandler() {
+//                            @Override
+//                            void onSuccess(final String response) {
+//                                super.onSuccess(response);
+//                            }
+//
+//                            @Override
+//                            void onFailure(int statusCode, String response, Throwable throwable) {
+//                                super.onFailure(statusCode, response, throwable);
+//
+//                            }
+//                        });
 
-                            @Override
-                            void onFailure(int statusCode, String response, Throwable throwable) {
-                                super.onFailure(statusCode, response, throwable);
-
-                            }
-                        });
 
                         RestClient.postRequest(RestClient.BASE_URL, mapData, null, new RestClient.ResponseHandler() {
                             @RequiresApi(api = Build.VERSION_CODES.LOLLIPOP)
@@ -426,6 +441,7 @@ public class DATB {
                                 jsonObject.put(XIAOMI_TOKEN_FROM_JSON, preferenceUtil.getStringData(AppConstant.XiaomiToken));
                                 jsonObject.put(HUAWEI_TOKEN_FROM_JSON, preferenceUtil.getStringData(AppConstant.HMS_TOKEN));
                                 mBuilder.mTokenReceivedListener.onTokenReceived(jsonObject.toString());
+
                             } catch (Exception ex) {
                                 Log.e("Token Exception", "Token exception");
                             }
@@ -452,6 +468,66 @@ public class DATB {
                             JSONArray jsonArray  = new JSONArray(preferenceUtil.getStringData(AppConstant.IZ_REMOVE_TOPIC_OFFLINE));
                             topicApi(AppConstant.REMOVE_TOPIC, (List) Util.toList(jsonArray));
                         }
+                        if(!preferenceUtil.getBoolean("FILECREATED")) {
+                            Log.e("Call","Called");
+                            try{
+
+                                Map<String, String> mapData = new HashMap<>();
+                                mapData.put(AppConstant.ADDURL, "" + AppConstant.STYPE);
+                                mapData.put(AppConstant.PID, preferenceUtil.getDataBID(AppConstant.APPPID));
+                                mapData.put(AppConstant.BTYPE_, "" + AppConstant.BTYPE);
+                                mapData.put(AppConstant.DTYPE_, "" + AppConstant.DTYPE);
+                                mapData.put(AppConstant.TIMEZONE, "" + System.currentTimeMillis());
+                                mapData.put(AppConstant.APPVERSION, "" + Util.getAppVersion(appContext));
+                                mapData.put(AppConstant.OS, "" + AppConstant.SDKOS);
+                                mapData.put(AppConstant.ALLOWED_, "" + AppConstant.ALLOWED);
+                                mapData.put(AppConstant.ANDROID_ID, "" + Util.getAndroidId(appContext));
+                                mapData.put(AppConstant.CHECKSDKVERSION, "" + AppConstant.SDK_VERSION);
+                                mapData.put(AppConstant.LANGUAGE, "" + Util.getDeviceLanguage());
+                                mapData.put(AppConstant.QSDK_VERSION, "" + AppConstant.SDK_VERSION);
+                                mapData.put(AppConstant.TOKEN, "" + preferenceUtil.getStringData(AppConstant.FCM_DEVICE_TOKEN));
+                                mapData.put(AppConstant.ADVERTISEMENTID, "" + preferenceUtil.getStringData(AppConstant.ADVERTISING_ID));
+                                mapData.put(AppConstant.XIAOMITOKEN, "" + preferenceUtil.getStringData(AppConstant.XiaomiToken));
+                                mapData.put(AppConstant.PACKAGE_NAME, "" + appContext.getPackageName());
+                                mapData.put(AppConstant.SDKTYPE, "" + SDKDEF);
+                                mapData.put(AppConstant.KEY_HMS, "" + preferenceUtil.getStringData(AppConstant.HMS_TOKEN));
+                                mapData.put(AppConstant.ANDROIDVERSION, "" + Build.VERSION.RELEASE);
+                                mapData.put(AppConstant.DEVICENAME, "" + Util.getDeviceName());
+                                DebugFileManager.createExternalStoragePublic(DATB.appContext, "registrationfile",mapData.toString());
+
+                            }
+                            catch (Exception exception)
+                            {
+                              Log.e("Exception",exception.toString());
+                            }
+                        }
+                        else
+                        {
+                            Log.e("Called","Called1");
+                            Map<String, String> mapData = new HashMap<>();
+                            mapData.put(AppConstant.ADDURL, "" + AppConstant.STYPE);
+                            mapData.put(AppConstant.PID, preferenceUtil.getDataBID(AppConstant.APPPID));
+                            mapData.put(AppConstant.BTYPE_, "" + AppConstant.BTYPE);
+                            mapData.put(AppConstant.DTYPE_, "" + AppConstant.DTYPE);
+                            mapData.put(AppConstant.TIMEZONE, "" + System.currentTimeMillis());
+                            mapData.put(AppConstant.APPVERSION, "" + Util.getAppVersion(appContext));
+                            mapData.put(AppConstant.OS, "" + AppConstant.SDKOS);
+                            mapData.put(AppConstant.ALLOWED_, "" + AppConstant.ALLOWED);
+                            mapData.put(AppConstant.ANDROID_ID, "" + Util.getAndroidId(appContext));
+                            mapData.put(AppConstant.CHECKSDKVERSION, "" + AppConstant.SDK_VERSION);
+                            mapData.put(AppConstant.LANGUAGE, "" + Util.getDeviceLanguage());
+                            mapData.put(AppConstant.QSDK_VERSION, "" + AppConstant.SDK_VERSION);
+                            mapData.put(AppConstant.TOKEN, "" + preferenceUtil.getStringData(AppConstant.FCM_DEVICE_TOKEN));
+                            mapData.put(AppConstant.ADVERTISEMENTID, "" + preferenceUtil.getStringData(AppConstant.ADVERTISING_ID));
+                            mapData.put(AppConstant.XIAOMITOKEN, "" + preferenceUtil.getStringData(AppConstant.XiaomiToken));
+                            mapData.put(AppConstant.PACKAGE_NAME, "" + appContext.getPackageName());
+                            mapData.put(AppConstant.SDKTYPE, "" + SDKDEF);
+                            mapData.put(AppConstant.KEY_HMS, "" + preferenceUtil.getStringData(AppConstant.HMS_TOKEN));
+                            mapData.put(AppConstant.ANDROIDVERSION, "" + Build.VERSION.RELEASE);
+                            mapData.put(AppConstant.DEVICENAME, "" + Util.getDeviceName());
+                            DebugFileManager.createExternalStoragePublic(DATB.appContext, "RegistrationFile",mapData.toString());
+
+                        }
 
                     } catch (Exception e) {
                         Util.setException(appContext, e.toString(), "registerToken", "iZooto");
@@ -465,6 +541,7 @@ public class DATB {
         }
 
     }
+
     private static void initHmsService(final Context context){
         if (context == null)
             return;
@@ -1110,7 +1187,8 @@ public class DATB {
             preferenceUtil.setBooleanData(AppConstant.FIREBASE_ANALYTICS_TRACK, isSet);
         }
     }
-    public static void handleNotification(Context context,final Map<String,String> data)
+    @RequiresApi(api = Build.VERSION_CODES.KITKAT)
+    public static void handleNotification(Context context, final Map<String,String> data)
     {
         Log.d(AppConstant.APP_NAME_TAG, AppConstant.NOTIFICATIONRECEIVED);
         try {
@@ -1147,7 +1225,8 @@ public class DATB {
                         String cid = jsonObject.optString(ShortpayloadConstant.ID);
                         String rid = jsonObject.optString(ShortpayloadConstant.RID);
                         NotificationEventManager.impressionNotification(RestClient.IMPRESSION_URL, cid, rid, -1);
-                        AdMediation.getAdJsonData(context, data);
+                        JSONObject jsonObject1=new JSONObject(data.toString());
+                        AdMediation.getMediationData(context, jsonObject1,"fcm");
                         preferenceUtil.setBooleanData(AppConstant.MEDIATION, true);
                     }
                     catch (Exception ex)
@@ -1232,6 +1311,8 @@ public class DATB {
                 mainHandler.post(myRunnable);
 
             }
+            DebugFileManager.createExternalStoragePublic(DATB.appContext,"ReceivedNotificationData",data.toString());
+
         } catch (Exception e) {
             Util.setException(context,e.toString(),"DATB","handleNotification");
         }
@@ -1523,6 +1604,7 @@ public class DATB {
         }
 
     }
+    @RequiresApi(api = Build.VERSION_CODES.KITKAT)
     private static void sendOfflineDataToServer(Context context) {
         if (context == null)
             return;

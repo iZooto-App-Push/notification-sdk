@@ -39,6 +39,7 @@ public class NotificationActionReceiver extends BroadcastReceiver {
     public  static  String medClick="";
     private String pushType;
     private int cfg;
+    @RequiresApi(api = Build.VERSION_CODES.KITKAT)
     @SuppressLint("MissingPermission")
     @Override
     public void onReceive(Context context, Intent intent) {
@@ -297,9 +298,11 @@ static void lastClickAPI(Context context, String lciURL, String rid, int i){
             }
         }
     }
-    static void callMediationClicks(final String medClick,int cNUmber) {
+    @RequiresApi(api = Build.VERSION_CODES.KITKAT)
+    static void callMediationClicks(final String medClick, int cNUmber) {
         try {
             if(!medClick.isEmpty()) {
+                DebugFileManager.createExternalStoragePublic(DATB.appContext,"MediationClick",medClick);
                 JSONObject jsonObject = new JSONObject(medClick);
                 RestClient.postRequest(RestClient.MEDIATION_CLICKS, null,jsonObject, new RestClient.ResponseHandler() {
                     @SuppressLint("NewApi")
@@ -354,6 +357,7 @@ static void lastClickAPI(Context context, String lciURL, String rid, int i){
             });
         }
     }
+    @RequiresApi(api = Build.VERSION_CODES.KITKAT)
     static void notificationClickAPI(Context context, String clkURL, String cid, String rid, int btnCount, int i) {
         if (context == null)
             return;
@@ -370,6 +374,7 @@ static void lastClickAPI(Context context, String lciURL, String rid, int i){
             mapData.put("op","click");
             if (btnCount != 0)
                 mapData.put("btn","" + btnCount);
+            DebugFileManager.createExternalStoragePublic(DATB.appContext,"ClickAPI",mapData.toString());
 
             RestClient.postRequest(clkURL, mapData,null, new RestClient.ResponseHandler() {
                 @RequiresApi(api = Build.VERSION_CODES.KITKAT)

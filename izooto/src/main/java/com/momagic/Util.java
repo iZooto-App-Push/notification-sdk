@@ -1,7 +1,6 @@
 package com.momagic;
 
 
-import android.annotation.SuppressLint;
 import android.app.ActivityManager;
 import android.content.ContentResolver;
 import android.content.Context;
@@ -22,11 +21,8 @@ import android.net.NetworkInfo;
 import android.net.Uri;
 import android.os.Build;
 import android.provider.Settings;
-import android.telephony.TelephonyManager;
 import android.text.Html;
 import android.util.Log;
-import android.widget.Toast;
-
 import androidx.annotation.RequiresApi;
 import androidx.core.app.NotificationManagerCompat;
 import androidx.core.content.ContextCompat;
@@ -37,12 +33,7 @@ import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
 
-import java.io.File;
-import java.io.IOException;
-import java.io.InputStream;
-import java.net.HttpURLConnection;
 import java.net.URL;
-import java.net.URLEncoder;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Date;
@@ -58,9 +49,7 @@ import javax.crypto.Cipher;
 import javax.crypto.spec.IvParameterSpec;
 import javax.crypto.spec.SecretKeySpec;
 
-import static com.momagic.ShortpayloadConstant.TAG;
 
-import com.huawei.hms.framework.common.Logger;
 
 
 public class Util {
@@ -105,14 +94,29 @@ public class Util {
 
 
     private static Bitmap getBitMap(String src) {
-         try {
-             return BitmapFactory.decodeStream(new URL(src).openConnection().getInputStream());
-         } catch (Throwable t) {
-             Log.e(AppConstant.APP_NAME_TAG,t.getMessage());
-             return null;
-         }
+            int retry=0;
+            boolean isCheck=false;
+            do {
+                 if(isCheck)
+                 {
+                     sleepTime(2000);
+
+                 }
+                try {
+                    return BitmapFactory.decodeStream(new URL(src).openConnection().getInputStream());
+                } catch (Throwable t) {
+                    retry++;
+                    isCheck=true;
+                    if(retry>=4) {
+                        return null;
+                    }
+
+                }
+            }while(retry<4);
+
+        return null;
     }
-     static Bitmap getBitmapFromURL(String name) {
+    public static Bitmap getBitmapFromURL(String name) {
         if (name == null)
             return null;
          String trimmedName = name.trim();
@@ -120,9 +124,19 @@ public class Util {
          trimmedName = trimmedName.replace("//", "/");
          trimmedName = trimmedName.replace("http:/", "https://");
          trimmedName = trimmedName.replace("https:/", "https://");
-        if (trimmedName.startsWith("http://") || trimmedName.startsWith("https://")) {
-            return getBitMap(trimmedName);
-        }
+         if(trimmedName.contains(".jpeg") || trimmedName.contains(".jpg") || trimmedName.contains(".png")) {
+             if (trimmedName.startsWith("http://") || trimmedName.startsWith("https://")) {
+                 Bitmap bmp =getBitMap(trimmedName);
+                 if(bmp!=null) {
+                     return bmp;
+                 }
+             }
+         }
+         else
+         {
+             Util.setException(DATB.appContext,"Image URL is not correct"+name,AppConstant.APP_NAME_TAG,"Util");
+            return null;
+         }
         return null;
 
     }

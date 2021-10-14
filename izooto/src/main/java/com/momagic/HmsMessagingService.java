@@ -38,8 +38,9 @@ public class HmsMessagingService extends HmsMessageService {
             JSONObject payloadObj = new JSONObject(data);
             if(payloadObj.has(AppConstant.AD_NETWORK) && payloadObj.has(AppConstant.GLOBAL))
             {
-                AdMediation.getAdNotificationData(context,payloadObj,AppConstant.PUSH_HMS);
+                AdMediation.getMediationData(context,payloadObj,AppConstant.PUSH_HMS);
                 preferenceUtil.setBooleanData(AppConstant.MEDIATION,true);
+
             }
             else {
                 preferenceUtil.setBooleanData(AppConstant.MEDIATION, false);

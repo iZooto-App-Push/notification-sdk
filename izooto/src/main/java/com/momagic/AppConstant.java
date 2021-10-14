@@ -317,11 +317,13 @@ public interface AppConstant {
     String SUBSCRIBER_ID_DATA="iz_SUBSCRIBER_ID_DATA";
     String PAYLOAD_JSON_ARRAY = "payloadJsonArray";
     String NOTIFICATION_PREVIEW = "iz_notification_preview";
-    String DEVICE_ID = "{~DEVICEID~}";
+    String DEVICE_ID = "{~UUID~}";
     String ANDROID_TOKEN = "{~TOKEN~}";
     String R_XIAOMI_TOKEN = "{~MITOKEN~}";
     String R_HMS_TOKEN = "{~HMSTOKEN~}";
     String R_FCM_TOKEN="{~FCMTOKEN~}";
+    String ACCOUNT_ID="{~PID~}";
+    String ADID="{~ADID~}";
     String CAN_GENERATE_HUAWEI_TOKEN = "iz_canGenerateHuaweiToken";
     String CAN_GENERATE_XIAOMI_TOKEN = "iz_canGenerateXiaomiToken";
     String CAN_GENERATE_FCM_TOKEN = "iz_canGenerateFcmToken";
