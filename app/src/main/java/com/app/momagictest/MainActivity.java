@@ -1,22 +1,21 @@
 package com.app.momagictest;
-
-import android.annotation.SuppressLint;
-import android.content.Context;
-import android.content.ContextWrapper;
+import android.Manifest;
 import android.content.Intent;
-import android.media.MediaScannerConnection;
+import android.content.pm.PackageManager;
 import android.net.Uri;
-import android.net.wifi.WifiInfo;
-import android.net.wifi.WifiManager;
 import android.os.Build;
 import android.os.Bundle;
 
+import androidx.annotation.Nullable;
 import androidx.annotation.RequiresApi;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.appcompat.widget.Toolbar;
 import androidx.core.app.ActivityCompat;
+import androidx.core.content.ContextCompat;
 
 import android.os.Environment;
+import android.os.StrictMode;
+import android.provider.Settings;
 import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
@@ -26,200 +25,134 @@ import android.widget.EditText;
 import android.widget.Toast;
 import com.momagic.AppConstant;
 import com.momagic.DATB;
-import com.momagic.Payload;
+import com.momagic.DebugFileManager;
 import com.momagic.PreferenceUtil;
 
-import org.json.JSONObject;
-
-import java.io.File;
-import java.io.FileNotFoundException;
-import java.io.FileOutputStream;
-import java.io.FileWriter;
-import java.io.IOException;
-import java.io.InputStream;
-import java.io.OutputStream;
-import java.io.OutputStreamWriter;
-import java.util.List;
 
 public class MainActivity extends AppCompatActivity {
     private EditText editText;
-    private int EXTERNAL_STORAGE_PERMISSION_CODE = 23;
-
+    String url = "https://www.izooto.com";
+    static final Integer WRITE_EXST = 0x3;
+    static final Integer READ_EXST=0x5;
 
     @RequiresApi(api = Build.VERSION_CODES.O)
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
+        StrictMode.VmPolicy.Builder builder = new StrictMode.VmPolicy.Builder();
+        StrictMode.setVmPolicy(builder.build());
+        builder.detectFileUriExposure();
         Toolbar toolbar = findViewById(R.id.toolbar);
         setSupportActionBar(toolbar);
-        editText = findViewById(R.id.editText);
-        Button sendSubID = findViewById(R.id.sendSubID);
-        sendSubID.setVisibility(View.GONE);
-        editText.setVisibility(View.GONE);
-        sendSubID.setOnClickListener(v -> {
-            if (editText.getText().toString().length() > 0) {
-                DATB.setSubscriberID(editText.getText().toString());
-            } else {
-                Toast.makeText(getApplicationContext(), "Please Enter the SubID", Toast.LENGTH_SHORT).show();
-            }
+        //askForPermission(android.Manifest.permission.WRITE_EXTERNAL_STORAGE,WRITE_EXST);
+       // askForReadPermission(Manifest.permission.READ_EXTERNAL_STORAGE,READ_EXST);
+
+        Button sendDebugFile = findViewById(R.id.sendDebugFile);
+       sendDebugFile.setOnClickListener(new View.OnClickListener() {
+           @Override
+           public void onClick(View view) {
+               DATB.shareFile(MainActivity.this,"","");
+           }
+       });
+        Button beginDebugFile = findViewById(R.id.beginDebugFile);
+        beginDebugFile.setOnClickListener(v -> {
+            DATB.createDirectory(MainActivity.this);
+
+//            PreferenceUtil preferenceUtil = PreferenceUtil.getInstance(MainActivity.this);
+//            String token = preferenceUtil.getStringData(AppConstant.FCM_DEVICE_TOKEN);
+//            if (token != null && !token.isEmpty()) {
+//                sendEmail(token);
+//            }
+
+
         });
-        Button sendToken = findViewById(R.id.sendToken);
-        sendToken.setOnClickListener(v -> {
+        Button deleteDebugFile = findViewById(R.id.deleteDebugFile);
+        deleteDebugFile.setOnClickListener(v -> {
+            DATB.deleteDirectory(MainActivity.this);
+           // DATB.createDirectory(MainActivity.this);
 
-            PreferenceUtil preferenceUtil = PreferenceUtil.getInstance(MainActivity.this);
-            String token = preferenceUtil.getStringData(AppConstant.FCM_DEVICE_TOKEN);
-            if (token != null && !token.isEmpty()) {
-                sendEmail(token);
-            }
+//            PreferenceUtil preferenceUtil = PreferenceUtil.getInstance(MainActivity.this);
+//            String token = preferenceUtil.getStringData(AppConstant.FCM_DEVICE_TOKEN);
+//            if (token != null && !token.isEmpty()) {
+//                sendEmail(token);
+//            }
 
-//            List<Payload> payloadList=DATB.getNotificationList(MainActivity.this);
-//            assert payloadList != null;
-//            if(payloadList.size()>0) {
-//               Log.e("CountData","" + payloadList.size());
-//           }
+
         });
 
-//        File file = new File(MainActivity.this.getFilesDir(), "text");
-//        if (!file.exists()) {
-//            file.mkdir();
-//        }
-//        try {
-//            File gpxfile = new File(file, "sample");
-//            FileWriter writer = new FileWriter(gpxfile);
-//            writer.append("Amit kumar Gupta");
-//            writer.flush();
-//            writer.close();
-//            Log.e("SuccessFull1","SuccessFull");
-//            Toast.makeText(MainActivity.this, "Saved your text", Toast.LENGTH_LONG).show();
-//        } catch (Exception e) {
-//            Log.e("SuccessFull2","SuccessFull"+e.toString());
-//
-//        }
-        try {
-            JSONObject jsonObject=new JSONObject();
-            jsonObject.put("FCMTOKEN","tokenData");
-            jsonObject.put("AndroidID","bckfgsdsdsdsdsdsdsds");
-            jsonObject.put("SDKVERSION","1.1.6");
-            jsonObject.put("AppVersion","2.0.5");
-            jsonObject.put("ADID","ADID");
+        // below line is setting toolbar color
+        // for our custom chrome tab.
+        //customIntent.setToolbarColor(ContextCompat.getColor(MainActivity.this, R.color.colorAccent));
 
-        }
-        catch (Exception ex)
-        {
+        // we are calling below method after
+        // setting our toolbar color.
+      //  openCustomTab(MainActivity.this, customIntent.build(), Uri.parse(url));
+      Button   permissionFIle =findViewById(R.id.permissionFIle);
+      permissionFIle.setOnClickListener(new View.OnClickListener() {
+          @Override
+          public void onClick(View view) {
+              requestPermission();
+          }
+      });
 
-        }
-
-//        File dir = new File(Environment.getExternalStorageDirectory().getPath() + "/folderDir/");
-//        Log.e("Filepath is",Environment.getExternalStorageDirectory().getPath());
-//        dir.mkdirs();
-
-        try
-        {
-           // File myDir = MainActivity.this.getFilesDir();
-          //  Log.e("File1",myDir.toString());
-            // Documents Path
-//            File mediaStorageDir = new File(Environment.getExternalStorageDirectory(), "documents");
-//
-//            String documents = "documents/data";
-//            File documentsFolder = new File(mediaStorageDir, documents);
-//            documentsFolder.mkdirs(); // this line creates data folder at documents directory
-//
-//            String publicC = "documents/public/com.izooto";
-//            File publicFolder = new File(mediaStorageDir, publicC);
-//            publicFolder.mkdirs();
-          //  String path = Environment.getExternalStoragePublicDirectory().getAbsolutePath().toString() + "/storage/emulated/0/appFolder";
-
-           // File mFolder = new File(path);
-//            if (!mFolder.exists()) {
-//                mFolder.mkdir();
-//            }
-//            File directory = new File(Environment.getExternalStorageDirectory(),"/momagic");
-//            if(!directory.exists())
-//            {
-//                Log.e("File ","Directory does not exits");
-//
-//            }
-//            else
-//            {
-//                Log.e("File ","Directory  exits");
-//
-//            }
-//            String root_sd = Environment.getExternalStorageDirectory().toString();
-//            Log.e("RootSD",root_sd);
-//
-////            File f = new File(path);//converted string object to file
-////            String[] values = f.list();
-////            for(int i=0;i<values.length;i++)
-////            {
-////                Log.e("FileName",values[i]);
-////            }
-//            File docs = new File(Environment.getExternalStoragePublicDirectory(
-//                    Environment.DIRECTORY_DOWNLOADS), "YourAppDirectory");
-//// Make the directory if it does not yet exist
-//            docs.mkdirs();
-         //   createExternalStoragePublic();
-        }
-        catch (Exception ex)
-        {
-            Log.e("AppTag",ex.toString());
-        }
 
     }
-    @RequiresApi(api = Build.VERSION_CODES.KITKAT)
-    void createExternalStoragePublic() {
+    private void requestPermission() {
+        if (android.os.Build.VERSION.SDK_INT>= Build.VERSION_CODES.R) {
+            Log.e("Android11","Permission");
+            try {
+                Intent intent = null;
+                if (android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.R) {
+                    intent = new Intent(Settings.ACTION_MANAGE_APP_ALL_FILES_ACCESS_PERMISSION);
+                    intent.addCategory("android.intent.category.DEFAULT");
+                    intent.setData(Uri.parse(String.format("package:%s",getApplicationContext().getPackageName())));
+                    startActivityForResult(intent, 2296);
+                }
 
+            } catch (Exception e) {
+                Intent intent = new Intent();
+                intent.setAction(Settings.ACTION_MANAGE_ALL_FILES_ACCESS_PERMISSION);
+                startActivityForResult(intent, 2296);
+            }
+        } else {
+            Log.e("Android11 below","Permission");
 
-        try {
-            File outputDirectory = GetPhotoDirectory(Environment.DIRECTORY_NOTIFICATIONS, "com.momagictest");
-            GenerateTimeStampPhotoFileUri(outputDirectory,"pid.txt");
-
-        } catch (Exception e) {
-            // Unable to create file, likely because external storage is
-            // not currently mounted.
-            Log.w("ExternalStorage", "Error writing " , e);
+            askForPermission(android.Manifest.permission.WRITE_EXTERNAL_STORAGE,WRITE_EXST);
+            askForReadPermission(Manifest.permission.READ_EXTERNAL_STORAGE,READ_EXST);
         }
     }
-    public  void  GenerateTimeStampPhotoFileUri(File outputDirectory, String fileName){
-
-        if(outputDirectory!=null) {
-            File file = new File(outputDirectory, fileName);
-
-        try {
-            JSONObject jsonObject=new JSONObject();
-            jsonObject.put("FCMTOKEN","FCMTOKEN");
-            jsonObject.put("BKEY","androidID");
-            jsonObject.put("PID","500");
-            jsonObject.put("ADID","ADID");
-            FileWriter writer = new FileWriter(file);
-            writer.append(jsonObject.toString());
-            writer.flush();
-            writer.close();
-            Log.e("SuccessFull1","SuccessFull");
-            Toast.makeText(MainActivity.this, "Saved your text", Toast.LENGTH_LONG).show();
-        } catch (Exception e) {
-            Log.e("SuccessFull2","SuccessFull"+e.toString());
-
-        }
-        }
-    }
-    public static File GetPhotoDirectory(String inWhichFolder, String yourFolderName ) {
-        File outputDirectory = null;
-
-        String externalStorageState = Environment.getExternalStorageState();
-        if (externalStorageState.equals(Environment.MEDIA_MOUNTED)) {
-
-            File pictureDirectory = Environment.getExternalStoragePublicDirectory(inWhichFolder);
-
-            outputDirectory = new File(pictureDirectory, yourFolderName);
-            if (!outputDirectory.exists()) {
-                if (!outputDirectory.mkdirs()) {
-                    Log.e("LogTag", "Failed to create directory: " + outputDirectory.getAbsolutePath());
-                    outputDirectory = null;
+    @RequiresApi(api = Build.VERSION_CODES.R)
+    @Override
+    protected void onActivityResult(int requestCode, int resultCode, @Nullable Intent data) {
+        super.onActivityResult(requestCode, resultCode, data);
+        if (requestCode == 2296) {
+            if (30 >= Build.VERSION_CODES.R) {
+                if (Environment.isExternalStorageManager()) {
+                    // perform action when allow permission success
+                } else {
+                    Toast.makeText(this, "Allow permission for storage access!", Toast.LENGTH_SHORT).show();
                 }
             }
         }
-        return outputDirectory;
+    }
+    private void askForPermission(String permission, Integer requestCode) {
+        if (ContextCompat.checkSelfPermission(MainActivity.this, permission) != PackageManager.PERMISSION_GRANTED) {
+
+            // Should we show an explanation?
+            if (ActivityCompat.shouldShowRequestPermissionRationale(MainActivity.this, permission)) {
+
+                //This is called if user has denied the permission before
+                //In this case I am just asking the permission again
+                ActivityCompat.requestPermissions(MainActivity.this, new String[]{permission}, requestCode);
+
+            } else {
+
+                ActivityCompat.requestPermissions(MainActivity.this, new String[]{permission}, requestCode);
+            }
+        } else {
+            //  Toast.makeText(this, "" + permission + " is already granted.", Toast.LENGTH_SHORT).show();
+        }
     }
 
 
@@ -255,6 +188,24 @@ public class MainActivity extends AppCompatActivity {
         return super.onOptionsItemSelected(item);
     }
 
+    private void askForReadPermission(String permission, Integer requestCode) {
+        if (ContextCompat.checkSelfPermission(MainActivity.this, permission) != PackageManager.PERMISSION_GRANTED) {
+
+            // Should we show an explanation?
+            if (ActivityCompat.shouldShowRequestPermissionRationale(MainActivity.this, permission)) {
+
+                //This is called if user has denied the permission before
+                //In this case I am just asking the permission again
+                ActivityCompat.requestPermissions(MainActivity.this, new String[]{permission}, requestCode);
+
+            } else {
+
+                ActivityCompat.requestPermissions(MainActivity.this, new String[]{permission}, requestCode);
+            }
+        } else {
+            //  Toast.makeText(this, "" + permission + " is already granted.", Toast.LENGTH_SHORT).show();
+        }
+    }
 
   
 

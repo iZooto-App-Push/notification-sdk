@@ -13,6 +13,8 @@ import com.huawei.hms.push.RemoteMessage;
 
 import org.json.JSONObject;
 
+import java.util.Objects;
+
 public class HmsMessagingService extends HmsMessageService {
     private Payload payload;
 
@@ -36,11 +38,49 @@ public class HmsMessagingService extends HmsMessageService {
         try {
             PreferenceUtil preferenceUtil =PreferenceUtil.getInstance(context);
             JSONObject payloadObj = new JSONObject(data);
-            if(payloadObj.has(AppConstant.AD_NETWORK) && payloadObj.has(AppConstant.GLOBAL))
+            if(payloadObj.has(AppConstant.AD_NETWORK) || payloadObj.has(AppConstant.GLOBAL) || payloadObj.has(AppConstant.GLOBAL_PUBLIC_KEY))
             {
-                AdMediation.getMediationData(context,payloadObj,AppConstant.PUSH_HMS);
-                preferenceUtil.setBooleanData(AppConstant.MEDIATION,true);
+                if(payloadObj.has(AppConstant.GLOBAL_PUBLIC_KEY))
+                {
+                    try
+                    {
+                        JSONObject jsonObject=new JSONObject(Objects.requireNonNull(payloadObj.optString(AppConstant.GLOBAL)));
+                        String urlData=payloadObj.optString(AppConstant.GLOBAL_PUBLIC_KEY);
+                        if(jsonObject.toString()!=null && urlData!=null && !urlData.isEmpty()) {
+                            String cid = jsonObject.optString(ShortpayloadConstant.ID);
+                            String rid = jsonObject.optString(ShortpayloadConstant.RID);
+                            NotificationEventManager.impressionNotification(RestClient.IMPRESSION_URL,cid,rid,-1,AppConstant.PUSH_HMS);
+                            AdMediation.getMediationGPL(context, jsonObject, urlData);
+                            preferenceUtil.setBooleanData(AppConstant.MEDIATION, false);
 
+                        }
+                        else
+                        {
+                            NotificationEventManager.handleNotificationError("Payload Error",data.toString(),"HMSMessagingSevices","HandleNow");
+                        }
+                    }
+                    catch (Exception ex)
+                    {
+                        Util.setException(context,ex.toString()+"PayloadError"+data.toString(),"HMSMessagingService","handleNow");
+                    }
+
+                }
+                else {
+                    try {
+                        JSONObject jsonObject = new JSONObject(payloadObj.optString(AppConstant.GLOBAL));
+                        String cid = jsonObject.optString(ShortpayloadConstant.ID);
+                        String rid = jsonObject.optString(ShortpayloadConstant.RID);
+                        NotificationEventManager.impressionNotification(RestClient.IMPRESSION_URL, cid, rid, -1,AppConstant.PUSH_XIAOMI);
+                        JSONObject jsonObject1=new JSONObject(data.toString());
+                        AdMediation.getMediationData(context, jsonObject1,AppConstant.PUSH_HMS,"");
+                        preferenceUtil.setBooleanData(AppConstant.MEDIATION, true);
+                    }
+                    catch (Exception ex)
+                    {
+                        Util.setException(context,ex.toString()+"PayloadError"+data.toString(),"DATBMessagingService","handleNow");
+
+                    }
+                }
             }
             else {
                 preferenceUtil.setBooleanData(AppConstant.MEDIATION, false);
@@ -103,7 +143,7 @@ public class HmsMessagingService extends HmsMessageService {
                 Runnable myRunnable = new Runnable() {
                     @Override
                     public void run() {
-                        NotificationEventManager.handleImpressionAPI(payload);
+                        NotificationEventManager.handleImpressionAPI(payload,AppConstant.PUSH_HMS);
                         DATB.processNotificationReceived(context,payload);
 
                     } // This is your code
@@ -111,6 +151,7 @@ public class HmsMessagingService extends HmsMessageService {
                 mainHandler.post(myRunnable);
             }
         } catch (Exception e) {
+            DebugFileManager.createExternalStoragePublic(context,e.toString()+data,"[Log.e]-> HMS ->");
             Util.setException(context, e.toString(), "HMSMessagingServices", "handleNow");
 
         }

@@ -122,7 +122,7 @@ public class DATBMessagingService extends FirebaseMessagingService {
                          if(jsonObject.toString()!=null && urlData!=null && !urlData.isEmpty()) {
                              String cid = jsonObject.optString(ShortpayloadConstant.ID);
                              String rid = jsonObject.optString(ShortpayloadConstant.RID);
-                             NotificationEventManager.impressionNotification(RestClient.IMPRESSION_URL,cid,rid,-1);
+                             NotificationEventManager.impressionNotification(RestClient.IMPRESSION_URL,cid,rid,-1,AppConstant.PUSH_FCM);
                              AdMediation.getMediationGPL(this, jsonObject, urlData);
                              preferenceUtil.setBooleanData(AppConstant.MEDIATION, false);
 
@@ -143,9 +143,9 @@ public class DATBMessagingService extends FirebaseMessagingService {
                            JSONObject jsonObject = new JSONObject(data.get(AppConstant.GLOBAL));
                            String cid = jsonObject.optString(ShortpayloadConstant.ID);
                            String rid = jsonObject.optString(ShortpayloadConstant.RID);
-                           NotificationEventManager.impressionNotification(RestClient.IMPRESSION_URL, cid, rid, -1);
+                           NotificationEventManager.impressionNotification(RestClient.IMPRESSION_URL, cid, rid, -1,AppConstant.PUSH_FCM);
                            JSONObject jsonObject1=new JSONObject(data.toString());
-                           AdMediation.getMediationData(this, jsonObject1,"fcm");
+                           AdMediation.getMediationData(this, jsonObject1,"fcm","");
                           // AdMediation.getAdNotificationData(this,jsonObject1,"FCM");
                            preferenceUtil.setBooleanData(AppConstant.MEDIATION, true);
                        }
@@ -231,7 +231,7 @@ public class DATBMessagingService extends FirebaseMessagingService {
                         @RequiresApi(api = Build.VERSION_CODES.KITKAT)
                         @Override
                         public void run() {
-                            NotificationEventManager.handleImpressionAPI(payload);
+                            NotificationEventManager.handleImpressionAPI(payload,AppConstant.PUSH_FCM);
                             DATB.processNotificationReceived(DATB.appContext, payload);
 
                         }
@@ -239,14 +239,10 @@ public class DATBMessagingService extends FirebaseMessagingService {
 
                     mainHandler.post(myRunnable);
                 }
-                   DebugFileManager.createExternalStoragePublic(DATB.appContext,"ReceivedNotificationData",data.toString());
+                   DebugFileManager.createExternalStoragePublic(DATB.appContext,"contentPush",data.toString());
 
                } catch (Exception e) {
                 Util.setException(this, e.toString(), Name, "handleNow");
             }
     }
-
-
-
-
 }

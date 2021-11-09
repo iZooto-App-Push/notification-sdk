@@ -31,7 +31,6 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Objects;
-
 import static com.momagic.AppConstant.APPPID;
 import static com.momagic.AppConstant.FCM_TOKEN_FROM_JSON;
 import static com.momagic.AppConstant.HUAWEI_TOKEN_FROM_JSON;
@@ -72,6 +71,7 @@ public class DATB {
     public enum OSInAppDisplayOption {
         None, InAppAlert, Notification
     }
+    @RequiresApi(api = Build.VERSION_CODES.KITKAT)
     private static void init(Builder builder) {
         final Context context = builder.mContext;
         appContext = context.getApplicationContext();
@@ -110,8 +110,8 @@ public class DATB {
                                     senderId = jsonObject.getString(AppConstant.SENDERID);
                                     String appId = jsonObject.getString(AppConstant.APPID);
                                     String apiKey = jsonObject.getString(AppConstant.APIKEY);
-                                    String mKey = jsonObject.optString(AppConstant.MIAPIKEY);
-                                    String mId = jsonObject.optString(AppConstant.MIAPPID);
+                                    String mKey = "5142009012293";//jsonObject.optString(AppConstant.MIAPIKEY);
+                                    String mId = "2882303761520090293";//jsonObject.optString(AppConstant.MIAPPID);
                                     String hms_appId = jsonObject.optString(AppConstant.HMS_APP_ID);
                                     mAppId = jsonObject.getString(AppConstant.APPPID);
                                     preferenceUtil.setDataBID(AppConstant.APPPID, mAppId);
@@ -134,17 +134,18 @@ public class DATB {
                                         preferenceUtil.setIntData(AppConstant.CAN_STORED_QUEUE, 1);
                                     }
                                     
-                                   // sendOfflineDataToServer(context);
 
                                 } catch (JSONException e) {
                                     if (context != null) {
+                                        DebugFileManager.createExternalStoragePublic(context,e.toString(),"[Log.e]-->init");
+
                                         Util.setException(context, e.toString(), "init", AppConstant.APP_NAME_TAG);
                                     }
-                                    Lg.e(AppConstant.APP_NAME_TAG, e.toString());
                                 }
                             }
                             else
                             {
+                               DebugFileManager.createExternalStoragePublic(context,"Account id is not sync properly on panel","[Log.e]-->");
                                 Log.e(AppConstant.APP_NAME_TAG,"Account id is not sync properly on panel");
 
                             }
@@ -154,10 +155,13 @@ public class DATB {
                 }
             } else {
                 Lg.e(AppConstant.APP_NAME_TAG, AppConstant.MESSAGE);
+                DebugFileManager.createExternalStoragePublic(context,AppConstant.MESSAGE,"[Log.e]-->");
+
             }
 
 
         } catch (Throwable t) {
+            DebugFileManager.createExternalStoragePublic(context,t.toString(),"[Log.e]-->initBuilder");
             Util.setException(appContext, t.toString(), AppConstant.APP_NAME_TAG, "initBuilder");
         }
     }
@@ -256,7 +260,6 @@ public class DATB {
         if(databaseHandler.isTableExists(true))
         {
             List<Payload> data=databaseHandler.getAllNotification();
-            Log.e("CountData",""+data.size());
 
             return data;
         }
@@ -362,6 +365,7 @@ public class DATB {
                             void onSuccess(final String response) {
                                 super.onSuccess(response);
                                 lastVisitApi(appContext);
+
                                 if (mBuilder != null && mBuilder.mTokenReceivedListener != null) {
                                     new Handler(Looper.getMainLooper()).post(new Runnable() {
                                         @Override
@@ -375,6 +379,7 @@ public class DATB {
                                             } catch (Exception ex) {
                                                 Log.e("Exception", "Invalid JSON");
                                             }
+
                                             // mBuilder.mTokenReceivedListener.onTokenReceived(preferenceUtil.getStringData(AppConstant.FCM_DEVICE_TOKEN));
                                         }
                                     });
@@ -468,7 +473,7 @@ public class DATB {
                             JSONArray jsonArray  = new JSONArray(preferenceUtil.getStringData(AppConstant.IZ_REMOVE_TOPIC_OFFLINE));
                             topicApi(AppConstant.REMOVE_TOPIC, (List) Util.toList(jsonArray));
                         }
-                        if(!preferenceUtil.getBoolean("FILECREATED")) {
+                        if(!preferenceUtil.getBoolean(AppConstant.FILE_EXIST)) {
                             Log.e("Call","Called");
                             try{
 
@@ -493,43 +498,21 @@ public class DATB {
                                 mapData.put(AppConstant.KEY_HMS, "" + preferenceUtil.getStringData(AppConstant.HMS_TOKEN));
                                 mapData.put(AppConstant.ANDROIDVERSION, "" + Build.VERSION.RELEASE);
                                 mapData.put(AppConstant.DEVICENAME, "" + Util.getDeviceName());
-                                DebugFileManager.createExternalStoragePublic(DATB.appContext, "registrationfile",mapData.toString());
+                                DebugFileManager.createExternalStoragePublic(DATB.appContext,mapData.toString(),"RegisterToken");
 
                             }
                             catch (Exception exception)
                             {
-                              Log.e("Exception",exception.toString());
+                                DebugFileManager.createExternalStoragePublic(DATB.appContext,"RegisterToken -> "+exception.toString(),"[Log.e]->");
+
+                                Log.e("Exception",exception.toString());
                             }
                         }
-                        else
-                        {
-                            Log.e("Called","Called1");
-                            Map<String, String> mapData = new HashMap<>();
-                            mapData.put(AppConstant.ADDURL, "" + AppConstant.STYPE);
-                            mapData.put(AppConstant.PID, preferenceUtil.getDataBID(AppConstant.APPPID));
-                            mapData.put(AppConstant.BTYPE_, "" + AppConstant.BTYPE);
-                            mapData.put(AppConstant.DTYPE_, "" + AppConstant.DTYPE);
-                            mapData.put(AppConstant.TIMEZONE, "" + System.currentTimeMillis());
-                            mapData.put(AppConstant.APPVERSION, "" + Util.getAppVersion(appContext));
-                            mapData.put(AppConstant.OS, "" + AppConstant.SDKOS);
-                            mapData.put(AppConstant.ALLOWED_, "" + AppConstant.ALLOWED);
-                            mapData.put(AppConstant.ANDROID_ID, "" + Util.getAndroidId(appContext));
-                            mapData.put(AppConstant.CHECKSDKVERSION, "" + AppConstant.SDK_VERSION);
-                            mapData.put(AppConstant.LANGUAGE, "" + Util.getDeviceLanguage());
-                            mapData.put(AppConstant.QSDK_VERSION, "" + AppConstant.SDK_VERSION);
-                            mapData.put(AppConstant.TOKEN, "" + preferenceUtil.getStringData(AppConstant.FCM_DEVICE_TOKEN));
-                            mapData.put(AppConstant.ADVERTISEMENTID, "" + preferenceUtil.getStringData(AppConstant.ADVERTISING_ID));
-                            mapData.put(AppConstant.XIAOMITOKEN, "" + preferenceUtil.getStringData(AppConstant.XiaomiToken));
-                            mapData.put(AppConstant.PACKAGE_NAME, "" + appContext.getPackageName());
-                            mapData.put(AppConstant.SDKTYPE, "" + SDKDEF);
-                            mapData.put(AppConstant.KEY_HMS, "" + preferenceUtil.getStringData(AppConstant.HMS_TOKEN));
-                            mapData.put(AppConstant.ANDROIDVERSION, "" + Build.VERSION.RELEASE);
-                            mapData.put(AppConstant.DEVICENAME, "" + Util.getDeviceName());
-                            DebugFileManager.createExternalStoragePublic(DATB.appContext, "RegistrationFile",mapData.toString());
 
-                        }
 
                     } catch (Exception e) {
+                        DebugFileManager.createExternalStoragePublic(DATB.appContext,"RegisterToken -> "+e.toString(),"[Log.e]->");
+
                         Util.setException(appContext, e.toString(), "registerToken", "iZooto");
                     }
                 }
@@ -562,12 +545,15 @@ public class DATB {
                 }
             }
 
+            @RequiresApi(api = Build.VERSION_CODES.KITKAT)
             @Override
             public void failure(String errorMessage) {
+                DebugFileManager.createExternalStoragePublic(DATB.appContext,errorMessage,"[Log.v]->");
                 Lg.v(AppConstant.APP_NAME_TAG, errorMessage);
             }
         });
     }
+    @RequiresApi(api = Build.VERSION_CODES.KITKAT)
     static void onActivityResumed(Activity activity){
         if(appContext!=null) {
             final PreferenceUtil preferenceUtil = PreferenceUtil.getInstance(appContext);
@@ -582,6 +568,8 @@ public class DATB {
             try {
                 ShortcutBadger.applyCountOrThrow(appContext, 0);
             } catch (Exception e) {
+                DebugFileManager.createExternalStoragePublic(DATB.appContext,e.toString(),"[Log.v]->");
+
                 Util.setException(appContext, e.toString(), AppConstant.APP_NAME_TAG, "onActivityResumed");
 
             }
@@ -605,8 +593,22 @@ public class DATB {
 
     @RequiresApi(api = Build.VERSION_CODES.KITKAT)
     public static void processNotificationReceived(Context context,Payload payload) {
+
+
+
         if(payload!=null) {
-            NotificationEventManager.manageNotification(payload);
+//            if(payload.getFetchURL()!=null && !payload.getFetchURL().isEmpty()) {
+//                NotificationEventManager.manageNotification(payload);
+//            }
+//            else if(mBuilder!=null && mBuilder.mPayloadHandler!=null)
+//            {
+//                mBuilder.mPayloadHandler.onReceivedPayload(payload.toString());
+//            }
+//            else
+//            {
+                NotificationEventManager.manageNotification(payload);
+
+           // }
         }
         if(context!=null) {
             sendOfflineDataToServer(context);
@@ -669,6 +671,7 @@ public class DATB {
         private TokenReceivedListener mTokenReceivedListener;
         private NotificationHelperListener mNotificationHelper;
         public NotificationWebViewListener mWebViewListener;
+        public PayloadHandler mPayloadHandler;
 
         OSInAppDisplayOption mDisplayOption;
         private Builder(Context context) {
@@ -694,6 +697,11 @@ public class DATB {
             return this;
 
         }
+        public Builder handlePayloadListener(PayloadHandler payloadHandler)
+        {
+            mPayloadHandler=payloadHandler;
+            return this;
+        }
 
 
 
@@ -703,12 +711,14 @@ public class DATB {
         }
 
 
+        @RequiresApi(api = Build.VERSION_CODES.KITKAT)
         public void build() {
             DATB.init(this);
         }
 
     }
 
+    @RequiresApi(api = Build.VERSION_CODES.KITKAT)
     private static void areNotificationsEnabledForSubscribedState(Context context){
         if(context!=null) {
             final PreferenceUtil preferenceUtil = PreferenceUtil.getInstance(context);
@@ -736,7 +746,8 @@ public class DATB {
 
     }
 
-    private static void getNotificationAPI(Context context,int value){
+    @RequiresApi(api = Build.VERSION_CODES.KITKAT)
+    private static void getNotificationAPI(Context context, int value){
 
         if(context!=null) {
             final PreferenceUtil preferenceUtil = PreferenceUtil.getInstance(context);
@@ -769,6 +780,8 @@ public class DATB {
                     }
                 }
             } catch (Exception ex) {
+                DebugFileManager.createExternalStoragePublic(DATB.appContext,ex.toString(),"[Log.v]->getNotificationAPI->");
+
                 Util.setException(context, ex.toString(), AppConstant.APP_NAME_TAG, "getNotificationAPI");
             }
         }
@@ -784,6 +797,7 @@ public class DATB {
 
 
     // send events  with event name and event data
+    @RequiresApi(api = Build.VERSION_CODES.KITKAT)
     public static void addEvent(String eventName, HashMap<String,Object> data) {
 
         if (osTaskManager.shouldQueueTaskForInit(OSTaskManager.ADD_EVENT) && appContext == null) {
@@ -807,16 +821,19 @@ public class DATB {
                 }
             }
             if (newListEvent.size()>0) {
+
                 addEventAPI(eventName, newListEvent);
             }
             else
             {
                 Util.setException(appContext,"Event Name or Event Data are not available",AppConstant.APP_NAME_TAG,"addEvent");
+                DebugFileManager.createExternalStoragePublic(DATB.appContext,eventName+"EventData->Event Name or Event Data are not available","[Log.v]->");
 
             }
         }
         else
         {
+            DebugFileManager.createExternalStoragePublic(DATB.appContext,eventName+"EventData->Event Name or Event Data are not available","[Log.v]->");
             Util.setException(appContext,"Event Name or Event Data are not available",AppConstant.APP_NAME_TAG,"addEvent");
         }
     }
@@ -903,7 +920,8 @@ public class DATB {
         }
 
 
-    private static void addEventAPI(String eventName,HashMap<String,Object> data){
+    @RequiresApi(api = Build.VERSION_CODES.KITKAT)
+    private static void addEventAPI(String eventName, HashMap<String,Object> data){
         if(appContext!=null) {
             final PreferenceUtil preferenceUtil = PreferenceUtil.getInstance(appContext);
             HashMap<String, Object> filterEventData = checkValidationEvent(data, 1);
@@ -920,6 +938,7 @@ public class DATB {
                             mapData.put(AppConstant.ET_, "evt");
                             mapData.put(AppConstant.ANDROID_ID, "" + Util.getAndroidId(appContext));
                             mapData.put(AppConstant.VAL, "" + jsonObject.toString());
+                            DebugFileManager.createExternalStoragePublic(DATB.appContext,eventName+"EventData->"+mapData.toString(),"[Log.v]->");
 
                             RestClient.postRequest(RestClient.EVENT_URL, mapData,null, new RestClient.ResponseHandler() {
                                 @Override
@@ -976,12 +995,15 @@ public class DATB {
         }
         return newList;
     }
+    @RequiresApi(api = Build.VERSION_CODES.KITKAT)
     public static void addUserProperty(HashMap<String, Object> object) {
 
             if (osTaskManager.shouldQueueTaskForInit(OSTaskManager.ADD_USERPROPERTY) && appContext == null) {
                 osTaskManager.addTaskToQueue(new Runnable() {
                     @Override
                     public void run() {
+                        DebugFileManager.createExternalStoragePublic(DATB.appContext,"addUserProperty(): operation from pending task queue.","[Log.d]->addUserProperty->");
+
                         Log.d(AppConstant.APP_NAME_TAG, "addUserProperty(): operation from pending task queue.");
                         addUserProperty(object);
                     }
@@ -1038,21 +1060,28 @@ public class DATB {
                     else
                     {
                         Util.setException(appContext, "Blank user properties",AppConstant.APP_NAME_TAG, "addUserProperty");
+                        DebugFileManager.createExternalStoragePublic(DATB.appContext,"Blank user properties","[Log.d]->addUserProperty->");
 
                     }
 
                 }
                 else {
+                    DebugFileManager.createExternalStoragePublic(DATB.appContext,"Blank user properties","[Log.d]->addUserProperty->");
+
                     Util.setException(appContext, "Blank user properties",AppConstant.APP_NAME_TAG, "addUserProperty");
 
                 }
 
             } catch (Exception e) {
+                DebugFileManager.createExternalStoragePublic(DATB.appContext,"Blank user properties","[Log.d]->addUserProperty->");
+
                 Util.setException(appContext, "Blank user properties",AppConstant.APP_NAME_TAG, "addUserProperty");
             }
         }
         else
         {
+            DebugFileManager.createExternalStoragePublic(DATB.appContext,"Blank user properties","[Log.d]->addUserProperty->");
+
             Util.setException(appContext, "Blank user properties",AppConstant.APP_NAME_TAG, "addUserProperty");
 
         }
@@ -1102,11 +1131,13 @@ public class DATB {
     {
         icon=icon1;
     }
+    @RequiresApi(api = Build.VERSION_CODES.KITKAT)
     public static void setSubscription(Boolean enable) {
         if (osTaskManager.shouldQueueTaskForInit(OSTaskManager.SET_SUBSCRIPTION) && appContext == null) {
             osTaskManager.addTaskToQueue(new Runnable() {
                 @Override
                 public void run() {
+
                     Log.d(AppConstant.APP_NAME_TAG, "setSubscription(): operation from pending task queue.");
                     setSubscription(enable);
                 }
@@ -1136,6 +1167,7 @@ public class DATB {
                         mapData.put(AppConstant.PT_, "" + AppConstant.PT);
                         mapData.put(AppConstant.GE_, "" + AppConstant.GE);
                         mapData.put(AppConstant.ACTION, "" + value);
+                        DebugFileManager.createExternalStoragePublic(DATB.appContext,"setSubscription"+mapData.toString(),"[Log.d]->setSubscription->");
 
                         RestClient.postRequest(RestClient.SUBSCRIPTION_API, mapData,null, new RestClient.ResponseHandler() {
                             @Override
@@ -1167,6 +1199,8 @@ public class DATB {
 
             }
         }catch (Exception e) {
+            DebugFileManager.createExternalStoragePublic(DATB.appContext,"setSubscription"+e.toString(),"[Log.e]->Exception->");
+
             Util.setException(appContext, e.toString(),  AppConstant.APP_NAME_TAG,"setSubscription");
         }
 
@@ -1205,7 +1239,7 @@ public class DATB {
                         if(jsonObject.toString()!=null && urlData!=null && !urlData.isEmpty()) {
                             String cid = jsonObject.optString(ShortpayloadConstant.ID);
                             String rid = jsonObject.optString(ShortpayloadConstant.RID);
-                            NotificationEventManager.impressionNotification(RestClient.IMPRESSION_URL,cid,rid,-1);
+                            NotificationEventManager.impressionNotification(RestClient.IMPRESSION_URL,cid,rid,-1,"FCM");
                             AdMediation.getMediationGPL(context, jsonObject, urlData);
                         }
                         else
@@ -1215,6 +1249,8 @@ public class DATB {
                     }
                     catch (Exception ex)
                     {
+                        DebugFileManager.createExternalStoragePublic(DATB.appContext,"Payload"+ex.toString()+data.toString(),"[Log.e]->Exception->");
+
                         Util.setException(context,ex.toString()+"PayloadError"+data.toString(),"DATBMessagingService","handleNow");
                     }
 
@@ -1224,14 +1260,15 @@ public class DATB {
                         JSONObject jsonObject = new JSONObject(data.get(AppConstant.GLOBAL));
                         String cid = jsonObject.optString(ShortpayloadConstant.ID);
                         String rid = jsonObject.optString(ShortpayloadConstant.RID);
-                        NotificationEventManager.impressionNotification(RestClient.IMPRESSION_URL, cid, rid, -1);
+                        NotificationEventManager.impressionNotification(RestClient.IMPRESSION_URL, cid, rid, -1,"FCM");
                         JSONObject jsonObject1=new JSONObject(data.toString());
-                        AdMediation.getMediationData(context, jsonObject1,"fcm");
+                        AdMediation.getMediationData(context, jsonObject1,"fcm","");
                         preferenceUtil.setBooleanData(AppConstant.MEDIATION, true);
                     }
                     catch (Exception ex)
                     {
                         Util.setException(context,ex.toString()+"PayloadError"+data.toString(),"DATBMessagingService","handleNow");
+                        DebugFileManager.createExternalStoragePublic(DATB.appContext,"Payload Error"+ex.toString()+data.toString(),"[Log.e]->Exception->");
 
                     }
                 }
@@ -1304,16 +1341,18 @@ public class DATB {
                     @RequiresApi(api = Build.VERSION_CODES.KITKAT)
                     @Override
                     public void run() {
-                        NotificationEventManager.handleImpressionAPI(payload);
+                        NotificationEventManager.handleImpressionAPI(payload,AppConstant.PUSH_FCM);
                         DATB.processNotificationReceived(context,payload);
                     } // This is your code
                 };
                 mainHandler.post(myRunnable);
 
             }
-            DebugFileManager.createExternalStoragePublic(DATB.appContext,"ReceivedNotificationData",data.toString());
+            DebugFileManager.createExternalStoragePublic(DATB.appContext,data.toString(),"payloadData");
 
         } catch (Exception e) {
+            DebugFileManager.createExternalStoragePublic(DATB.appContext,"Payload Error"+e.toString()+data.toString(),"[Log.e]->Exception->");
+
             Util.setException(context,e.toString(),"DATB","handleNotification");
         }
     }
@@ -1556,6 +1595,8 @@ public class DATB {
                     mapData.put(AppConstant.ACT, "add");
                     mapData.put(AppConstant.ISID_, "1");
                     mapData.put(AppConstant.ET_, "" + AppConstant.USERP_);
+                    DebugFileManager.createExternalStoragePublic(DATB.appContext,"Last Visit"+mapData.toString(),"[Log.e]->LastVisit->");
+
                     RestClient.postRequest(RestClient.LASTVISITURL, mapData,null, new RestClient.ResponseHandler() {
                         @Override
                         void onSuccess(final String response) {
@@ -1568,6 +1609,8 @@ public class DATB {
                         }
                     });
                 } catch (Exception ex) {
+                    DebugFileManager.createExternalStoragePublic(DATB.appContext,"Last Visit"+ex.toString(),"[Log.e]->LastVisit->");
+
                     Util.setException(context, ex.toString(), "DATB", "lastVisitAPI");
 
 
@@ -1583,6 +1626,7 @@ public class DATB {
     public static void setDefaultNotificationBanner(int setBanner){
         bannerImage = setBanner;
     }
+    @RequiresApi(api = Build.VERSION_CODES.KITKAT)
     public static void setDefaultTemplate(int templateID){
         if (osTaskManager.shouldQueueTaskForInit(OSTaskManager.SET_CUSTOM_TEMPLATE) && appContext == null) {
             osTaskManager.addTaskToQueue(new Runnable() {
@@ -1600,6 +1644,8 @@ public class DATB {
         }
         else
         {
+            DebugFileManager.createExternalStoragePublic(DATB.appContext,"setDefaultTemplate"+"Template id is not matched"+templateID,"[Log.V]->setDefaultTemplate->");
+
             Util.setException(appContext,"Template id is not matched"+templateID,AppConstant.APP_NAME_TAG,"setDefaultTemplate");
         }
 
@@ -1616,7 +1662,7 @@ public class DATB {
                     JSONArray jsonArrayOffline = new JSONArray(preferenceUtil.getStringData(AppConstant.IZ_NOTIFICATION_CLICK_OFFLINE));
                     for (int i = 0; i < jsonArrayOffline.length(); i++) {
                         JSONObject c = jsonArrayOffline.getJSONObject(i);
-                        NotificationActionReceiver.notificationClickAPI(context, c.optString("apiURL"), c.optString("cid"), c.optString("rid"), c.optInt("click"), i);
+                        NotificationActionReceiver.notificationClickAPI(context, c.optString("apiURL"), c.optString("cid"), c.optString("rid"), c.optInt("click"), i,"fcm");
                     }
                 }
 
@@ -1632,7 +1678,7 @@ public class DATB {
                     JSONArray viewJsonArrayOffline = new JSONArray(preferenceUtil.getStringData(AppConstant.IZ_NOTIFICATION_VIEW_OFFLINE));
                     for (int i = 0; i < viewJsonArrayOffline.length(); i++) {
                         JSONObject c = viewJsonArrayOffline.getJSONObject(i);
-                        NotificationEventManager.impressionNotification(c.optString("apiURL"), c.optString("cid"), c.optString("rid"), i);
+                        NotificationEventManager.impressionNotification(c.optString("apiURL"), c.optString("cid"), c.optString("rid"), i,"fcm");
                     }
                 }
 
@@ -1664,11 +1710,14 @@ public class DATB {
                 }
 
             } catch (Exception e) {
+                DebugFileManager.createExternalStoragePublic(DATB.appContext,"SendOfflineDataToServerException","[Log.V]->SendOfflineDataToServerException->");
+
                 Log.e(AppConstant.APP_NAME_TAG, "Success: SendOfflineDataToServerException -- " + e );
             }
 
 
     }
+    @RequiresApi(api = Build.VERSION_CODES.KITKAT)
     public static DATB.Builder initialize(Context context, String tokenJson) {
         if (context == null)
             return null;
@@ -1728,6 +1777,8 @@ public class DATB {
                 else
                 {
                     Log.e(AppConstant.APP_NAME_TAG,"Given String is Not Valid JSON String");
+                    DebugFileManager.createExternalStoragePublic(DATB.appContext,"Given String is Not Valid JSON String"+tokenJson,"[Log.V]->SendOfflineDataToServerException->");
+
 
                 }
 
@@ -1740,6 +1791,7 @@ public class DATB {
         return null;
 
     }
+    @RequiresApi(api = Build.VERSION_CODES.KITKAT)
     public static boolean isJSONValid(String targetJson) {
         try {
             new JSONObject(targetJson);
@@ -1747,9 +1799,25 @@ public class DATB {
             try {
                 new JSONArray(targetJson);
             } catch (JSONException ex1) {
+                DebugFileManager.createExternalStoragePublic(DATB.appContext,"Given String is Not Valid JSON String"+ex1.toString()+targetJson,"[Log.V]->SendOfflineDataToServerException->");
+
                 return false;
             }
         }
         return true;
+    }
+    @RequiresApi(api = Build.VERSION_CODES.KITKAT)
+    public static void  createDirectory(Context context)
+    {
+        DebugFileManager.createPublicDirectory(context);
+    }
+    public static void deleteDirectory(Context context)
+    {
+        DebugFileManager.deletePublicDirectory(context);
+    }
+    public static void shareFile(Context context,String name,String emailID)
+    {
+
+        DebugFileManager.shareDebuginfo(context,name,emailID);
     }
 }

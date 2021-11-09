@@ -6,11 +6,14 @@ import android.content.Context;
 import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
 import android.database.sqlite.SQLiteOpenHelper;
+import android.os.Build;
 import android.util.Log;
 
 import androidx.annotation.Nullable;
+import androidx.annotation.RequiresApi;
 
 import com.momagic.AppConstant;
+import com.momagic.DATB;
 import com.momagic.Payload;
 import com.momagic.PreferenceUtil;
 import com.momagic.Util;
@@ -135,6 +138,7 @@ public class DatabaseHandler extends SQLiteOpenHelper {
         sqLiteDatabase.execSQL("DROP TABLE IF EXISTS " + TABLE_NAME);
         onCreate(sqLiteDatabase);
     }
+   @RequiresApi(api = Build.VERSION_CODES.KITKAT)
    public void addNotificationInDB(Payload payload) {
         if(payload!=null) {
             SQLiteDatabase db = this.getWritableDatabase();
@@ -248,6 +252,8 @@ public class DatabaseHandler extends SQLiteOpenHelper {
         }
         catch (Exception ex)
         {
+            Util.setException(context,ex.toString(),"DatabaseHandler","getNotificationFromDB");
+
             return null;
         }
     }
@@ -261,7 +267,7 @@ public class DatabaseHandler extends SQLiteOpenHelper {
         }
         catch (Exception ex)
         {
-            Log.e("Exception ",ex.toString());
+            Util.setException(context,ex.toString(),"DatabaseHandler","deleteNotificationFromDB");
         }
     }
     public int getNotificationCount() {
@@ -278,6 +284,8 @@ public class DatabaseHandler extends SQLiteOpenHelper {
         }
         catch (Exception ex)
         {
+            Util.setException(context,ex.toString(),"DatabaseHandler","getNotificationCount");
+
             return 0;
         }
     }
@@ -344,6 +352,8 @@ public class DatabaseHandler extends SQLiteOpenHelper {
         }
         catch (Exception ex)
         {
+            Util.setException(context,ex.toString(),"DatabaseHandler","getAllNotification");
+
             return null;
         }
 
@@ -397,8 +407,7 @@ public class DatabaseHandler extends SQLiteOpenHelper {
         }
         catch(Exception errorException)
         {
-
-            Log.d("Exception occured", "Exception occured "+errorException);
+            Util.setException(context,errorException.toString(),"DatabaseHandler","checkIfRecordExist");
         }
         return false;
     }
@@ -412,7 +421,7 @@ public class DatabaseHandler extends SQLiteOpenHelper {
         }
         catch (Exception ex)
         {
-            Log.e("Exception ",ex.toString());
+            Util.setException(context,ex.toString(),"DatabaseHandler","deleteRow");
         }
     }
 }

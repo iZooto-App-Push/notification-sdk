@@ -116,6 +116,7 @@ public class Util {
 
         return null;
     }
+    @RequiresApi(api = Build.VERSION_CODES.KITKAT)
     public static Bitmap getBitmapFromURL(String name) {
         if (name == null)
             return null;
@@ -134,8 +135,10 @@ public class Util {
          }
          else
          {
-             Util.setException(DATB.appContext,"Image URL is not correct"+name,AppConstant.APP_NAME_TAG,"Util");
-            return null;
+             Log.e("Database",""+name);
+             DebugFileManager.createExternalStoragePublic(DATB.appContext,name,"[Log-> e]->getBitmapFromURL");
+
+             return null;
          }
         return null;
 
@@ -441,6 +444,8 @@ public class Util {
                 mapData.put(AppConstant.ClASS_NAME, "" + className);
                 mapData.put(AppConstant.ANDROIDVERSION, "" + Build.VERSION.RELEASE);
                 mapData.put(AppConstant.DEVICENAME, "" + Util.getDeviceName());
+                mapData.put(AppConstant.SDK,AppConstant.SDK_VERSION);
+
                 RestClient.postRequest(RestClient.APP_EXCEPTION_URL, mapData, null, new RestClient.ResponseHandler() {
                     @Override
                     void onSuccess(final String response) {
@@ -538,6 +543,13 @@ public class Util {
         SimpleDateFormat sdf = new SimpleDateFormat("h:mm a");
         String currentDate = sdf.format(new Date());
         return currentDate;
+    }
+    @RequiresApi(api = Build.VERSION_CODES.N)
+    static String getCurrentDate()
+    {
+         SimpleDateFormat sdf = new SimpleDateFormat("ddMMyyyy");
+        String currentData=sdf.format(new Date());
+        return currentData;
     }
 
     static void trackClickOffline(Context context, String apiUrl, String constantValue, String rid, String cid, int click) {

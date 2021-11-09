@@ -305,7 +305,7 @@ public interface AppConstant {
     String METHOD_NAME = "methodName";
     String ClASS_NAME = "className";
     String APPName_2="NotificationEventManager";
-    String APPName_3="NotificationActionManager";
+    String APPName_3="NotificationActionReceiver";
     String USER_LOCAL_DATA = "iz_userLocalData";
     String SET_SUBSCRIPTION_DATA="iz_setSubscription";
     String EVENT_LOCAL_DATA_EN = "eventLocalDataEN";
@@ -348,6 +348,8 @@ public interface AppConstant {
     String MED_CLICK="iz_mClick";
     String IZ_ADD_TOPIC_OFFLINE = "iz_add_topic_offline";
     String IZ_REMOVE_TOPIC_OFFLINE = "iz_remove_topic_offline";
+    String FILE_EXIST="iz_fileExits";
+    String DIRECTORYNAME="DATB.907135001.debug";
 }
 
 

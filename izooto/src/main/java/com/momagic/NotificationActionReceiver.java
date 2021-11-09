@@ -1,6 +1,11 @@
 package com.momagic;
 
+import static android.content.Intent.CATEGORY_BROWSABLE;
+import static android.content.Intent.FLAG_ACTIVITY_REQUIRE_DEFAULT;
+import static android.content.Intent.FLAG_ACTIVITY_REQUIRE_NON_BROWSER;
+
 import android.annotation.SuppressLint;
+import android.app.Activity;
 import android.app.NotificationManager;
 import android.content.BroadcastReceiver;
 import android.content.Context;
@@ -60,7 +65,7 @@ public class NotificationActionReceiver extends BroadcastReceiver {
                     } else {
                         clkURL = RestClient.NOTIFICATIONCLICK;
                     }
-                    notificationClickAPI(context, clkURL, cid, rid, btnCount, -1);
+                    notificationClickAPI(context, clkURL, cid, rid, btnCount, -1,pushType);
 
 
                     String lastEighthIndex = "0";
@@ -126,7 +131,7 @@ public class NotificationActionReceiver extends BroadcastReceiver {
             }
 
 
-            if (additionalData.equalsIgnoreCase("")) {
+            if (additionalData.equalsIgnoreCase("") && additionalData.isEmpty()) {
                 additionalData = "1";
             }
 
@@ -155,21 +160,26 @@ public class NotificationActionReceiver extends BroadcastReceiver {
                     try {
                         if (phoneNumber.equalsIgnoreCase(AppConstant.NO)) {
                             if(mUrl!=null && !mUrl.isEmpty()) {
-                                if (!mUrl.startsWith("http://") && !mUrl.startsWith("https://")) {
-                                    String  url = "https://" + mUrl;
-                                    Intent browserIntent = new Intent(Intent.ACTION_VIEW, Uri.parse(url));
-                                    browserIntent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TASK);
-                                    context.startActivity(browserIntent);
-                                }
-                                else {
-                                    Intent browserIntent = new Intent(Intent.ACTION_VIEW, Uri.parse(mUrl));
-                                    browserIntent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TASK);
-                                    context.startActivity(browserIntent);
-                                }
+
+                                    if (!mUrl.startsWith("http://") && !mUrl.startsWith("https://")) {
+                                        String url = "https://" + mUrl;
+                                        Intent browserIntent = new Intent(Intent.ACTION_VIEW, Uri.parse(url));
+                                        browserIntent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TASK);
+                                        context.startActivity(browserIntent);
+
+
+                                    } else {
+                                            Intent browserIntent = new Intent(Intent.ACTION_VIEW, Uri.parse(mUrl));
+                                            browserIntent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TASK);
+                                            context.startActivity(browserIntent);
+                                    }
+
                             }
+
                             else
                             {
-                                Util.setException(context, "URL is not defined"+mUrl, AppConstant.APPName_3, "onReceived");
+
+                                 Util.setException(context, "URL is not defined"+mUrl+"Browser is not present", AppConstant.APPName_3, "onReceived");
 
                             }
                         } else {
@@ -186,7 +196,8 @@ public class NotificationActionReceiver extends BroadcastReceiver {
         }
     }
 
-static void lastClickAPI(Context context, String lciURL, String rid, int i){
+
+    static void lastClickAPI(Context context, String lciURL, String rid, int i){
     if (context == null)
         return;
 
@@ -218,13 +229,13 @@ static void lastClickAPI(Context context, String lciURL, String rid, int i){
                         preferenceUtil.setStringData(AppConstant.IZ_NOTIFICATION_LAST_CLICK_OFFLINE, null);
                     }
                 } catch (Exception e) {
-                    Log.e(AppConstant.APP_NAME_TAG, "Success: clkURLException -- " + e );
+                    DebugFileManager.createExternalStoragePublic(DATB.appContext,"LastClick"+e.toString(),"[Log.V]->");
                 }
             }
+            @RequiresApi(api = Build.VERSION_CODES.KITKAT)
             @Override
             void onFailure(int statusCode, String response, Throwable throwable) {
                 super.onFailure(statusCode, response, throwable);
-                Log.e("Response","onFailure lciURL");
                 try {
                     if (!preferenceUtil.getStringData(AppConstant.IZ_NOTIFICATION_LAST_CLICK_OFFLINE).isEmpty()) {
                         JSONArray jsonArrayOffline = new JSONArray(preferenceUtil.getStringData(AppConstant.IZ_NOTIFICATION_LAST_CLICK_OFFLINE));
@@ -234,7 +245,8 @@ static void lastClickAPI(Context context, String lciURL, String rid, int i){
                     } else
                         Util.trackClickOffline(context, lciURL, AppConstant.IZ_NOTIFICATION_LAST_CLICK_OFFLINE, rid, "0", 0);
                 } catch (Exception e) {
-                    Log.e("Response", "onFailure  ");
+                    DebugFileManager.createExternalStoragePublic(DATB.appContext,"LastClick"+e.toString(),"[Log.V]->");
+
                 }
 
             }
@@ -244,6 +256,7 @@ static void lastClickAPI(Context context, String lciURL, String rid, int i){
     }
 
 }
+    @RequiresApi(api = Build.VERSION_CODES.KITKAT)
     private void getBundleData(Context context, Intent intent) {
         if(context!=null) {
             try {
@@ -285,8 +298,6 @@ static void lastClickAPI(Context context, String lciURL, String rid, int i){
                         pushType = tempBundle.getString(AppConstant.PUSH);
                     if (tempBundle.containsKey(AppConstant.CFGFORDOMAIN))
                         cfg = tempBundle.getInt(AppConstant.CFGFORDOMAIN);
-
-
                     if (tempBundle.containsKey(AppConstant.KEY_NOTIFICITON_ID)) {
                         NotificationManager notificationManager =
                                 (NotificationManager) context.getSystemService(Context.NOTIFICATION_SERVICE);
@@ -294,6 +305,8 @@ static void lastClickAPI(Context context, String lciURL, String rid, int i){
                     }
                 }
             } catch (Exception ex) {
+                DebugFileManager.createExternalStoragePublic(DATB.appContext,"getBundleData"+ex.toString(),"[Log.V]->");
+
                 Util.setException(context, ex.toString(), AppConstant.APPName_3, "getBundleData");
             }
         }
@@ -302,7 +315,7 @@ static void lastClickAPI(Context context, String lciURL, String rid, int i){
     static void callMediationClicks(final String medClick, int cNUmber) {
         try {
             if(!medClick.isEmpty()) {
-                DebugFileManager.createExternalStoragePublic(DATB.appContext,"MediationClick",medClick);
+                DebugFileManager.createExternalStoragePublic(DATB.appContext,medClick,"mediationClick");
                 JSONObject jsonObject = new JSONObject(medClick);
                 RestClient.postRequest(RestClient.MEDIATION_CLICKS, null,jsonObject, new RestClient.ResponseHandler() {
                     @SuppressLint("NewApi")
@@ -318,7 +331,9 @@ static void lastClickAPI(Context context, String lciURL, String rid, int i){
                             }
                             catch (Exception ex)
                             {
-                                Log.e("Exception",ex.toString());
+                                DebugFileManager.createExternalStoragePublic(DATB.appContext,"MediationCLick"+ex.toString(),"[Log.V]->");
+
+
                             }
                         }
                         else {
@@ -337,7 +352,8 @@ static void lastClickAPI(Context context, String lciURL, String rid, int i){
         }
         catch (Exception ex)
         {
-            System.out.println(ex.toString());
+            DebugFileManager.createExternalStoragePublic(DATB.appContext,"MediationCLick"+ex.toString(),"[Log.V]->");
+
         }
     }
     private static void callRandomClick(String rv) {
@@ -358,7 +374,7 @@ static void lastClickAPI(Context context, String lciURL, String rid, int i){
         }
     }
     @RequiresApi(api = Build.VERSION_CODES.KITKAT)
-    static void notificationClickAPI(Context context, String clkURL, String cid, String rid, int btnCount, int i) {
+    static void notificationClickAPI(Context context, String clkURL, String cid, String rid, int btnCount, int i,String pushType) {
         if (context == null)
             return;
 
@@ -370,11 +386,11 @@ static void lastClickAPI(Context context, String lciURL, String rid, int i){
             mapData.put(AppConstant.CID_, cid);
             mapData.put(AppConstant.ANDROID_ID,"" + Util.getAndroidId(context));
             mapData.put(AppConstant.RID_,"" + rid);
-            mapData.put(AppConstant.PUSH, AppConstant.PUSH_FCM);
+            mapData.put(AppConstant.PUSH, pushType);
             mapData.put("op","click");
             if (btnCount != 0)
                 mapData.put("btn","" + btnCount);
-            DebugFileManager.createExternalStoragePublic(DATB.appContext,"ClickAPI",mapData.toString());
+            DebugFileManager.createExternalStoragePublic(DATB.appContext,mapData.toString(),"clickData");
 
             RestClient.postRequest(clkURL, mapData,null, new RestClient.ResponseHandler() {
                 @RequiresApi(api = Build.VERSION_CODES.KITKAT)
@@ -390,7 +406,7 @@ static void lastClickAPI(Context context, String lciURL, String rid, int i){
                             preferenceUtil.setStringData(AppConstant.IZ_NOTIFICATION_CLICK_OFFLINE, null);
                         }
                     } catch (Exception e) {
-                        Log.e(AppConstant.APP_NAME_TAG, "Success: clkURLException -- " + e );
+                        Util.setException(DATB.appContext,e.toString(),AppConstant.APPName_3,"notificationClickAPI");
                     }
 
                 }
@@ -407,7 +423,7 @@ static void lastClickAPI(Context context, String lciURL, String rid, int i){
                             Util.trackClickOffline(context, clkURL, AppConstant.IZ_NOTIFICATION_CLICK_OFFLINE, rid, cid, btnCount);
                         }
                     } catch (Exception e) {
-                        Log.e("TAG", "onFailure: clkURLException"+e );
+                        Util.setException(DATB.appContext,e.toString(),AppConstant.APPName_3,"notificationClickAPI->onFailure");
                     }
                 }
             });
@@ -424,7 +440,7 @@ static void lastClickAPI(Context context, String lciURL, String rid, int i){
                         } else
                             Util.trackClickOffline(context, clkURL, AppConstant.IZ_NOTIFICATION_CLICK_OFFLINE, rid, cid, btnCount);
                     } catch (Exception e) {
-                        Log.e("TAG", "onFailure: clkURLException"+e );
+                        Util.setException(DATB.appContext,e.toString(),AppConstant.APPName_3,"notificationClickAPI");
                     }
                 }
 
@@ -440,7 +456,7 @@ static void lastClickAPI(Context context, String lciURL, String rid, int i){
 
                         }
                     } catch (Exception e) {
-                        Log.e(AppConstant.APP_NAME_TAG, "Success: clkURLException -- " + e );
+                        Util.setException(DATB.appContext,e.toString(),AppConstant.APPName_3,"notificationClickAPI");
                     }
                 }
             });
@@ -463,7 +479,6 @@ static void lastClickAPI(Context context, String lciURL, String rid, int i){
 
         }
 
-        System.out.println("json : "+jObject);
         return map;
     }
 }

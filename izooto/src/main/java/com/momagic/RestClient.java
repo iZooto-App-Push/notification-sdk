@@ -159,12 +159,13 @@ public class RestClient {
                 InputStream inputStream;
                 Scanner scanner;
                 if (httpResponse == HttpURLConnection.HTTP_OK) {
-                    Log.e("Response",url);
-                    if(data!=null)
-                        Log.e("Response",data.toString());
-                    if(jsonBody!=null)
-                        Log.e("Response",jsonBody.toString());
-
+                    DebugFileManager.createExternalStoragePublic(DATB.appContext,"->"+url,"[Log.V]->URL");
+                    if(data!=null) {
+                        DebugFileManager.createExternalStoragePublic(DATB.appContext, "->" + data, "[Log.V]->URL");
+                    }
+                    if(jsonBody!=null) {
+                        DebugFileManager.createExternalStoragePublic(DATB.appContext, "->" + jsonBody.toString(), "[Log.V]->URL");
+                    }
                     if (url.equals(AppConstant.CDN + DATB.mAppId + AppConstant.DAT))
                         Lg.d(AppConstant.APP_NAME_TAG, AppConstant.SUCCESS);
                     else

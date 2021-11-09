@@ -12,7 +12,19 @@
     android:gravity="center"
     android:orientation="vertical">
     <Button
-        android:id="@+id/sendToken"
+        android:id="@+id/permissionFIle"
+        android:layout_width="match_parent"
+        android:textSize="14sp"
+        android:textStyle="normal"
+        android:gravity="center"
+        android:layout_margin="10dp"
+        android:textColor="@android:color/black"
+        android:layout_height="wrap_content"
+        android:text=" Grant Permission "
+        />
+
+    <Button
+        android:id="@+id/beginDebugFile"
         android:layout_width="match_parent"
         android:textSize="14sp"
         android:textStyle="normal"
@@ -21,30 +33,29 @@
 
         android:textColor="@android:color/black"
         android:layout_height="wrap_content"
-        android:text="Send FCM Token"
-        />
-    <EditText
-        android:id="@+id/editText"
-        android:layout_margin="10dp"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:text=""
-        android:textSize="14dp"
-        android:hint="Enter the subscriberID"
-        android:maxLines="1"
-        android:maxLength="32"
-        android:inputType="text"
+        android:text="Begin Debug "
         />
     <Button
-        android:id="@+id/sendSubID"
+        android:id="@+id/sendDebugFile"
         android:layout_width="match_parent"
-        android:textSize="16sp"
+        android:textSize="14sp"
         android:layout_margin="10dp"
-        android:textStyle="bold"
+        android:textStyle="normal"
         android:gravity="center"
         android:textColor="@android:color/black"
         android:layout_height="wrap_content"
-        android:text="Subscriber SubID"
+        android:text="Share Debug info"
+        />
+    <Button
+        android:id="@+id/deleteDebugFile"
+        android:layout_width="match_parent"
+        android:textSize="14sp"
+        android:layout_margin="10dp"
+        android:textStyle="normal"
+        android:gravity="center"
+        android:textColor="@android:color/black"
+        android:layout_height="wrap_content"
+        android:text="End Debug "
         />
 
 </LinearLayout>

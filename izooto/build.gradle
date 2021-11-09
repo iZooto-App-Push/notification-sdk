@@ -29,9 +29,11 @@ dependencies {
     implementation platform('com.google.firebase:firebase-bom:28.4.0')
     implementation 'com.google.firebase:firebase-messaging'
     api 'androidx.legacy:legacy-support-v4:1.0.0'
-    implementation files('libs/MiPush_SDK_Client_3_8_5.jar')
+    //implementation files('libs/MiPush_SDK_Client_3_8_5.jar')
+    implementation files('libs/MiPush_SDK_Client_4_8_3.jar')
     testImplementation 'org.testng:testng:7.3.0'
     compileOnly 'com.huawei.hms:push:5.0.0.300'
+   // implementation "androidx.browser:browser:1.3.0"
 
 }
 apply from: 'maven-push.gradle'

@@ -16,7 +16,9 @@ import org.json.JSONObject;
 
 import java.net.URLEncoder;
 import java.util.HashMap;
+import java.util.Locale;
 import java.util.Map;
+import java.util.Objects;
 
 public class XiaomiPushReceiver extends PushMessageReceiver {
     private String TAG="XiaomiPushReceiver  PAYLOAD";
@@ -48,13 +50,53 @@ public class XiaomiPushReceiver extends PushMessageReceiver {
         Log.d(TAG, AppConstant.NOTIFICATIONRECEIVED);
         try {
 
-                   PreferenceUtil preferenceUtil =PreferenceUtil.getInstance(context);
-                    JSONObject payloadObj = new JSONObject(data);
-                    if(payloadObj.has(AppConstant.AD_NETWORK) && payloadObj.has(AppConstant.GLOBAL))
+            PreferenceUtil preferenceUtil =PreferenceUtil.getInstance(context);
+            JSONObject payloadObj = new JSONObject(data);
+            if(payloadObj.has(AppConstant.AD_NETWORK) || payloadObj.has(AppConstant.GLOBAL) || payloadObj.has(AppConstant.GLOBAL_PUBLIC_KEY))
+            {
+                if(payloadObj.has(AppConstant.GLOBAL_PUBLIC_KEY))
+                {
+                    try
                     {
-                       AdMediation.getMediationData(context,payloadObj,AppConstant.PUSH_XIAOMI);
-                        preferenceUtil.setBooleanData(AppConstant.MEDIATION,true);
+                        JSONObject jsonObject=new JSONObject(Objects.requireNonNull(payloadObj.optString(AppConstant.GLOBAL)));
+                        String urlData=payloadObj.optString(AppConstant.GLOBAL_PUBLIC_KEY);
+                        if(jsonObject.toString()!=null && urlData!=null && !urlData.isEmpty()) {
+                            String cid = jsonObject.optString(ShortpayloadConstant.ID);
+                            String rid = jsonObject.optString(ShortpayloadConstant.RID);
+                            NotificationEventManager.impressionNotification(RestClient.IMPRESSION_URL,cid,rid,-1,AppConstant.PUSH_XIAOMI);
+                            AdMediation.getMediationGPL(context, jsonObject, urlData);
+                            preferenceUtil.setBooleanData(AppConstant.MEDIATION, false);
+
+                        }
+                        else
+                        {
+                            NotificationEventManager.handleNotificationError("Payload Error",data.toString(),"MessagingSevices","HandleNow");
+                        }
                     }
+                    catch (Exception ex)
+                    {
+                        Util.setException(context,ex.toString()+"PayloadError"+data.toString(),"DATBMessagingService","handleNow");
+                    }
+
+                }
+                else {
+                    try {
+                        JSONObject jsonObject = new JSONObject(payloadObj.optString(AppConstant.GLOBAL));
+                        String cid = jsonObject.optString(ShortpayloadConstant.ID);
+                        String rid = jsonObject.optString(ShortpayloadConstant.RID);
+                        NotificationEventManager.impressionNotification(RestClient.IMPRESSION_URL, cid, rid, -1,AppConstant.PUSH_XIAOMI);
+                        JSONObject jsonObject1=new JSONObject(data.toString());
+                        AdMediation.getMediationData(context, jsonObject1,AppConstant.PUSH_XIAOMI,"");
+                        // AdMediation.getAdNotificationData(this,jsonObject1,"FCM");
+                        preferenceUtil.setBooleanData(AppConstant.MEDIATION, true);
+                    }
+                    catch (Exception ex)
+                    {
+                        Util.setException(context,ex.toString()+"PayloadError"+data.toString(),"DATBMessagingService","handleNow");
+
+                    }
+                }
+            }
                     else {
                         preferenceUtil.setBooleanData(AppConstant.MEDIATION,false);
                         if (payloadObj.optLong(ShortpayloadConstant.CREATEDON) > PreferenceUtil.getInstance(context).getLongValue(AppConstant.DEVICE_REGISTRATION_TIMESTAMP)) {
@@ -106,6 +148,11 @@ public class XiaomiPushReceiver extends PushMessageReceiver {
                             payload.setPush_type(AppConstant.PUSH_XIAOMI);
                             payload.setSound(payloadObj.optString(ShortpayloadConstant.NOTIFICATION_SOUND));
                             payload.setMaxNotification(payloadObj.optInt(ShortpayloadConstant.MAX_NOTIFICATION));
+                            payload.setFallBackDomain(payloadObj.optString(ShortpayloadConstant.FALL_BACK_DOMAIN));
+                            payload.setFallBackSubDomain(payloadObj.optString(ShortpayloadConstant.FALLBACK_SUB_DOMAIN));
+                            payload.setFallBackPath(payloadObj.optString(ShortpayloadConstant.FAll_BACK_PATH));
+                            payload.setDefaultNotificationPreview(payloadObj.optInt(ShortpayloadConstant.TEXTOVERLAY));
+                            payload.setNotification_bg_color(payloadObj.optString(ShortpayloadConstant.BGCOLOR));
 
                         }
                         else {
@@ -117,23 +164,19 @@ public class XiaomiPushReceiver extends PushMessageReceiver {
                         Runnable myRunnable = new Runnable() {
                             @Override
                             public void run() {
-                                NotificationEventManager.handleImpressionAPI(payload);
+                                NotificationEventManager.handleImpressionAPI(payload,AppConstant.PUSH_XIAOMI);
                                 DATB.processNotificationReceived(context,payload);
 
                             } // This is your code
                         };
                         mainHandler.post(myRunnable);
                     }
+            DebugFileManager.createExternalStoragePublic(DATB.appContext,"MIPush",data.toString());
 
             } catch (Exception e) {
-               Util.setException(context, e.toString(), TAG, "handleNow");
+            DebugFileManager.createExternalStoragePublic(DATB.appContext, e.toString(),"[Log.e]->MIPush");
+            Util.setException(context, e.toString(), TAG, "handleNow");
             }
-
-
-
-
-
-
     }
     @Override
     public void onReceiveRegisterResult(Context context, MiPushCommandMessage miPushCommandMessage) {
@@ -152,15 +195,18 @@ public class XiaomiPushReceiver extends PushMessageReceiver {
                 Log.i(AppConstant.XiaomiToken, mi_token);
                 if(mi_token!=null && !mi_token.isEmpty())
                 {
+                    DebugFileManager.createExternalStoragePublic(DATB.appContext,mi_token,"[Log.e]-> MI Token->");
+
                     registerToken(context,mi_token);
                 }
             }
             catch (Exception ex)
             {
-                Log.e("XMPush",ex.toString());
+                //Log.e("XMPush",ex.toString());
             }
         }
     }
+
     @RequiresApi(api = Build.VERSION_CODES.LOLLIPOP)
     private static void registerToken(final Context context,String miToken) {
         if (context == null)
@@ -225,7 +271,7 @@ public class XiaomiPushReceiver extends PushMessageReceiver {
                                 DATB.setSubscriberID(preferenceUtil.getStringData(AppConstant.SUBSCRIBER_ID_DATA));
 
                         } catch (Exception e) {
-                            Util.setException(context, e.toString(), "registerToken", AppConstant.APP_NAME_TAG);
+                            Util.setException(context, e.toString(), "xiaomi_registration ", AppConstant.APP_NAME_TAG);
                         }
                         if (preferenceUtil.getStringData(AppConstant.FCM_DEVICE_TOKEN).isEmpty() || preferenceUtil.getStringData(AppConstant.HMS_TOKEN).isEmpty())
                             preferenceUtil.setLongData(AppConstant.DEVICE_REGISTRATION_TIMESTAMP, System.currentTimeMillis());
@@ -249,7 +295,7 @@ public class XiaomiPushReceiver extends PushMessageReceiver {
                     }
                 });
             }catch (Exception e){
-                Util.setException(context, e.toString(), "registerToken", AppConstant.APP_NAME_TAG);
+                Util.setException(context, e.toString(), "MIRegisterToken", AppConstant.APP_NAME_TAG);
             }
 
         } else {

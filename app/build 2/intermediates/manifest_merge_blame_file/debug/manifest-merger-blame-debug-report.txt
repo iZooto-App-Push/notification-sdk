@@ -1,0 +1,413 @@
+1<?xml version="1.0" encoding="utf-8"?>
+2<manifest xmlns:android="http://schemas.android.com/apk/res/android"
+3    package="com.app.momagictest"
+4    android:versionCode="10"
+5    android:versionName="1.0.9" >
+6
+7    <uses-sdk
+8        android:minSdkVersion="17"
+8-->/Users/amit/Documents/momagicsdk/notification-sdk/app/src/main/AndroidManifest.xml
+9        android:targetSdkVersion="31" />
+9-->/Users/amit/Documents/momagicsdk/notification-sdk/app/src/main/AndroidManifest.xml
+10
+11    <uses-permission android:name="android.permission.INTERNET" />
+11-->/Users/amit/Documents/momagicsdk/notification-sdk/app/src/main/AndroidManifest.xml:6:5-67
+11-->/Users/amit/Documents/momagicsdk/notification-sdk/app/src/main/AndroidManifest.xml:6:22-64
+12    <uses-permission android:name="android.permission.WAKE_LOCK" />
+12-->/Users/amit/Documents/momagicsdk/notification-sdk/app/src/main/AndroidManifest.xml:7:5-68
+12-->/Users/amit/Documents/momagicsdk/notification-sdk/app/src/main/AndroidManifest.xml:7:22-65
+13    <uses-permission android:name="android.permission.VIBRATE" />
+13-->/Users/amit/Documents/momagicsdk/notification-sdk/app/src/main/AndroidManifest.xml:8:5-66
+13-->/Users/amit/Documents/momagicsdk/notification-sdk/app/src/main/AndroidManifest.xml:8:22-63
+14    <uses-permission android:name="android.permission.ACCESS_NETWORK_STATE" />
+14-->/Users/amit/Documents/momagicsdk/notification-sdk/app/src/main/AndroidManifest.xml:9:5-79
+14-->/Users/amit/Documents/momagicsdk/notification-sdk/app/src/main/AndroidManifest.xml:9:22-76
+15    <uses-permission android:name="android.permission.ACCESS_WIFI_STATE" />
+15-->/Users/amit/Documents/momagicsdk/notification-sdk/app/src/main/AndroidManifest.xml:10:5-75
+15-->/Users/amit/Documents/momagicsdk/notification-sdk/app/src/main/AndroidManifest.xml:10:22-73
+16    <uses-permission android:name="android.permission.CHANGE_WIFI_STATE" />
+16-->/Users/amit/Documents/momagicsdk/notification-sdk/app/src/main/AndroidManifest.xml:11:5-75
+16-->/Users/amit/Documents/momagicsdk/notification-sdk/app/src/main/AndroidManifest.xml:11:22-73
+17    <uses-permission android:name="android.permission.ACCESS_COARSE_LOCATION" />
+17-->/Users/amit/Documents/momagicsdk/notification-sdk/app/src/main/AndroidManifest.xml:12:5-80
+17-->/Users/amit/Documents/momagicsdk/notification-sdk/app/src/main/AndroidManifest.xml:12:22-78
+18    <uses-permission android:name="android.permission.ACCESS_FINE_LOCATION" />
+18-->/Users/amit/Documents/momagicsdk/notification-sdk/app/src/main/AndroidManifest.xml:13:5-78
+18-->/Users/amit/Documents/momagicsdk/notification-sdk/app/src/main/AndroidManifest.xml:13:22-76
+19    <uses-permission android:name="android.permission.WRITE_EXTERNAL_STORAGE" />
+19-->/Users/amit/Documents/momagicsdk/notification-sdk/app/src/main/AndroidManifest.xml:14:5-80
+19-->/Users/amit/Documents/momagicsdk/notification-sdk/app/src/main/AndroidManifest.xml:14:22-78
+20    <uses-permission android:name="android.permission.READ_EXTERNAL_STORAGE" />
+20-->/Users/amit/Documents/momagicsdk/notification-sdk/app/src/main/AndroidManifest.xml:15:5-79
+20-->/Users/amit/Documents/momagicsdk/notification-sdk/app/src/main/AndroidManifest.xml:15:22-77
+21    <uses-permission android:name="android.permission.MANAGE_EXTERNAL_STORAGE" />
+21-->/Users/amit/Documents/momagicsdk/notification-sdk/app/src/main/AndroidManifest.xml:16:5-81
+21-->/Users/amit/Documents/momagicsdk/notification-sdk/app/src/main/AndroidManifest.xml:16:22-79
+22    <uses-permission android:name="WRITE_MEDIA_STORAGE" />
+22-->/Users/amit/Documents/momagicsdk/notification-sdk/app/src/main/AndroidManifest.xml:17:5-58
+22-->/Users/amit/Documents/momagicsdk/notification-sdk/app/src/main/AndroidManifest.xml:17:22-56
+23    <uses-permission android:name="android.permission.READ_PHONE_STATE" /> <!-- <uses-permission android:name="android.permission.READ_EXTERNAL_STORAGE"/> -->
+23-->[:izooto] /Users/amit/Documents/momagicsdk/notification-sdk/izooto/build/intermediates/library_manifest/debug/AndroidManifest.xml:17:5-75
+23-->[:izooto] /Users/amit/Documents/momagicsdk/notification-sdk/izooto/build/intermediates/library_manifest/debug/AndroidManifest.xml:17:22-72
+24    <!-- <uses-permission android:name="android.permission.WRITE_EXTERNAL_STORAGE"/> -->
+25    <!-- <uses-permission android:name="WRITE_MEDIA_STORAGE"/> -->
+26    <!-- <uses-permission android:name="android.permission.MANAGE_EXTERNAL_STORAGE" -->
+27    <!-- tools:ignore="ScopedStorage" /> -->
+28    <queries>
+28-->[:izooto] /Users/amit/Documents/momagicsdk/notification-sdk/izooto/build/intermediates/library_manifest/debug/AndroidManifest.xml:23:5-27:15
+29        <intent>
+29-->[:izooto] /Users/amit/Documents/momagicsdk/notification-sdk/izooto/build/intermediates/library_manifest/debug/AndroidManifest.xml:24:9-26:18
+30            <action android:name="android.support.customtabs.action.CustomTabsService" />
+30-->[:izooto] /Users/amit/Documents/momagicsdk/notification-sdk/izooto/build/intermediates/library_manifest/debug/AndroidManifest.xml:25:13-90
+30-->[:izooto] /Users/amit/Documents/momagicsdk/notification-sdk/izooto/build/intermediates/library_manifest/debug/AndroidManifest.xml:25:21-87
+31        </intent>
+32    </queries>
+33
+34    <permission
+34-->[:izooto] /Users/amit/Documents/momagicsdk/notification-sdk/izooto/build/intermediates/library_manifest/debug/AndroidManifest.xml:29:5-31:47
+35        android:name="com.app.momagictest.permission.MIPUSH_RECEIVE"
+35-->[:izooto] /Users/amit/Documents/momagicsdk/notification-sdk/izooto/build/intermediates/library_manifest/debug/AndroidManifest.xml:30:9-66
+36        android:protectionLevel="signature" />
+36-->[:izooto] /Users/amit/Documents/momagicsdk/notification-sdk/izooto/build/intermediates/library_manifest/debug/AndroidManifest.xml:31:9-44
+37
+38    <uses-permission android:name="com.app.momagictest.permission.MIPUSH_RECEIVE" /> <!-- Include required permissions for Advertising Id -->
+38-->[:izooto] /Users/amit/Documents/momagicsdk/notification-sdk/izooto/build/intermediates/library_manifest/debug/AndroidManifest.xml:33:5-82
+38-->[:izooto] /Users/amit/Documents/momagicsdk/notification-sdk/izooto/build/intermediates/library_manifest/debug/AndroidManifest.xml:33:22-79
+39    <uses-permission android:name="com.google.android.gms.permission.AD_ID" /> <!-- Required by older versions of Google Play services to create IID tokens -->
+39-->[com.google.android.gms:play-services-ads-identifier:17.1.0] /Users/amit/.gradle/caches/transforms-2/files-2.1/0f35fcd7247598f55908ddaf2a5c8811/jetified-play-services-ads-identifier-17.1.0/AndroidManifest.xml:23:5-79
+39-->[com.google.android.gms:play-services-ads-identifier:17.1.0] /Users/amit/.gradle/caches/transforms-2/files-2.1/0f35fcd7247598f55908ddaf2a5c8811/jetified-play-services-ads-identifier-17.1.0/AndroidManifest.xml:23:22-76
+40    <uses-permission android:name="com.google.android.c2dm.permission.RECEIVE" />
+40-->[com.google.firebase:firebase-messaging:22.0.0] /Users/amit/.gradle/caches/transforms-2/files-2.1/eaebe5287b440ce087532b2e3518f20d/jetified-firebase-messaging-22.0.0/AndroidManifest.xml:25:5-82
+40-->[com.google.firebase:firebase-messaging:22.0.0] /Users/amit/.gradle/caches/transforms-2/files-2.1/eaebe5287b440ce087532b2e3518f20d/jetified-firebase-messaging-22.0.0/AndroidManifest.xml:25:22-79
+41
+42    <application
+42-->/Users/amit/Documents/momagicsdk/notification-sdk/app/src/main/AndroidManifest.xml:19:5-43:19
+43        android:name="com.app.momagictest.AppController"
+43-->/Users/amit/Documents/momagicsdk/notification-sdk/app/src/main/AndroidManifest.xml:20:9-57
+44        android:allowBackup="true"
+44-->/Users/amit/Documents/momagicsdk/notification-sdk/app/src/main/AndroidManifest.xml:21:9-35
+45        android:appComponentFactory="androidx.core.app.CoreComponentFactory"
+45-->[androidx.core:core:1.5.0] /Users/amit/.gradle/caches/transforms-2/files-2.1/9a27efb73921b658b455bd66921d0a77/core-1.5.0/AndroidManifest.xml:24:18-86
+46        android:debuggable="true"
+47        android:icon="@drawable/splash_image"
+47-->/Users/amit/Documents/momagicsdk/notification-sdk/app/src/main/AndroidManifest.xml:23:9-46
+48        android:label="@string/app_name"
+48-->/Users/amit/Documents/momagicsdk/notification-sdk/app/src/main/AndroidManifest.xml:24:9-41
+49        android:requestLegacyExternalStorage="true"
+49-->/Users/amit/Documents/momagicsdk/notification-sdk/app/src/main/AndroidManifest.xml:22:9-52
+50        android:roundIcon="@drawable/splash_image"
+50-->/Users/amit/Documents/momagicsdk/notification-sdk/app/src/main/AndroidManifest.xml:25:9-51
+51        android:supportsRtl="true"
+51-->/Users/amit/Documents/momagicsdk/notification-sdk/app/src/main/AndroidManifest.xml:26:9-35
+52        android:testOnly="true"
+53        android:theme="@style/AppTheme"
+53-->/Users/amit/Documents/momagicsdk/notification-sdk/app/src/main/AndroidManifest.xml:27:9-40
+54        android:usesCleartextTraffic="true" >
+54-->[:izooto] /Users/amit/Documents/momagicsdk/notification-sdk/izooto/build/intermediates/library_manifest/debug/AndroidManifest.xml:37:9-44
+55        <activity
+55-->/Users/amit/Documents/momagicsdk/notification-sdk/app/src/main/AndroidManifest.xml:28:9-37:20
+56            android:name="com.app.momagictest.MainActivity"
+56-->/Users/amit/Documents/momagicsdk/notification-sdk/app/src/main/AndroidManifest.xml:29:13-60
+57            android:label="@string/app_name"
+57-->/Users/amit/Documents/momagicsdk/notification-sdk/app/src/main/AndroidManifest.xml:30:13-45
+58            android:theme="@style/AppTheme.NoActionBar" >
+58-->/Users/amit/Documents/momagicsdk/notification-sdk/app/src/main/AndroidManifest.xml:31:13-56
+59            <intent-filter>
+59-->/Users/amit/Documents/momagicsdk/notification-sdk/app/src/main/AndroidManifest.xml:32:13-36:29
+60                <action android:name="android.intent.action.MAIN" />
+60-->/Users/amit/Documents/momagicsdk/notification-sdk/app/src/main/AndroidManifest.xml:33:17-69
+60-->/Users/amit/Documents/momagicsdk/notification-sdk/app/src/main/AndroidManifest.xml:33:25-66
+61
+62                <category android:name="android.intent.category.LAUNCHER" />
+62-->/Users/amit/Documents/momagicsdk/notification-sdk/app/src/main/AndroidManifest.xml:35:17-77
+62-->/Users/amit/Documents/momagicsdk/notification-sdk/app/src/main/AndroidManifest.xml:35:27-74
+63            </intent-filter>
+64        </activity> <!-- <meta-data -->
+65        <!-- android:name="izooto_enc_key" -->
+66        <!-- android:value="${izooto_enc_key}" /> -->
+67        <!-- <meta-data -->
+68        <!-- android:name="izooto_app_id" -->
+69        <!-- android:value="${izooto_app_id}" /> -->
+70        <activity
+70-->[:izooto] /Users/amit/Documents/momagicsdk/notification-sdk/izooto/build/intermediates/library_manifest/debug/AndroidManifest.xml:39:9-43:52
+71            android:name="com.momagic.DATBWebViewActivity"
+71-->[:izooto] /Users/amit/Documents/momagicsdk/notification-sdk/izooto/build/intermediates/library_manifest/debug/AndroidManifest.xml:40:13-59
+72            android:exported="false"
+72-->[:izooto] /Users/amit/Documents/momagicsdk/notification-sdk/izooto/build/intermediates/library_manifest/debug/AndroidManifest.xml:41:13-37
+73            android:launchMode="singleTask"
+73-->[:izooto] /Users/amit/Documents/momagicsdk/notification-sdk/izooto/build/intermediates/library_manifest/debug/AndroidManifest.xml:42:13-44
+74            android:screenOrientation="portrait" />
+74-->[:izooto] /Users/amit/Documents/momagicsdk/notification-sdk/izooto/build/intermediates/library_manifest/debug/AndroidManifest.xml:43:13-49
+75
+76        <meta-data
+76-->[:izooto] /Users/amit/Documents/momagicsdk/notification-sdk/izooto/build/intermediates/library_manifest/debug/AndroidManifest.xml:45:9-47:36
+77            android:name="android.webkit.WebView.EnableSafeBrowsing"
+77-->[:izooto] /Users/amit/Documents/momagicsdk/notification-sdk/izooto/build/intermediates/library_manifest/debug/AndroidManifest.xml:46:13-69
+78            android:value="true" />
+78-->[:izooto] /Users/amit/Documents/momagicsdk/notification-sdk/izooto/build/intermediates/library_manifest/debug/AndroidManifest.xml:47:13-33
+79
+80        <receiver
+80-->[:izooto] /Users/amit/Documents/momagicsdk/notification-sdk/izooto/build/intermediates/library_manifest/debug/AndroidManifest.xml:49:9-57:20
+81            android:name="com.momagic.NotificationActionReceiver"
+81-->[:izooto] /Users/amit/Documents/momagicsdk/notification-sdk/izooto/build/intermediates/library_manifest/debug/AndroidManifest.xml:50:13-66
+82            android:enabled="true"
+82-->[:izooto] /Users/amit/Documents/momagicsdk/notification-sdk/izooto/build/intermediates/library_manifest/debug/AndroidManifest.xml:51:13-35
+83            android:exported="false" >
+83-->[:izooto] /Users/amit/Documents/momagicsdk/notification-sdk/izooto/build/intermediates/library_manifest/debug/AndroidManifest.xml:52:13-37
+84            <intent-filter>
+84-->[:izooto] /Users/amit/Documents/momagicsdk/notification-sdk/izooto/build/intermediates/library_manifest/debug/AndroidManifest.xml:53:13-56:29
+85                <action android:name="actionBtnOne" />
+85-->[:izooto] /Users/amit/Documents/momagicsdk/notification-sdk/izooto/build/intermediates/library_manifest/debug/AndroidManifest.xml:54:17-55
+85-->[:izooto] /Users/amit/Documents/momagicsdk/notification-sdk/izooto/build/intermediates/library_manifest/debug/AndroidManifest.xml:54:25-52
+86                <action android:name="actionBtnTwo" />
+86-->[:izooto] /Users/amit/Documents/momagicsdk/notification-sdk/izooto/build/intermediates/library_manifest/debug/AndroidManifest.xml:55:17-55
+86-->[:izooto] /Users/amit/Documents/momagicsdk/notification-sdk/izooto/build/intermediates/library_manifest/debug/AndroidManifest.xml:55:25-52
+87            </intent-filter>
+88        </receiver>
+89
+90        <service
+90-->[:izooto] /Users/amit/Documents/momagicsdk/notification-sdk/izooto/build/intermediates/library_manifest/debug/AndroidManifest.xml:59:9-66:19
+91            android:name="com.momagic.DATBMessagingService"
+91-->[:izooto] /Users/amit/Documents/momagicsdk/notification-sdk/izooto/build/intermediates/library_manifest/debug/AndroidManifest.xml:60:13-60
+92            android:enabled="true"
+92-->[:izooto] /Users/amit/Documents/momagicsdk/notification-sdk/izooto/build/intermediates/library_manifest/debug/AndroidManifest.xml:61:13-35
+93            android:exported="true" >
+93-->[:izooto] /Users/amit/Documents/momagicsdk/notification-sdk/izooto/build/intermediates/library_manifest/debug/AndroidManifest.xml:62:13-36
+94            <intent-filter>
+94-->[:izooto] /Users/amit/Documents/momagicsdk/notification-sdk/izooto/build/intermediates/library_manifest/debug/AndroidManifest.xml:63:13-65:29
+95                <action android:name="com.google.firebase.MESSAGING_EVENT" />
+95-->[:izooto] /Users/amit/Documents/momagicsdk/notification-sdk/izooto/build/intermediates/library_manifest/debug/AndroidManifest.xml:64:17-78
+95-->[:izooto] /Users/amit/Documents/momagicsdk/notification-sdk/izooto/build/intermediates/library_manifest/debug/AndroidManifest.xml:64:25-75
+96            </intent-filter>
+97        </service>
+98
+99        <meta-data
+99-->[:izooto] /Users/amit/Documents/momagicsdk/notification-sdk/izooto/build/intermediates/library_manifest/debug/AndroidManifest.xml:68:9-70:49
+100            android:name="momagic_app_id"
+100-->[:izooto] /Users/amit/Documents/momagicsdk/notification-sdk/izooto/build/intermediates/library_manifest/debug/AndroidManifest.xml:69:13-42
+101            android:value="09f06385e06cc10d0fc7a5e1c002cd9338a2c94f" />
+101-->[:izooto] /Users/amit/Documents/momagicsdk/notification-sdk/izooto/build/intermediates/library_manifest/debug/AndroidManifest.xml:70:13-46
+102
+103        <service
+103-->[:izooto] /Users/amit/Documents/momagicsdk/notification-sdk/izooto/build/intermediates/library_manifest/debug/AndroidManifest.xml:72:9-75:46
+104            android:name="com.xiaomi.push.service.XMPushService"
+104-->[:izooto] /Users/amit/Documents/momagicsdk/notification-sdk/izooto/build/intermediates/library_manifest/debug/AndroidManifest.xml:73:13-65
+105            android:enabled="true"
+105-->[:izooto] /Users/amit/Documents/momagicsdk/notification-sdk/izooto/build/intermediates/library_manifest/debug/AndroidManifest.xml:74:13-35
+106            android:process=":pushservice" />
+106-->[:izooto] /Users/amit/Documents/momagicsdk/notification-sdk/izooto/build/intermediates/library_manifest/debug/AndroidManifest.xml:75:13-43
+107        <service
+107-->[:izooto] /Users/amit/Documents/momagicsdk/notification-sdk/izooto/build/intermediates/library_manifest/debug/AndroidManifest.xml:76:9-81:46
+108            android:name="com.xiaomi.push.service.XMJobService"
+108-->[:izooto] /Users/amit/Documents/momagicsdk/notification-sdk/izooto/build/intermediates/library_manifest/debug/AndroidManifest.xml:77:13-64
+109            android:enabled="true"
+109-->[:izooto] /Users/amit/Documents/momagicsdk/notification-sdk/izooto/build/intermediates/library_manifest/debug/AndroidManifest.xml:78:13-35
+110            android:exported="false"
+110-->[:izooto] /Users/amit/Documents/momagicsdk/notification-sdk/izooto/build/intermediates/library_manifest/debug/AndroidManifest.xml:79:13-37
+111            android:permission="android.permission.BIND_JOB_SERVICE"
+111-->[:izooto] /Users/amit/Documents/momagicsdk/notification-sdk/izooto/build/intermediates/library_manifest/debug/AndroidManifest.xml:80:13-69
+112            android:process=":pushservice" />
+112-->[:izooto] /Users/amit/Documents/momagicsdk/notification-sdk/izooto/build/intermediates/library_manifest/debug/AndroidManifest.xml:81:13-43
+113        <service
+113-->[:izooto] /Users/amit/Documents/momagicsdk/notification-sdk/izooto/build/intermediates/library_manifest/debug/AndroidManifest.xml:82:9-85:39
+114            android:name="com.xiaomi.mipush.sdk.PushMessageHandler"
+114-->[:izooto] /Users/amit/Documents/momagicsdk/notification-sdk/izooto/build/intermediates/library_manifest/debug/AndroidManifest.xml:83:13-68
+115            android:enabled="true"
+115-->[:izooto] /Users/amit/Documents/momagicsdk/notification-sdk/izooto/build/intermediates/library_manifest/debug/AndroidManifest.xml:84:13-35
+116            android:exported="true" />
+116-->[:izooto] /Users/amit/Documents/momagicsdk/notification-sdk/izooto/build/intermediates/library_manifest/debug/AndroidManifest.xml:85:13-36
+117        <service
+117-->[:izooto] /Users/amit/Documents/momagicsdk/notification-sdk/izooto/build/intermediates/library_manifest/debug/AndroidManifest.xml:86:9-88:38
+118            android:name="com.xiaomi.mipush.sdk.MessageHandleService"
+118-->[:izooto] /Users/amit/Documents/momagicsdk/notification-sdk/izooto/build/intermediates/library_manifest/debug/AndroidManifest.xml:87:13-70
+119            android:enabled="true" />
+119-->[:izooto] /Users/amit/Documents/momagicsdk/notification-sdk/izooto/build/intermediates/library_manifest/debug/AndroidManifest.xml:88:13-35
+120
+121        <receiver
+121-->[:izooto] /Users/amit/Documents/momagicsdk/notification-sdk/izooto/build/intermediates/library_manifest/debug/AndroidManifest.xml:90:9-104:20
+122            android:name="com.momagic.XiaomiPushReceiver"
+122-->[:izooto] /Users/amit/Documents/momagicsdk/notification-sdk/izooto/build/intermediates/library_manifest/debug/AndroidManifest.xml:91:13-58
+123            android:exported="true" >
+123-->[:izooto] /Users/amit/Documents/momagicsdk/notification-sdk/izooto/build/intermediates/library_manifest/debug/AndroidManifest.xml:92:13-36
+124
+125            <!-- Here change com.xiaomi.mipushdemo.DemoMessageRreceiver to the class name defined in your app -->
+126            <intent-filter>
+126-->[:izooto] /Users/amit/Documents/momagicsdk/notification-sdk/izooto/build/intermediates/library_manifest/debug/AndroidManifest.xml:95:13-97:29
+127                <action android:name="com.xiaomi.mipush.RECEIVE_MESSAGE" />
+127-->[:izooto] /Users/amit/Documents/momagicsdk/notification-sdk/izooto/build/intermediates/library_manifest/debug/AndroidManifest.xml:96:17-76
+127-->[:izooto] /Users/amit/Documents/momagicsdk/notification-sdk/izooto/build/intermediates/library_manifest/debug/AndroidManifest.xml:96:25-73
+128            </intent-filter>
+129            <intent-filter>
+129-->[:izooto] /Users/amit/Documents/momagicsdk/notification-sdk/izooto/build/intermediates/library_manifest/debug/AndroidManifest.xml:98:13-100:29
+130                <action android:name="com.xiaomi.mipush.MESSAGE_ARRIVED" />
+130-->[:izooto] /Users/amit/Documents/momagicsdk/notification-sdk/izooto/build/intermediates/library_manifest/debug/AndroidManifest.xml:99:17-76
+130-->[:izooto] /Users/amit/Documents/momagicsdk/notification-sdk/izooto/build/intermediates/library_manifest/debug/AndroidManifest.xml:99:25-73
+131            </intent-filter>
+132            <intent-filter>
+132-->[:izooto] /Users/amit/Documents/momagicsdk/notification-sdk/izooto/build/intermediates/library_manifest/debug/AndroidManifest.xml:101:13-103:29
+133                <action android:name="com.xiaomi.mipush.ERROR" />
+133-->[:izooto] /Users/amit/Documents/momagicsdk/notification-sdk/izooto/build/intermediates/library_manifest/debug/AndroidManifest.xml:102:17-66
+133-->[:izooto] /Users/amit/Documents/momagicsdk/notification-sdk/izooto/build/intermediates/library_manifest/debug/AndroidManifest.xml:102:25-63
+134            </intent-filter>
+135        </receiver>
+136        <receiver
+136-->[:izooto] /Users/amit/Documents/momagicsdk/notification-sdk/izooto/build/intermediates/library_manifest/debug/AndroidManifest.xml:105:9-115:20
+137            android:name="com.xiaomi.push.service.receivers.NetworkStatusReceiver"
+137-->[:izooto] /Users/amit/Documents/momagicsdk/notification-sdk/izooto/build/intermediates/library_manifest/debug/AndroidManifest.xml:106:13-83
+138            android:exported="true" >
+138-->[:izooto] /Users/amit/Documents/momagicsdk/notification-sdk/izooto/build/intermediates/library_manifest/debug/AndroidManifest.xml:107:13-36
+139            <intent-filter>
+139-->[:izooto] /Users/amit/Documents/momagicsdk/notification-sdk/izooto/build/intermediates/library_manifest/debug/AndroidManifest.xml:108:13-114:29
+140                <action android:name="android.net.conn.CONNECTIVITY_CHANGE" />
+140-->[:izooto] /Users/amit/Documents/momagicsdk/notification-sdk/izooto/build/intermediates/library_manifest/debug/AndroidManifest.xml:109:17-111:50
+140-->[:izooto] /Users/amit/Documents/momagicsdk/notification-sdk/izooto/build/intermediates/library_manifest/debug/AndroidManifest.xml:110:21-72
+141
+142                <category android:name="android.intent.category.DEFAULT" />
+142-->[:izooto] /Users/amit/Documents/momagicsdk/notification-sdk/izooto/build/intermediates/library_manifest/debug/AndroidManifest.xml:113:17-76
+142-->[:izooto] /Users/amit/Documents/momagicsdk/notification-sdk/izooto/build/intermediates/library_manifest/debug/AndroidManifest.xml:113:27-73
+143            </intent-filter>
+144        </receiver>
+145        <receiver
+145-->[:izooto] /Users/amit/Documents/momagicsdk/notification-sdk/izooto/build/intermediates/library_manifest/debug/AndroidManifest.xml:116:9-123:20
+146            android:name="com.xiaomi.push.service.receivers.PingReceiver"
+146-->[:izooto] /Users/amit/Documents/momagicsdk/notification-sdk/izooto/build/intermediates/library_manifest/debug/AndroidManifest.xml:117:13-74
+147            android:exported="false"
+147-->[:izooto] /Users/amit/Documents/momagicsdk/notification-sdk/izooto/build/intermediates/library_manifest/debug/AndroidManifest.xml:118:13-37
+148            android:process=":pushservice" >
+148-->[:izooto] /Users/amit/Documents/momagicsdk/notification-sdk/izooto/build/intermediates/library_manifest/debug/AndroidManifest.xml:119:13-43
+149            <intent-filter>
+149-->[:izooto] /Users/amit/Documents/momagicsdk/notification-sdk/izooto/build/intermediates/library_manifest/debug/AndroidManifest.xml:120:13-122:29
+150                <action android:name="com.xiaomi.push.PING_TIMER" />
+150-->[:izooto] /Users/amit/Documents/momagicsdk/notification-sdk/izooto/build/intermediates/library_manifest/debug/AndroidManifest.xml:121:17-69
+150-->[:izooto] /Users/amit/Documents/momagicsdk/notification-sdk/izooto/build/intermediates/library_manifest/debug/AndroidManifest.xml:121:25-66
+151            </intent-filter>
+152        </receiver>
+153
+154        <service
+154-->[:izooto] /Users/amit/Documents/momagicsdk/notification-sdk/izooto/build/intermediates/library_manifest/debug/AndroidManifest.xml:125:9-131:19
+155            android:name="com.momagic.HmsMessagingService"
+155-->[:izooto] /Users/amit/Documents/momagicsdk/notification-sdk/izooto/build/intermediates/library_manifest/debug/AndroidManifest.xml:126:13-59
+156            android:exported="false" >
+156-->[:izooto] /Users/amit/Documents/momagicsdk/notification-sdk/izooto/build/intermediates/library_manifest/debug/AndroidManifest.xml:127:13-37
+157            <intent-filter>
+157-->[:izooto] /Users/amit/Documents/momagicsdk/notification-sdk/izooto/build/intermediates/library_manifest/debug/AndroidManifest.xml:128:13-130:29
+158                <action android:name="com.huawei.push.action.MESSAGING_EVENT" />
+158-->[:izooto] /Users/amit/Documents/momagicsdk/notification-sdk/izooto/build/intermediates/library_manifest/debug/AndroidManifest.xml:129:17-81
+158-->[:izooto] /Users/amit/Documents/momagicsdk/notification-sdk/izooto/build/intermediates/library_manifest/debug/AndroidManifest.xml:129:25-78
+159            </intent-filter>
+160        </service>
+161
+162        <receiver
+162-->[com.google.firebase:firebase-messaging:22.0.0] /Users/amit/.gradle/caches/transforms-2/files-2.1/eaebe5287b440ce087532b2e3518f20d/jetified-firebase-messaging-22.0.0/AndroidManifest.xml:28:9-35:20
+163            android:name="com.google.firebase.iid.FirebaseInstanceIdReceiver"
+163-->[com.google.firebase:firebase-messaging:22.0.0] /Users/amit/.gradle/caches/transforms-2/files-2.1/eaebe5287b440ce087532b2e3518f20d/jetified-firebase-messaging-22.0.0/AndroidManifest.xml:29:13-78
+164            android:exported="true"
+164-->[com.google.firebase:firebase-messaging:22.0.0] /Users/amit/.gradle/caches/transforms-2/files-2.1/eaebe5287b440ce087532b2e3518f20d/jetified-firebase-messaging-22.0.0/AndroidManifest.xml:30:13-36
+165            android:permission="com.google.android.c2dm.permission.SEND" >
+165-->[com.google.firebase:firebase-messaging:22.0.0] /Users/amit/.gradle/caches/transforms-2/files-2.1/eaebe5287b440ce087532b2e3518f20d/jetified-firebase-messaging-22.0.0/AndroidManifest.xml:31:13-73
+166            <intent-filter>
+166-->[com.google.firebase:firebase-messaging:22.0.0] /Users/amit/.gradle/caches/transforms-2/files-2.1/eaebe5287b440ce087532b2e3518f20d/jetified-firebase-messaging-22.0.0/AndroidManifest.xml:32:13-34:29
+167                <action android:name="com.google.android.c2dm.intent.RECEIVE" />
+167-->[com.google.firebase:firebase-messaging:22.0.0] /Users/amit/.gradle/caches/transforms-2/files-2.1/eaebe5287b440ce087532b2e3518f20d/jetified-firebase-messaging-22.0.0/AndroidManifest.xml:33:17-81
+167-->[com.google.firebase:firebase-messaging:22.0.0] /Users/amit/.gradle/caches/transforms-2/files-2.1/eaebe5287b440ce087532b2e3518f20d/jetified-firebase-messaging-22.0.0/AndroidManifest.xml:33:25-78
+168            </intent-filter>
+169        </receiver>
+170        <!--
+171             FirebaseMessagingService performs security checks at runtime,
+172             but set to not exported to explicitly avoid allowing another app to call it.
+173        -->
+174        <service
+174-->[com.google.firebase:firebase-messaging:22.0.0] /Users/amit/.gradle/caches/transforms-2/files-2.1/eaebe5287b440ce087532b2e3518f20d/jetified-firebase-messaging-22.0.0/AndroidManifest.xml:41:9-48:19
+175            android:name="com.google.firebase.messaging.FirebaseMessagingService"
+175-->[com.google.firebase:firebase-messaging:22.0.0] /Users/amit/.gradle/caches/transforms-2/files-2.1/eaebe5287b440ce087532b2e3518f20d/jetified-firebase-messaging-22.0.0/AndroidManifest.xml:42:13-82
+176            android:directBootAware="true"
+176-->[com.google.firebase:firebase-messaging:22.0.0] /Users/amit/.gradle/caches/transforms-2/files-2.1/eaebe5287b440ce087532b2e3518f20d/jetified-firebase-messaging-22.0.0/AndroidManifest.xml:43:13-43
+177            android:exported="false" >
+177-->[com.google.firebase:firebase-messaging:22.0.0] /Users/amit/.gradle/caches/transforms-2/files-2.1/eaebe5287b440ce087532b2e3518f20d/jetified-firebase-messaging-22.0.0/AndroidManifest.xml:44:13-37
+178            <intent-filter android:priority="-500" >
+178-->[:izooto] /Users/amit/Documents/momagicsdk/notification-sdk/izooto/build/intermediates/library_manifest/debug/AndroidManifest.xml:63:13-65:29
+179                <action android:name="com.google.firebase.MESSAGING_EVENT" />
+179-->[:izooto] /Users/amit/Documents/momagicsdk/notification-sdk/izooto/build/intermediates/library_manifest/debug/AndroidManifest.xml:64:17-78
+179-->[:izooto] /Users/amit/Documents/momagicsdk/notification-sdk/izooto/build/intermediates/library_manifest/debug/AndroidManifest.xml:64:25-75
+180            </intent-filter>
+181        </service>
+182        <service
+182-->[com.google.firebase:firebase-messaging:22.0.0] /Users/amit/.gradle/caches/transforms-2/files-2.1/eaebe5287b440ce087532b2e3518f20d/jetified-firebase-messaging-22.0.0/AndroidManifest.xml:49:9-55:19
+183            android:name="com.google.firebase.components.ComponentDiscoveryService"
+183-->[com.google.firebase:firebase-messaging:22.0.0] /Users/amit/.gradle/caches/transforms-2/files-2.1/eaebe5287b440ce087532b2e3518f20d/jetified-firebase-messaging-22.0.0/AndroidManifest.xml:50:13-84
+184            android:directBootAware="true"
+184-->[com.google.firebase:firebase-common:20.0.0] /Users/amit/.gradle/caches/transforms-2/files-2.1/af15692b9c52fe548880adb459b1ea97/jetified-firebase-common-20.0.0/AndroidManifest.xml:35:13-43
+185            android:exported="false" >
+185-->[com.google.firebase:firebase-messaging:22.0.0] /Users/amit/.gradle/caches/transforms-2/files-2.1/eaebe5287b440ce087532b2e3518f20d/jetified-firebase-messaging-22.0.0/AndroidManifest.xml:51:13-37
+186            <meta-data
+186-->[com.google.firebase:firebase-messaging:22.0.0] /Users/amit/.gradle/caches/transforms-2/files-2.1/eaebe5287b440ce087532b2e3518f20d/jetified-firebase-messaging-22.0.0/AndroidManifest.xml:52:13-54:85
+187                android:name="com.google.firebase.components:com.google.firebase.messaging.FirebaseMessagingRegistrar"
+187-->[com.google.firebase:firebase-messaging:22.0.0] /Users/amit/.gradle/caches/transforms-2/files-2.1/eaebe5287b440ce087532b2e3518f20d/jetified-firebase-messaging-22.0.0/AndroidManifest.xml:53:17-119
+188                android:value="com.google.firebase.components.ComponentRegistrar" />
+188-->[com.google.firebase:firebase-messaging:22.0.0] /Users/amit/.gradle/caches/transforms-2/files-2.1/eaebe5287b440ce087532b2e3518f20d/jetified-firebase-messaging-22.0.0/AndroidManifest.xml:54:17-82
+189            <meta-data
+189-->[com.google.firebase:firebase-installations:17.0.0] /Users/amit/.gradle/caches/transforms-2/files-2.1/0fd2297e3f4c562e4beb53dd8b107617/jetified-firebase-installations-17.0.0/AndroidManifest.xml:18:13-20:85
+190                android:name="com.google.firebase.components:com.google.firebase.installations.FirebaseInstallationsRegistrar"
+190-->[com.google.firebase:firebase-installations:17.0.0] /Users/amit/.gradle/caches/transforms-2/files-2.1/0fd2297e3f4c562e4beb53dd8b107617/jetified-firebase-installations-17.0.0/AndroidManifest.xml:19:17-127
+191                android:value="com.google.firebase.components.ComponentRegistrar" />
+191-->[com.google.firebase:firebase-installations:17.0.0] /Users/amit/.gradle/caches/transforms-2/files-2.1/0fd2297e3f4c562e4beb53dd8b107617/jetified-firebase-installations-17.0.0/AndroidManifest.xml:20:17-82
+192            <meta-data
+192-->[com.google.firebase:firebase-datatransport:18.0.0] /Users/amit/.gradle/caches/transforms-2/files-2.1/08cb7cb44dd99f391d05be2ffa128aec/jetified-firebase-datatransport-18.0.0/AndroidManifest.xml:28:13-30:85
+193                android:name="com.google.firebase.components:com.google.firebase.datatransport.TransportRegistrar"
+193-->[com.google.firebase:firebase-datatransport:18.0.0] /Users/amit/.gradle/caches/transforms-2/files-2.1/08cb7cb44dd99f391d05be2ffa128aec/jetified-firebase-datatransport-18.0.0/AndroidManifest.xml:29:17-115
+194                android:value="com.google.firebase.components.ComponentRegistrar" />
+194-->[com.google.firebase:firebase-datatransport:18.0.0] /Users/amit/.gradle/caches/transforms-2/files-2.1/08cb7cb44dd99f391d05be2ffa128aec/jetified-firebase-datatransport-18.0.0/AndroidManifest.xml:30:17-82
+195        </service>
+196
+197        <provider
+197-->[com.google.firebase:firebase-common:20.0.0] /Users/amit/.gradle/caches/transforms-2/files-2.1/af15692b9c52fe548880adb459b1ea97/jetified-firebase-common-20.0.0/AndroidManifest.xml:26:9-31:39
+198            android:name="com.google.firebase.provider.FirebaseInitProvider"
+198-->[com.google.firebase:firebase-common:20.0.0] /Users/amit/.gradle/caches/transforms-2/files-2.1/af15692b9c52fe548880adb459b1ea97/jetified-firebase-common-20.0.0/AndroidManifest.xml:27:13-77
+199            android:authorities="com.app.momagictest.firebaseinitprovider"
+199-->[com.google.firebase:firebase-common:20.0.0] /Users/amit/.gradle/caches/transforms-2/files-2.1/af15692b9c52fe548880adb459b1ea97/jetified-firebase-common-20.0.0/AndroidManifest.xml:28:13-72
+200            android:directBootAware="true"
+200-->[com.google.firebase:firebase-common:20.0.0] /Users/amit/.gradle/caches/transforms-2/files-2.1/af15692b9c52fe548880adb459b1ea97/jetified-firebase-common-20.0.0/AndroidManifest.xml:29:13-43
+201            android:exported="false"
+201-->[com.google.firebase:firebase-common:20.0.0] /Users/amit/.gradle/caches/transforms-2/files-2.1/af15692b9c52fe548880adb459b1ea97/jetified-firebase-common-20.0.0/AndroidManifest.xml:30:13-37
+202            android:initOrder="100" />
+202-->[com.google.firebase:firebase-common:20.0.0] /Users/amit/.gradle/caches/transforms-2/files-2.1/af15692b9c52fe548880adb459b1ea97/jetified-firebase-common-20.0.0/AndroidManifest.xml:31:13-36
+203
+204        <meta-data
+204-->[com.google.android.gms:play-services-basement:17.0.0] /Users/amit/.gradle/caches/transforms-2/files-2.1/f6a2d779c69629caa802732744910600/jetified-play-services-basement-17.0.0/AndroidManifest.xml:23:9-25:69
+205            android:name="com.google.android.gms.version"
+205-->[com.google.android.gms:play-services-basement:17.0.0] /Users/amit/.gradle/caches/transforms-2/files-2.1/f6a2d779c69629caa802732744910600/jetified-play-services-basement-17.0.0/AndroidManifest.xml:24:13-58
+206            android:value="@integer/google_play_services_version" />
+206-->[com.google.android.gms:play-services-basement:17.0.0] /Users/amit/.gradle/caches/transforms-2/files-2.1/f6a2d779c69629caa802732744910600/jetified-play-services-basement-17.0.0/AndroidManifest.xml:25:13-66
+207
+208        <service
+208-->[com.google.android.datatransport:transport-backend-cct:3.0.0] /Users/amit/.gradle/caches/transforms-2/files-2.1/6987f018cc7cdb307315d2fd1bf7b27c/jetified-transport-backend-cct-3.0.0/AndroidManifest.xml:29:9-35:19
+209            android:name="com.google.android.datatransport.runtime.backends.TransportBackendDiscovery"
+209-->[com.google.android.datatransport:transport-backend-cct:3.0.0] /Users/amit/.gradle/caches/transforms-2/files-2.1/6987f018cc7cdb307315d2fd1bf7b27c/jetified-transport-backend-cct-3.0.0/AndroidManifest.xml:30:13-103
+210            android:exported="false" >
+210-->[com.google.android.datatransport:transport-backend-cct:3.0.0] /Users/amit/.gradle/caches/transforms-2/files-2.1/6987f018cc7cdb307315d2fd1bf7b27c/jetified-transport-backend-cct-3.0.0/AndroidManifest.xml:31:13-37
+211            <meta-data
+211-->[com.google.android.datatransport:transport-backend-cct:3.0.0] /Users/amit/.gradle/caches/transforms-2/files-2.1/6987f018cc7cdb307315d2fd1bf7b27c/jetified-transport-backend-cct-3.0.0/AndroidManifest.xml:32:13-34:39
+212                android:name="backend:com.google.android.datatransport.cct.CctBackendFactory"
+212-->[com.google.android.datatransport:transport-backend-cct:3.0.0] /Users/amit/.gradle/caches/transforms-2/files-2.1/6987f018cc7cdb307315d2fd1bf7b27c/jetified-transport-backend-cct-3.0.0/AndroidManifest.xml:33:17-94
+213                android:value="cct" />
+213-->[com.google.android.datatransport:transport-backend-cct:3.0.0] /Users/amit/.gradle/caches/transforms-2/files-2.1/6987f018cc7cdb307315d2fd1bf7b27c/jetified-transport-backend-cct-3.0.0/AndroidManifest.xml:34:17-36
+214        </service>
+215        <service
+215-->[com.google.android.datatransport:transport-runtime:3.0.0] /Users/amit/.gradle/caches/transforms-2/files-2.1/90cfed5ccde998c320942ddbb033e611/jetified-transport-runtime-3.0.0/AndroidManifest.xml:26:9-30:19
+216            android:name="com.google.android.datatransport.runtime.scheduling.jobscheduling.JobInfoSchedulerService"
+216-->[com.google.android.datatransport:transport-runtime:3.0.0] /Users/amit/.gradle/caches/transforms-2/files-2.1/90cfed5ccde998c320942ddbb033e611/jetified-transport-runtime-3.0.0/AndroidManifest.xml:27:13-117
+217            android:exported="false"
+217-->[com.google.android.datatransport:transport-runtime:3.0.0] /Users/amit/.gradle/caches/transforms-2/files-2.1/90cfed5ccde998c320942ddbb033e611/jetified-transport-runtime-3.0.0/AndroidManifest.xml:28:13-37
+218            android:permission="android.permission.BIND_JOB_SERVICE" >
+218-->[com.google.android.datatransport:transport-runtime:3.0.0] /Users/amit/.gradle/caches/transforms-2/files-2.1/90cfed5ccde998c320942ddbb033e611/jetified-transport-runtime-3.0.0/AndroidManifest.xml:29:13-69
+219        </service>
+220
+221        <receiver
+221-->[com.google.android.datatransport:transport-runtime:3.0.0] /Users/amit/.gradle/caches/transforms-2/files-2.1/90cfed5ccde998c320942ddbb033e611/jetified-transport-runtime-3.0.0/AndroidManifest.xml:32:9-34:40
+222            android:name="com.google.android.datatransport.runtime.scheduling.jobscheduling.AlarmManagerSchedulerBroadcastReceiver"
+222-->[com.google.android.datatransport:transport-runtime:3.0.0] /Users/amit/.gradle/caches/transforms-2/files-2.1/90cfed5ccde998c320942ddbb033e611/jetified-transport-runtime-3.0.0/AndroidManifest.xml:33:13-132
+223            android:exported="false" />
+223-->[com.google.android.datatransport:transport-runtime:3.0.0] /Users/amit/.gradle/caches/transforms-2/files-2.1/90cfed5ccde998c320942ddbb033e611/jetified-transport-runtime-3.0.0/AndroidManifest.xml:34:13-37
+224    </application>
+225
+226</manifest>

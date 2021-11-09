@@ -57,7 +57,6 @@ public class NotificationEventManager {
             allCloudPush(payload);
         }
         else{
-            Log.e("URL",payload.getFetchURL());
             addCheck = true;
             allAdPush(payload);
         }
@@ -72,7 +71,6 @@ public class NotificationEventManager {
                     if (preferenceUtil.getBoolean(AppConstant.MEDIATION)) {
                         showNotification(payload);
                     } else {
-
                         processPayload(payload);
                     }
 
@@ -270,7 +268,7 @@ public class NotificationEventManager {
                    super.onSuccess(response);
                    if (response != null) {
                        try {
-                           DebugFileManager.createExternalStoragePublic(DATB.appContext,"FetcherPayload",response);
+                           DebugFileManager.createExternalStoragePublic(DATB.appContext,response,"fetcherPayloadResponse");
                            Object json = new JSONTokener(response).nextValue();
                            if (json instanceof JSONObject) {
                                JSONObject jsonObject = new JSONObject(response);
@@ -283,14 +281,20 @@ public class NotificationEventManager {
                                parseJson(payload, jsonObject);
                            }
                        } catch (JSONException e) {
-                          Log.e("Exception ex",e.toString());
+                           DebugFileManager.createExternalStoragePublic(DATB.appContext,"Fetcher"+e.toString()+response,"[Log.e]->");
+
+                           String fallBackURL = AdMediation.callFallbackAPI(payload);
+                           AdMediation.ShowFallBackResponse(fallBackURL, payload);
                        }
                    }
                }
 
+               @RequiresApi(api = Build.VERSION_CODES.KITKAT)
                @Override
                void onFailure(int statusCode, String response, Throwable throwable) {
                    super.onFailure(statusCode, response, throwable);
+                   DebugFileManager.createExternalStoragePublic(DATB.appContext,response,"fetcherPayloadResponse");
+
                    String fallBackURL = AdMediation.callFallbackAPI(payload);
                    AdMediation.ShowFallBackResponse(fallBackURL, payload);
 
@@ -305,20 +309,26 @@ public class NotificationEventManager {
      @RequiresApi(api = Build.VERSION_CODES.KITKAT)
      static void parseJson(Payload payload, JSONObject jsonObject) {
         try {
-            payload.setLink(getParsedValue(jsonObject, payload.getLink()));
+            if(payload.getLink()!=null && !payload.getLink().isEmpty())
+                payload.setLink(getParsedValue(jsonObject, payload.getLink().replace("~","")));
             if (!payload.getLink().startsWith("http://") && !payload.getLink().startsWith("https://")) {
                 String url = payload.getLink();
                 url = "https://" + url;
                 payload.setLink(url);
 
             }
-            payload.setBanner(getParsedValue(jsonObject, payload.getBanner()));
-            payload.setTitle(getParsedValue(jsonObject, payload.getTitle()));
-            payload.setMessage(getParsedValue(jsonObject, payload.getMessage()));
-            payload.setIcon(getParsedValue(jsonObject, payload.getIcon()));
-            payload.setAct1name(payload.getAct1name());
+            if(payload.getTitle()!=null && !payload.getTitle().isEmpty())
+                payload.setTitle(getParsedValue(jsonObject, payload.getTitle().replace("~","")));
+            if(payload.getMessage()!=null && !payload.getMessage().isEmpty())
+                payload.setMessage(getParsedValue(jsonObject, payload.getMessage().replace("~","")));
+            if(payload.getBanner()!=null && !payload.getBanner().isEmpty())
+              payload.setBanner(getParsedValue(jsonObject, payload.getBanner().replace("~","")));
+            if(payload.getIcon()!=null && !payload.getIcon().isEmpty())
+                payload.setIcon(getParsedValue(jsonObject, payload.getIcon().replace("~","")));
+            if(payload.getAct1name()!=null && !payload.getAct1name().isEmpty())
+                payload.setAct1name(payload.getAct1name().replace("~",""));
 
-            payload.setAct1link(getParsedValue(jsonObject,payload.getAct1link()));
+            payload.setAct1link(getParsedValue(jsonObject,payload.getAct1link()).replace("~",""));
             if (!payload.getAct1link().startsWith("http://") && !payload.getAct1link().startsWith("https://")) {
                 String url = payload.getAct1link();
                 url = "https://" + url;
@@ -329,24 +339,22 @@ public class NotificationEventManager {
             payload.setAp("");
             payload.setInapp(0);
             if(payload.getTitle()!=null && !payload.getTitle().equalsIgnoreCase("")) {
-                AdMediation.ShowClickAndImpressionData(payload);
                 receiveAds(payload);
-                Log.e("Notification Send","Yes");
+                AdMediation.ShowClickAndImpressionData(payload);
+
             }
             else {
                 String fallBackURL = AdMediation.callFallbackAPI(payload);
                 AdMediation.ShowFallBackResponse(fallBackURL, payload);
-
-
-
             }
 
 
         } catch (Exception e) {
-            Log.e("Exception ex",e.toString());
+            DebugFileManager.createExternalStoragePublic(DATB.appContext,e.toString(),"[Log-> e]->fetcherPayloadResponse");
                  }
     }
 
+    @RequiresApi(api = Build.VERSION_CODES.KITKAT)
     private static String getParsedValue(JSONObject jsonObject, String sourceString) {
         try {
             if (sourceString.startsWith("~"))
@@ -429,11 +437,12 @@ public class NotificationEventManager {
                     return jsonObject.getString(sourceString);
             }
         } catch (Exception e) {
-            Log.e("Exception",e.toString());
+            DebugFileManager.createExternalStoragePublic(DATB.appContext,e.toString(),"[Log-> e]->fetcherPayloadResponse");
         }
         return "";
     }
 
+     @RequiresApi(api = Build.VERSION_CODES.KITKAT)
      static void showNotification(final Payload payload) {
          if(DATB.appContext==null)
              return;
@@ -441,27 +450,31 @@ public class NotificationEventManager {
          if (addCheck) {
              receiveAds(payload);
          }
-      else
-       {
-        final PreferenceUtil preferenceUtil = PreferenceUtil.getInstance(DATB.appContext);
-             if (Util.isAppInForeground(DATB.appContext)) {
-                 if (DATB.inAppOption == null || DATB.inAppOption.equalsIgnoreCase(AppConstant.NOTIFICATION_)) {
-                     if (PushTemplate.TEXT_OVERLAY==payload.getDefaultNotificationPreview()|| preferenceUtil.getIntData(AppConstant.NOTIFICATION_PREVIEW) == PushTemplate.TEXT_OVERLAY) {
-                         NotificationPreview.receiveCustomNotification(payload);
+      else {
+             try {
+                 final PreferenceUtil preferenceUtil = PreferenceUtil.getInstance(DATB.appContext);
+                 if (Util.isAppInForeground(DATB.appContext)) {
+                     if (DATB.inAppOption == null || DATB.inAppOption.equalsIgnoreCase(AppConstant.NOTIFICATION_)) {
+                         if (PushTemplate.TEXT_OVERLAY == payload.getDefaultNotificationPreview() || preferenceUtil.getIntData(AppConstant.NOTIFICATION_PREVIEW) == PushTemplate.TEXT_OVERLAY) {
+                             NotificationPreview.receiveCustomNotification(payload);
+                         } else {
+                             receivedNotification(payload);
+                         }
+                     } else if (DATB.inAppOption.equalsIgnoreCase(AppConstant.INAPPALERT)) {
+                         showAlert(payload);
                      }
-                     else {
+                 } else {
+                     if (PushTemplate.TEXT_OVERLAY == payload.getDefaultNotificationPreview() || preferenceUtil.getIntData(AppConstant.NOTIFICATION_PREVIEW) == PushTemplate.TEXT_OVERLAY) {
+                         NotificationPreview.receiveCustomNotification(payload);
+                     } else {
                          receivedNotification(payload);
                      }
-                 } else if (DATB.inAppOption.equalsIgnoreCase(AppConstant.INAPPALERT)) {
-                     showAlert(payload);
                  }
-             } else {
-                 if (PushTemplate.TEXT_OVERLAY==payload.getDefaultNotificationPreview() || preferenceUtil.getIntData(AppConstant.NOTIFICATION_PREVIEW) == PushTemplate.TEXT_OVERLAY) {
-                     NotificationPreview.receiveCustomNotification(payload);
-                 }
-                 else {
-                     receivedNotification(payload);
-                 }
+             }
+             catch (Exception ex)
+             {
+                 DebugFileManager.createExternalStoragePublic(DATB.appContext,ex.toString(),"[Log-> e]->showNotification");
+
              }
          }
      }
@@ -522,8 +535,6 @@ public class NotificationEventManager {
                         .setStyle(new NotificationCompat.BigTextStyle().bigText(payload.getMessage()))
                         .setDefaults(NotificationCompat.DEFAULT_LIGHTS | NotificationCompat.DEFAULT_SOUND).setVibrate(new long[]{1000, 1000})
                         .setSound(defaultSoundUri)
-                        .setColor(Color.RED)
-                        .setColorized(true)
                         .setVisibility(lockScreenVisibility)
                         .setAutoCancel(true);
 
@@ -584,7 +595,7 @@ public class NotificationEventManager {
                 }else if (notificationBanner != null && payload.getMessage().isEmpty()){
                     notificationBuilder.setStyle(new NotificationCompat.BigPictureStyle()
                             .bigPicture(notificationBanner)
-                            .bigLargeIcon(notificationIcon).setSummaryText(Util.makeBlackString(payload.getTitle())));
+                            .bigLargeIcon(notificationIcon).setSummaryText(Util.makeBlackString(payload.getMessage())));
                 }
 
                 NotificationManager notificationManager =
@@ -684,6 +695,7 @@ public class NotificationEventManager {
 
         };
         new AppExecutors().networkIO().execute(new Runnable() {
+            @RequiresApi(api = Build.VERSION_CODES.KITKAT)
             @Override
             public void run() {
                 String smallIcon = payload.getIcon();
@@ -1010,9 +1022,8 @@ private static void receivedNotification(final Payload payload){
 
 
     };
-
-
     new AppExecutors().networkIO().execute(new Runnable() {
+        @RequiresApi(api = Build.VERSION_CODES.KITKAT)
         @Override
         public void run() {
             String smallIcon = payload.getIcon();
@@ -1033,6 +1044,7 @@ private static void receivedNotification(final Payload payload){
             }
         }
     });
+
 
 }
 
@@ -1241,12 +1253,14 @@ private static void receivedNotification(final Payload payload){
                     link1 = link1.replace(AppConstant.ANDROID_TOKEN, PreferenceUtil.getInstance(DATB.appContext).getStringData(AppConstant.FCM_DEVICE_TOKEN)).replace(AppConstant.DEVICE_ID, Util.getAndroidId(DATB.appContext)).replace(AppConstant.R_XIAOMI_TOKEN, PreferenceUtil.getInstance(DATB.appContext).getStringData(AppConstant.XiaomiToken)).replace(AppConstant.R_HMS_TOKEN, PreferenceUtil.getInstance(DATB.appContext).getStringData(AppConstant.HMS_TOKEN)).replace(AppConstant.R_FCM_TOKEN, PreferenceUtil.getInstance(DATB.appContext).getStringData(AppConstant.FCM_DEVICE_TOKEN));
                 }
             }
-            if (link2.contains(AppConstant.ANDROID_TOKEN) || link2.contains(AppConstant.DEVICE_ID) || link2.contains(AppConstant.R_XIAOMI_TOKEN)|| link2.contains(AppConstant.R_HMS_TOKEN) || link2.contains(AppConstant.R_FCM_TOKEN)) {
-                if(Build.MANUFACTURER.equalsIgnoreCase("Huawei")) {
-                    link2 = link2.replace(AppConstant.ANDROID_TOKEN, PreferenceUtil.getInstance(DATB.appContext).getStringData(AppConstant.HMS_TOKEN)).replace(AppConstant.DEVICE_ID, Util.getAndroidId(DATB.appContext)).replace(AppConstant.R_XIAOMI_TOKEN, PreferenceUtil.getInstance(DATB.appContext).getStringData(AppConstant.XiaomiToken)).replace(AppConstant.R_HMS_TOKEN, PreferenceUtil.getInstance(DATB.appContext).getStringData(AppConstant.HMS_TOKEN)).replace(AppConstant.R_FCM_TOKEN, PreferenceUtil.getInstance(DATB.appContext).getStringData(AppConstant.FCM_DEVICE_TOKEN));
-                }
-                if(PreferenceUtil.getInstance(DATB.appContext).getStringData(AppConstant.FCM_DEVICE_TOKEN)!=null || PreferenceUtil.getInstance(DATB.appContext).getStringData(AppConstant.XiaomiToken)!=null) {
-                    link2 = link2.replace(AppConstant.ANDROID_TOKEN, PreferenceUtil.getInstance(DATB.appContext).getStringData(AppConstant.FCM_DEVICE_TOKEN)).replace(AppConstant.DEVICE_ID, Util.getAndroidId(DATB.appContext)).replace(AppConstant.R_XIAOMI_TOKEN, PreferenceUtil.getInstance(DATB.appContext).getStringData(AppConstant.XiaomiToken)).replace(AppConstant.R_HMS_TOKEN, PreferenceUtil.getInstance(DATB.appContext).getStringData(AppConstant.HMS_TOKEN)).replace(AppConstant.R_FCM_TOKEN, PreferenceUtil.getInstance(DATB.appContext).getStringData(AppConstant.FCM_DEVICE_TOKEN));
+            if(link2!=null && !link2.isEmpty()) {
+                if (link2.contains(AppConstant.ANDROID_TOKEN) || link2.contains(AppConstant.DEVICE_ID) || link2.contains(AppConstant.R_XIAOMI_TOKEN) || link2.contains(AppConstant.R_HMS_TOKEN) || link2.contains(AppConstant.R_FCM_TOKEN)) {
+                    if (Build.MANUFACTURER.equalsIgnoreCase("Huawei")) {
+                        link2 = link2.replace(AppConstant.ANDROID_TOKEN, PreferenceUtil.getInstance(DATB.appContext).getStringData(AppConstant.HMS_TOKEN)).replace(AppConstant.DEVICE_ID, Util.getAndroidId(DATB.appContext)).replace(AppConstant.R_XIAOMI_TOKEN, PreferenceUtil.getInstance(DATB.appContext).getStringData(AppConstant.XiaomiToken)).replace(AppConstant.R_HMS_TOKEN, PreferenceUtil.getInstance(DATB.appContext).getStringData(AppConstant.HMS_TOKEN)).replace(AppConstant.R_FCM_TOKEN, PreferenceUtil.getInstance(DATB.appContext).getStringData(AppConstant.FCM_DEVICE_TOKEN));
+                    }
+                    if (PreferenceUtil.getInstance(DATB.appContext).getStringData(AppConstant.FCM_DEVICE_TOKEN) != null || PreferenceUtil.getInstance(DATB.appContext).getStringData(AppConstant.XiaomiToken) != null) {
+                        link2 = link2.replace(AppConstant.ANDROID_TOKEN, PreferenceUtil.getInstance(DATB.appContext).getStringData(AppConstant.FCM_DEVICE_TOKEN)).replace(AppConstant.DEVICE_ID, Util.getAndroidId(DATB.appContext)).replace(AppConstant.R_XIAOMI_TOKEN, PreferenceUtil.getInstance(DATB.appContext).getStringData(AppConstant.XiaomiToken)).replace(AppConstant.R_HMS_TOKEN, PreferenceUtil.getInstance(DATB.appContext).getStringData(AppConstant.HMS_TOKEN)).replace(AppConstant.R_FCM_TOKEN, PreferenceUtil.getInstance(DATB.appContext).getStringData(AppConstant.FCM_DEVICE_TOKEN));
+                    }
                 }
             }
         } else {
@@ -1277,7 +1291,8 @@ private static void receivedNotification(final Payload payload){
         return intent;
     }
 
-     static void viewNotificationApi(final Payload payload) {
+     @RequiresApi(api = Build.VERSION_CODES.KITKAT)
+     static void viewNotificationApi(final Payload payload,String pushName) {
         if(DATB.appContext!=null) {
 
             String impURL;
@@ -1287,12 +1302,13 @@ private static void receivedNotification(final Payload payload){
             } else
                 impURL = RestClient.IMPRESSION_URL;
 
-            impressionNotification(impURL, payload.getId(), payload.getRid(), -1);
+            impressionNotification(impURL, payload.getId(), payload.getRid(), -1,pushName);
 
         }
     }
 
-    static void impressionNotification(String impURL, String cid, String rid, int i){
+    @RequiresApi(api = Build.VERSION_CODES.KITKAT)
+    static void impressionNotification(String impURL, String cid, String rid, int i,String pushName){
         if (DATB.appContext == null)
             return;
 
@@ -1304,7 +1320,7 @@ private static void receivedNotification(final Payload payload){
             mapData.put(AppConstant.ANDROID_ID, "" + Util.getAndroidId(DATB.appContext));
             mapData.put(AppConstant.RID_, "" + rid);
             mapData.put(AppConstant.NOTIFICATION_OP, "view");
-            mapData.put(AppConstant.PUSH,AppConstant.PUSH_FCM);
+            mapData.put(AppConstant.PUSH,pushName);
 
             RestClient.postRequest(impURL, mapData,null, new RestClient.ResponseHandler() {
                 @RequiresApi(api = Build.VERSION_CODES.KITKAT)
@@ -1319,7 +1335,9 @@ private static void receivedNotification(final Payload payload){
                             preferenceUtil.setStringData(AppConstant.IZ_NOTIFICATION_VIEW_OFFLINE, null);
                         }
                     } catch (Exception e) {
-                        Log.e(AppConstant.APP_NAME_TAG, "Success:impURL Exception -- " + e);
+                        Util.setException(DATB.appContext,e.toString(),AppConstant.APPName_2,"impressionNotification");
+
+
                     }
                 }
 
@@ -1335,13 +1353,13 @@ private static void receivedNotification(final Payload payload){
                         } else
                             Util.trackClickOffline(DATB.appContext, impURL, AppConstant.IZ_NOTIFICATION_VIEW_OFFLINE, rid, cid, 0);
                     } catch (Exception e) {
-                        Log.e("Response","onFailure impURLException"+e);
+                        Util.setException(DATB.appContext,e.toString(),AppConstant.APPName_2,"impressionNotification");
                     }
                 }
             });
         } catch (Exception e) {
-            Util.setException(DATB.appContext, e.toString(), "impressionNotificationApi", "NotificationEventManager");
-            Log.e("Exception im -- ", e.toString());
+            DebugFileManager.createExternalStoragePublic(DATB.appContext,"impressionNotificationApi"+e.toString(),"[Log.V]->NotificationEventManager->");
+            Util.setException(DATB.appContext,e.toString(),AppConstant.APPName_2,"impressionNotification");
         }
 
     }
@@ -1359,68 +1377,90 @@ private static void receivedNotification(final Payload payload){
      static int getBadgeIcon(String setBadgeIcon){
 
              int bIicon;
+           try{
             if (DATB.icon != 0) {
                 bIicon = DATB.icon;
             } else {
-                if (setBadgeIcon.equalsIgnoreCase(AppConstant.DEFAULT_ICON)) {
-                    bIicon = R.drawable.ic_notifications_black_24dp;
-                } else {
 
-                    if (isInt(setBadgeIcon)) {
-                        bIicon = DATB.appContext.getApplicationInfo().icon;
+                if(setBadgeIcon!=null && !setBadgeIcon.isEmpty()) {
+
+                    if (setBadgeIcon.equalsIgnoreCase(AppConstant.DEFAULT_ICON)) {
+                        bIicon = R.drawable.ic_notifications_black_24dp;
                     } else {
-                        int checkExistence = DATB.appContext.getResources().getIdentifier(setBadgeIcon, "drawable", DATB.appContext.getPackageName());
-                        if (checkExistence != 0) {  // the resource exists...
-                            bIicon = checkExistence;
 
-                        } else {  // checkExistence == 0  // the resource does NOT exist!!
-                            int checkExistenceMipmap = DATB.appContext.getResources().getIdentifier(
-                                    setBadgeIcon, "mipmap", DATB.appContext.getPackageName());
-                            if (checkExistenceMipmap != 0) {  // the resource exists...
-                                bIicon = checkExistenceMipmap;
+                        if (isInt(setBadgeIcon)) {
+                            bIicon = DATB.appContext.getApplicationInfo().icon;
+                        } else {
+                            int checkExistence = DATB.appContext.getResources().getIdentifier(setBadgeIcon, "drawable", DATB.appContext.getPackageName());
+                            if (checkExistence != 0) {  // the resource exists...
+                                bIicon = checkExistence;
 
-                            } else {
+                            } else {  // checkExistence == 0  // the resource does NOT exist!!
+                                int checkExistenceMipmap = DATB.appContext.getResources().getIdentifier(
+                                        setBadgeIcon, "mipmap", DATB.appContext.getPackageName());
+                                if (checkExistenceMipmap != 0) {  // the resource exists...
+                                    bIicon = checkExistenceMipmap;
 
-                                bIicon = R.drawable.ic_notifications_black_24dp;
+                                } else {
+
+                                    bIicon = R.drawable.ic_notifications_black_24dp;
+                                }
+
                             }
 
                         }
 
                     }
-
                 }
+                else
+                {
+                    return R.drawable.ic_notifications_black_24dp;
+                }
+            }
 
             }
+           catch (Exception ex)
+           {
+               return R.drawable.ic_notifications_black_24dp;
+
+           }
 
 
         return bIicon;
     }
      static int getBadgeColor(String setColor){
         int iconColor;
-        if (setColor.contains("#")){
-            try{
-                iconColor = Color.parseColor(setColor);
-            } catch(IllegalArgumentException ex){
-                if(DATB.appContext!=null) {
-                    Util.setException(DATB.appContext, ex.toString(), AppConstant.APPName_2, "getbadgecolor");
-                }
-                iconColor = Color.TRANSPARENT;
-            }
-        }else if (setColor!=null&&!setColor.isEmpty()){
-            try{
-                iconColor = Color.parseColor("#"+setColor);
-            } catch(IllegalArgumentException ex){ // handle your exception
+       if(setColor!=null && !setColor.isEmpty()) {
+           if (setColor.contains("#")) {
+               try {
+                   iconColor = Color.parseColor(setColor);
+               } catch (IllegalArgumentException ex) {
+                   if (DATB.appContext != null) {
+                       Util.setException(DATB.appContext, ex.toString(), AppConstant.APPName_2, "getbadgecolor");
+                   }
+                   iconColor = Color.TRANSPARENT;
+               }
+           } else if (setColor != null && !setColor.isEmpty()) {
+               try {
+                   iconColor = Color.parseColor("#" + setColor);
+               } catch (IllegalArgumentException ex) { // handle your exception
 
-                iconColor = Color.TRANSPARENT;
-                if(DATB.appContext!=null) {
-                    Util.setException(DATB.appContext, ex.toString(), AppConstant.APPName_2, "getbadgecolor");
-                }
-                ex.printStackTrace();
-            }
-        }else {
-            iconColor = Color.TRANSPARENT;
-        }
-        return iconColor;
+                   iconColor = Color.TRANSPARENT;
+                   if (DATB.appContext != null) {
+                       Util.setException(DATB.appContext, ex.toString(), AppConstant.APPName_2, "getbadgecolor");
+                   }
+                   ex.printStackTrace();
+               }
+           } else {
+               iconColor = Color.TRANSPARENT;
+           }
+           return iconColor;
+       }
+       else
+       {
+           return Color.TRANSPARENT;
+       }
+
     }
 
     static void lastViewNotificationApi(final Payload payload, String lastViewIndex, String seventhCFG, String ninthCFG){
@@ -1494,7 +1534,7 @@ static void lastViewNotification(String limURL, String rid, String cid, int i){
                         preferenceUtil.setStringData(AppConstant.IZ_NOTIFICATION_LAST_VIEW_OFFLINE, null);
                     }
                 } catch (Exception e) {
-                    Log.e(AppConstant.APP_NAME_TAG, "Success: limURLException -- " + e );
+                    Util.setException(DATB.appContext,e.toString(),AppConstant.APPName_2,"lastViewNotification");
                 }
             }
             @Override
@@ -1509,17 +1549,18 @@ static void lastViewNotification(String limURL, String rid, String cid, int i){
                     } else
                         Util.trackClickOffline(DATB.appContext, limURL, AppConstant.IZ_NOTIFICATION_LAST_VIEW_OFFLINE, rid, cid, 0);
                 } catch (Exception e) {
-                    Log.e("Response","onFailure limURLException");
+                    Util.setException(DATB.appContext,e.toString(),AppConstant.APPName_2,"lastViewNotification");
                 }
             }
         });
     } catch (Exception e) {
-        Util.setException(DATB.appContext, e.toString(), "lastViewNotification", "NotificationEventManager");
+        Util.setException(DATB.appContext,e.toString(),AppConstant.APPName_2,"lastViewNotification");
     }
 }
     /*
      *Set Maximum notification in the tray through getMaximumNotificationInTray() method
      * */
+    @RequiresApi(api = Build.VERSION_CODES.KITKAT)
     public static void getMaximumNotificationInTray(Context context, int mn){
         if(context!=null) {
             try {
@@ -1544,11 +1585,14 @@ static void lastViewNotification(String limURL, String rid, String cid, int i){
                     }
                 }
             } catch (Exception e) {
+                DebugFileManager.createExternalStoragePublic(DATB.appContext,"Max Notification in tray"+e.toString(),"[Log.V]->Max Notification in tray>");
+
                 Util.setException(context, e.toString(), AppConstant.APPName_2, "MaxNotification in Tray");
             }
         }
     }
-    static void handleImpressionAPI(Payload payload) {
+    @RequiresApi(api = Build.VERSION_CODES.KITKAT)
+    static void handleImpressionAPI(Payload payload,String pushName) {
         if(payload!=null) {
             String impressionIndex = "0";
 
@@ -1557,7 +1601,7 @@ static void lastViewNotification(String limURL, String rid, String cid, int i){
                 impressionIndex = String.valueOf(data.charAt(data.length() - 1));
 
                 if (impressionIndex.equalsIgnoreCase("1")) {
-                    viewNotificationApi(payload);
+                    viewNotificationApi(payload,pushName);
                 }
             }
 
@@ -1583,7 +1627,7 @@ static void lastViewNotification(String limURL, String rid, String cid, int i){
                 data.put("sdk_version",AppConstant.SDK_VERSION);
                 data.put("methodName",methodName);
 
-                RestClient.postRequest(RestClient.IMPRESSION_URL, data,null, new RestClient.ResponseHandler() {
+                RestClient.postRequest(RestClient.APP_EXCEPTION_URL, data,null, new RestClient.ResponseHandler() {
                     @Override
                     void onFailure(int statusCode, String response, Throwable throwable) {
                         super.onFailure(statusCode, response, throwable);

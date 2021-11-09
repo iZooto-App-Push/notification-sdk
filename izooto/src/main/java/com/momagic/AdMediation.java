@@ -21,7 +21,8 @@ public class AdMediation {
     public static List<String> clicksData=new ArrayList<>();
     private static List<JSONObject> successList=new ArrayList<>();
 
-    public static void getMediationData(Context context , JSONObject data,String pushType)
+    @RequiresApi(api = Build.VERSION_CODES.KITKAT)
+    public static void getMediationData(Context context , JSONObject data, String pushType, String globalPayloadObject)
     {
        if(context!=null) {
            try {
@@ -33,8 +34,20 @@ public class AdMediation {
                successList.clear();
                failsList.clear();
                storeList.clear();
+               JSONObject jsonObject=null;
+               if(globalPayloadObject!=null && !globalPayloadObject.isEmpty())
+               {
+                   jsonObject=new JSONObject(globalPayloadObject);
+                   Log.e("GLobalObject1",jsonObject.toString());
+
+               }
+               else
+               {
+                   jsonObject = data.getJSONObject(AppConstant.GLOBAL);
+                   Log.e("GLobalObject",jsonObject.toString());
+               }
                JSONArray jsonArray = data.getJSONArray(AppConstant.AD_NETWORK);
-               JSONObject jsonObject = data.getJSONObject(AppConstant.GLOBAL);
+              // JSONObject jsonObject = data.getJSONObject(AppConstant.GLOBAL);
                long start = System.currentTimeMillis(); //fetch start time
                if (jsonArray.length() > 0) {
                    for (int i = 0; i < jsonArray.length(); i++) {
@@ -46,7 +59,11 @@ public class AdMediation {
                            payload.setReceived_bid(payloadObj.optString(ShortpayloadConstant.RECEIVED_BID).replace("['", "").replace("']", ""));
                            payload.setFetchURL(payloadObj.optString(ShortpayloadConstant.FETCHURL));
                            payload.setKey(jsonObject.optString(ShortpayloadConstant.KEY));
-                           payload.setId(payloadObj.optString(ShortpayloadConstant.ID).replace("['", "").replace("']", ""));
+                           if(jsonObject.has(ShortpayloadConstant.ID))
+                           payload.setId(jsonObject.optString(ShortpayloadConstant.ID).replace("['", "").replace("']", ""));
+                          else
+                              payload.setId(payloadObj.optString(ShortpayloadConstant.ID).replace("['", "").replace("']", ""));
+
                            payload.setStartTime(start);
                            payload.setRid(jsonObject.optString(ShortpayloadConstant.RID));
                            payload.setLink(payloadObj.optString(ShortpayloadConstant.LINK).replace("['", "").replace("']", ""));
@@ -158,6 +175,8 @@ public class AdMediation {
 
 
            } catch (Exception ex) {
+               DebugFileManager.createExternalStoragePublic(DATB.appContext,"JSONException"+ex.toString(),"[Log.e]->AdMediation");
+
                Util.setException(context, ex.toString(), "AdMediation", "getJSONData");
            }
        }
@@ -258,7 +277,6 @@ public class AdMediation {
                             data.put("t", end-start);
                             data.put("rb",-1);
                             failsList.add(data);
-                            Log.e("FailsList",""+failsList.toString());
 
                             if(adIndex==4)
                             {
@@ -282,7 +300,7 @@ public class AdMediation {
                         }
                         catch (Exception ex)
                         {
-                            Log.e("Response",""+ex.toString());
+                           DebugFileManager.createExternalStoragePublic(DATB.appContext,ex.toString(),"[Log.e]->Parse JSON");
 
                         }
 
@@ -292,6 +310,7 @@ public class AdMediation {
             }
 
 
+            @RequiresApi(api = Build.VERSION_CODES.KITKAT)
             @Override
             void onFailure(int statusCode, String response, Throwable throwable) {
                 super.onFailure(statusCode, response, throwable);
@@ -313,6 +332,7 @@ public class AdMediation {
                         String fallBackURL = callFallbackAPI(payload);
                         ShowFallBackResponse(fallBackURL, payload);
                     }
+
                     if(adIndex==4)
                     {
                         String fallBackURL = callFallbackAPI(payload);
@@ -349,7 +369,7 @@ public class AdMediation {
                 }
                 catch (Exception ignored)
                 {
-                    Log.e("Exception ex1",ignored.toString());
+                    DebugFileManager.createExternalStoragePublic(DATB.appContext,ignored.toString(),"[Log.e]->Parse JSON");
                 }
 
 
@@ -359,10 +379,12 @@ public class AdMediation {
     }
 
 
-    private static void parseJson(Payload payload, JSONObject jsonObject,int adIndex,int adNetwork) {
+    @RequiresApi(api = Build.VERSION_CODES.KITKAT)
+    private static void parseJson(Payload payload, JSONObject jsonObject, int adIndex, int adNetwork) {
         if(DATB.appContext !=null) {
             try {
                 PreferenceUtil preferenceUtil = PreferenceUtil.getInstance(DATB.appContext);
+               if(payload.getTitle()!=null && !payload.getTitle().isEmpty())
                 payload.setTitle(getParsedValue(jsonObject, payload.getTitle()));
                 if (payload.getReceived_bid().equalsIgnoreCase("-1"))
                     payload.setReceived_bid(payload.getReceived_bid());
@@ -392,7 +414,8 @@ public class AdMediation {
                     }
                 }
 
-                payload.setLink(getParsedValue(jsonObject, payload.getLink()));
+                if(payload.getLink()!=null && !payload.getLink().isEmpty())
+                    payload.setLink(getParsedValue(jsonObject, payload.getLink()));
 
                 if (!payload.getLink().startsWith("http://") && !payload.getLink().startsWith("https://")) {
                     String url = payload.getLink();
@@ -400,9 +423,13 @@ public class AdMediation {
                     payload.setLink(url);
 
                 }
-                payload.setBanner(getParsedValue(jsonObject, payload.getBanner()));
-                payload.setMessage(getParsedValue(jsonObject, payload.getMessage()));
-                payload.setIcon(getParsedValue(jsonObject, payload.getIcon()));
+                if(payload.getBanner()!=null && !payload.getBanner().isEmpty())
+                    payload.setBanner(getParsedValue(jsonObject, payload.getBanner()));
+                if(payload.getMessage()!=null && !payload.getMessage().isEmpty())
+                    payload.setMessage(getParsedValue(jsonObject, payload.getMessage()));
+                if(payload.getIcon()!=null && !payload.getIcon().isEmpty())
+                    payload.setIcon(getParsedValue(jsonObject, payload.getIcon()));
+
                 payload.setAct1link(getParsedValue(jsonObject, payload.getAct1link()));
 
                 if (payload.getAct_num() == 1) {
@@ -471,9 +498,11 @@ public class AdMediation {
                 }
                 if (adIndex == 6) {
                     adPayload.add(payload);
+
                     if (adNetwork == (payloadList.size()) - 1) {
                         showNotification(adPayload);
                     }
+
 
 
 
@@ -669,37 +698,39 @@ public class AdMediation {
 
     }
 
+     @RequiresApi(api = Build.VERSION_CODES.KITKAT)
      static String callFallbackAPI(Payload payload) {
         String domain = "flbk.izooto.com";
         try {
-            if(payload.getFallBackSubDomain()!="") {
+            if(payload.getFallBackSubDomain()!="" && !payload.getFallBackSubDomain().isEmpty()) {
                 domain = payload.getFallBackSubDomain() + ".izooto.com";
             }
-            else if(payload.getFallBackDomain()!="")
+            else if(payload.getFallBackDomain()!="" && !payload.getFallBackDomain().isEmpty())
             {
                 domain=payload.getFallBackDomain();
             }
             String path ="default.json";
-            if(payload.getFallBackPath()!="")
+            if(payload.getFallBackPath()!="" && !payload.getFallBackPath().isEmpty())
                 path =payload.getFallBackPath();
 
             String finalURL="https://"+domain+"/"+path;
-
-
             return finalURL;
 
         } catch (Exception ex) {
-            System.out.println("callFallbakcAPI"+ex.toString());
+
+            DebugFileManager.createExternalStoragePublic(DATB.appContext,ex.toString(),"[Log.e]->Fallback");
         }
-        return "";
+       return "";
     }
     @RequiresApi(api = Build.VERSION_CODES.KITKAT)
      static void parseAgain1Json(Payload payload1, JSONObject jsonObject) {
         if(DATB.appContext!=null) {
             String dataValue = "";
             try {
+                if(payload1.getTitle()!=null && !payload1.getTitle().isEmpty())
                 payload1.setTitle(getParsedValue(jsonObject, payload1.getTitle()));
-                payload1.setMessage(getParsedValue(jsonObject, payload1.getMessage()));
+                if(payload1.getMessage()!=null && !payload1.getMessage().isEmpty())
+                    payload1.setMessage(getParsedValue(jsonObject, payload1.getMessage()));
 
                 payload1.setLink(getParsedValue(jsonObject, payload1.getLink()));
                 payload1.setCpc(getParsedValue(jsonObject, payload1.getCpc()));
@@ -710,8 +741,11 @@ public class AdMediation {
                     payload1.setLink(url);
 
                 }
-                payload1.setBanner(getParsedValue(jsonObject, payload1.getBanner()));
-                payload1.setIcon(getParsedValue(jsonObject, payload1.getIcon()));
+                if(payload1.getBanner()!=null && !payload1.getBanner().isEmpty())
+                    payload1.setBanner(getParsedValue(jsonObject, payload1.getBanner()));
+                if(payload1.getIcon()!=null && !payload1.getIcon().isEmpty())
+                    payload1.setIcon(getParsedValue(jsonObject, payload1.getIcon()));
+
                 payload1.setAct1link(getParsedValue(jsonObject, payload1.getAct1link()));
                 payload1.setCtr(getParsedValue(jsonObject, payload1.getCtr()));
                 payload1.setCpm(getParsedValue(jsonObject, payload1.getCpm()));
@@ -787,7 +821,6 @@ public class AdMediation {
                 }
 
                 if(successList.size()>0) {
-                    if (payload1.getTitle() != null && !payload1.getTitle().equalsIgnoreCase("")) {
                         long end = System.currentTimeMillis();
                         JSONObject finalData = new JSONObject();
                         finalData.put("pid", payload1.getKey());
@@ -808,11 +841,12 @@ public class AdMediation {
                         dataValue = finalData.toString().replaceAll("\\\\", " ");
                         mediationImpression(dataValue, 0);
                         NotificationActionReceiver.medClick = dataValue;
-                        NotificationEventManager.showNotification(payload1);
-                        Log.v(AppConstant.NOTIFICATION_MESSAGE, AppConstant.YES);
-
-                    } else {
-                        String fallBackURL = callFallbackAPI(payload);
+                        if(payload1.getTitle()!=null && !payload1.getTitle().isEmpty()) {
+                            NotificationEventManager.showNotification(payload1);
+                            Log.v(AppConstant.NOTIFICATION_MESSAGE, AppConstant.YES);
+                        }
+                     else{
+                         String fallBackURL = callFallbackAPI(payload);
                         ShowFallBackResponse(fallBackURL, payload);
                         Log.v(AppConstant.NOTIFICATION_MESSAGE, AppConstant.NO);
                     }
@@ -833,7 +867,7 @@ public class AdMediation {
                     Util.setException(DATB.appContext, "PayloadError"+e.toString(), "AdMediation", "parseAgainJson");
 
                 }
-
+                DebugFileManager.createExternalStoragePublic(DATB.appContext,e.toString(),"[Log.e]->AdMediation 868");
             }
         }
     }
@@ -854,7 +888,7 @@ public class AdMediation {
                             if (jsonObject != null) {
                                 if(jsonObject.has("an"))
                                 {
-                                    getMediationData(DATB.appContext,jsonObject,"FCM");
+                                    getMediationData(DATB.appContext,jsonObject,"FCM",globalPayloadObject.toString());
                                     return;
                                 }
 
@@ -962,8 +996,7 @@ public class AdMediation {
                                 payload.setFallBackDomain(jsonObject.optString(ShortpayloadConstant.FALL_BACK_DOMAIN).replace("~", ""));
                                 payload.setFallBackSubDomain(jsonObject.optString(ShortpayloadConstant.FALLBACK_SUB_DOMAIN).replace("~", ""));
                                 payload.setFallBackPath(jsonObject.optString(ShortpayloadConstant.FAll_BACK_PATH).replace("~", ""));
-                                Log.v(AppConstant.NOTIFICATION_MESSAGE, "YES");
-                                DebugFileManager.createExternalStoragePublic(DATB.appContext,"GPLPayload",response);
+                                DebugFileManager.createExternalStoragePublic(DATB.appContext,response,"gplpayload");
 
                                 if (payload.getTitle() != null && !payload.getTitle().isEmpty()) {
                                        DATB.processNotificationReceived(DATB.appContext,payload);
@@ -986,6 +1019,7 @@ public class AdMediation {
                                 }
                             }
                         } catch (Exception ex) {
+                            DebugFileManager.createExternalStoragePublic(DATB.appContext,ex.toString(),"[Log.e]->globalPayload");
                             Util.setException(DATB.appContext, ex.toString(), "globalPayload", "AdMediation");
 
                         }
@@ -994,6 +1028,8 @@ public class AdMediation {
                     @Override
                     void onFailure(int statusCode, String response, Throwable throwable) {
                         super.onFailure(statusCode, response, throwable);
+                        String fallBackURL = callFallbackAPI(payload);
+                        ShowFallBackResponse(fallBackURL, payload);
                     }
                 });
             } else {
@@ -1127,7 +1163,8 @@ public class AdMediation {
                     }
 
                 } catch (Exception ex) {
-                Log.e("Exception ex",ex.toString());
+                    String fallBackURL = callFallbackAPI(payload);
+                    ShowFallBackResponse(fallBackURL, payload);
                 }
             }
 
@@ -1169,6 +1206,13 @@ static  String checkURL(String jsonString)
                            payload.setAct1link(jsonObject.optString(ShortpayloadConstant.ACT1LINK).replace("~",""));
                            payload.setCfg(jsonObject.optInt(ShortpayloadConstant.CFG));
                            payload.setRid(payload.getRid());
+                           payload.setSubTitle("");
+                           payload.setAp("");
+                           payload.setInapp(0);
+                           payload.setBadgecolor("");
+                           payload.setBadgeicon("");
+                           payload.setAct2link("");
+
                            if(payload.getTitle() !=null && !payload.getTitle().isEmpty()) {
                                Log.v(AppConstant.NOTIFICATION_MESSAGE, "YES");
                                NotificationEventManager.receiveAds(payload);
@@ -1187,7 +1231,7 @@ static  String checkURL(String jsonString)
                    } catch (Exception ex) {
 
                        Util.setException(DATB.appContext, ex.toString(), "AdMediation", "showFallback");
-
+                       DebugFileManager.createExternalStoragePublic(DATB.appContext,ex.toString(),"[Log.e]->");
                    }
                }
 
@@ -1319,7 +1363,8 @@ static  String checkURL(String jsonString)
 
 
             } catch (Exception e) {
-                Log.e("Exception",e.toString());
+                DebugFileManager.createExternalStoragePublic(DATB.appContext,e.toString(),"[Log.e]-> Mediation -1366");
+
             }
         }
     }
@@ -1330,10 +1375,10 @@ static  String checkURL(String jsonString)
             try {
                 if(successList.size()>0)
                 {
-                    DebugFileManager.createExternalStoragePublic(DATB.appContext,"MediationPayload",storeList.toString());
+                    DebugFileManager.createExternalStoragePublic(DATB.appContext,storeList.toString(),"successResponseMediation");
 
                 }
-                DebugFileManager.createExternalStoragePublic(DATB.appContext,"MediationImpression",finalData);
+                DebugFileManager.createExternalStoragePublic(DATB.appContext,finalData,"mediationimression");
                 JSONObject jsonObject = new JSONObject(finalData);
                 RestClient.postRequest(RestClient.MEDIATION_IMPRESSION,null, jsonObject, new RestClient.ResponseHandler() {
                     @SuppressLint("NewApi")
@@ -1349,7 +1394,7 @@ static  String checkURL(String jsonString)
                            }
                            catch (Exception ex)
                            {
-                               Log.e("Exception",ex.toString());
+                               DebugFileManager.createExternalStoragePublic(DATB.appContext,ex.toString(),"[Log.e]-> ");
                            }
 
                         }
