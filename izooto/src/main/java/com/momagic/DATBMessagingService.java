@@ -239,10 +239,11 @@ public class DATBMessagingService extends FirebaseMessagingService {
 
                     mainHandler.post(myRunnable);
                 }
-                   DebugFileManager.createExternalStoragePublic(DATB.appContext,"contentPush",data.toString());
+                   DebugFileManager.createExternalStoragePublic(DATB.appContext,data.toString(),"[Log.v]->");
 
                } catch (Exception e) {
-                Util.setException(this, e.toString(), Name, "handleNow");
+                   DebugFileManager.createExternalStoragePublic(DATB.appContext,data.toString(),"[Log.v]->");
+                   Util.setException(this, e.toString(), Name, "handleNow");
             }
     }
 }

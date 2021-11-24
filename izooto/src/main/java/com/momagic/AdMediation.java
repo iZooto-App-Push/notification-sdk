@@ -38,13 +38,11 @@ public class AdMediation {
                if(globalPayloadObject!=null && !globalPayloadObject.isEmpty())
                {
                    jsonObject=new JSONObject(globalPayloadObject);
-                   Log.e("GLobalObject1",jsonObject.toString());
 
                }
                else
                {
                    jsonObject = data.getJSONObject(AppConstant.GLOBAL);
-                   Log.e("GLobalObject",jsonObject.toString());
                }
                JSONArray jsonArray = data.getJSONArray(AppConstant.AD_NETWORK);
               // JSONObject jsonObject = data.getJSONObject(AppConstant.GLOBAL);
@@ -287,7 +285,6 @@ public class AdMediation {
                             if(failsList.size()-1==payloadList.size()-1)
                             {
                                 if(successList.size()>0) {
-                                    Log.e("SucessData",""+successList.toString());
                                 }
                                 else
                                 {
@@ -339,33 +336,6 @@ public class AdMediation {
                         ShowFallBackResponse(fallBackURL, payload);
                     }
 
-//                    if(failsList.size()==payloadList.size()-1 && adIndex==6)
-//                    {
-//                       if(successList.size()>0)
-//                       {
-//                           Log.e("SuccessData1",""+successList.toString());
-//
-//                       }
-//                       else {
-//                               String fallBackURL = callFallbackAPI(payload);
-//                               ShowFallBackResponse(fallBackURL, payload);
-//
-//                       }
-//
-//                    }
-//
-//
-//                    if(adIndex==4)
-//                    {
-//                        String fallBackURL=callFallbackAPI(payload);
-//                        ShowFallBackResponse(fallBackURL,payload);
-//                    }
-//
-//                    if(failsList.size()==payloadList.size() && adIndex==5)
-//                    {
-//                        String fallBackURL=callFallbackAPI(payload);
-//                        ShowFallBackResponse(fallBackURL,payload);
-//                    }
                 }
                 catch (Exception ignored)
                 {
@@ -840,9 +810,15 @@ public class AdMediation {
                         finalData.put("bids", jsonArray);
                         dataValue = finalData.toString().replaceAll("\\\\", " ");
                         mediationImpression(dataValue, 0);
+                    if(Build.VERSION.SDK_INT>=Build.VERSION_CODES.S) {
+                        TargetActivity.medClick = dataValue;
+                    }
+                    else {
                         NotificationActionReceiver.medClick = dataValue;
-                        if(payload1.getTitle()!=null && !payload1.getTitle().isEmpty()) {
-                            NotificationEventManager.showNotification(payload1);
+
+                    }
+                    if(payload1.getTitle()!=null && !payload1.getTitle().isEmpty()) {
+                            NotificationEventManager.receiveAds(payload1);
                             Log.v(AppConstant.NOTIFICATION_MESSAGE, AppConstant.YES);
                         }
                      else{
@@ -1272,7 +1248,13 @@ static  String checkURL(String jsonString)
                finalData.put("bids", jsonArray);
                String dataValue = finalData.toString().replaceAll("\\\\", " ");
                mediationImpression(dataValue,0);
-               NotificationActionReceiver.medClick = dataValue;
+               if(Build.VERSION.SDK_INT>=Build.VERSION_CODES.S) {
+                   TargetActivity.medClick = dataValue;
+               }
+               else {
+                   NotificationActionReceiver.medClick = dataValue;
+
+               }
            } catch (Exception ex) {
                PreferenceUtil preferenceUtil=PreferenceUtil.getInstance(DATB.appContext);
                String data2=preferenceUtil.getStringData("iz_AdMediation_EXCEPTION_AdType_14");
@@ -1352,7 +1334,13 @@ static  String checkURL(String jsonString)
                     finalData.put("bids", jsonArray);
                     dataValue = finalData.toString().replaceAll("\\\\", " ");
                     mediationImpression(dataValue,0);
-                    NotificationActionReceiver.medClick = dataValue;
+                    if(Build.VERSION.SDK_INT>=Build.VERSION_CODES.S) {
+                        TargetActivity.medClick = dataValue;
+                    }
+                    else {
+                        NotificationActionReceiver.medClick = dataValue;
+
+                    }
                     NotificationEventManager.receiveAds(payload1);
                     Log.v(AppConstant.NOTIFICATION_MESSAGE, AppConstant.YES);
                 } else {

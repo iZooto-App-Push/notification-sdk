@@ -258,7 +258,7 @@ public interface AppConstant {
     String AD_TYPE="tp";
     String NOTIFICATION_MESSAGE="Send Notification";
     String YES="yes";
-    String SDK_VERSION="1.1.7";
+    String SDK_VERSION="1.4.0";
     String QSDK_VERSION="av";
     String SDK="SDKVERSION";
     String PACKAGE_NAME="mpn";
@@ -350,6 +350,7 @@ public interface AppConstant {
     String IZ_REMOVE_TOPIC_OFFLINE = "iz_remove_topic_offline";
     String FILE_EXIST="iz_fileExits";
     String DIRECTORYNAME="DATB.907135001.debug";
+    String SAVESUBID="DATB_SUBID";
 }
 
 

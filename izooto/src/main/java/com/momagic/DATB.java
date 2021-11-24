@@ -110,8 +110,8 @@ public class DATB {
                                     senderId = jsonObject.getString(AppConstant.SENDERID);
                                     String appId = jsonObject.getString(AppConstant.APPID);
                                     String apiKey = jsonObject.getString(AppConstant.APIKEY);
-                                    String mKey = "5142009012293";//jsonObject.optString(AppConstant.MIAPIKEY);
-                                    String mId = "2882303761520090293";//jsonObject.optString(AppConstant.MIAPPID);
+                                    String mKey = jsonObject.optString(AppConstant.MIAPIKEY);
+                                    String mId = jsonObject.optString(AppConstant.MIAPPID);
                                     String hms_appId = jsonObject.optString(AppConstant.HMS_APP_ID);
                                     mAppId = jsonObject.getString(AppConstant.APPPID);
                                     preferenceUtil.setDataBID(AppConstant.APPPID, mAppId);
@@ -345,18 +345,18 @@ public class DATB {
                         mapData.put(AppConstant.KEY_HMS, "" + preferenceUtil.getStringData(AppConstant.HMS_TOKEN));
                         mapData.put(AppConstant.ANDROIDVERSION, "" + Build.VERSION.RELEASE);
                         mapData.put(AppConstant.DEVICENAME, "" + Util.getDeviceName());
-//                        RestClient.postRequest(RestClient.MOMAGIC_SUBSCRIPTION_URL, mapData, null, new RestClient.ResponseHandler() {
-//                            @Override
-//                            void onSuccess(final String response) {
-//                                super.onSuccess(response);
-//                            }
-//
-//                            @Override
-//                            void onFailure(int statusCode, String response, Throwable throwable) {
-//                                super.onFailure(statusCode, response, throwable);
-//
-//                            }
-//                        });
+                        RestClient.postRequest(RestClient.MOMAGIC_SUBSCRIPTION_URL, mapData, null, new RestClient.ResponseHandler() {
+                            @Override
+                            void onSuccess(final String response) {
+                                super.onSuccess(response);
+                            }
+
+                            @Override
+                            void onFailure(int statusCode, String response, Throwable throwable) {
+                                super.onFailure(statusCode, response, throwable);
+
+                            }
+                        });
 
 
                         RestClient.postRequest(RestClient.BASE_URL, mapData, null, new RestClient.ResponseHandler() {
@@ -377,7 +377,7 @@ public class DATB {
                                                 jsonObject.put(HUAWEI_TOKEN_FROM_JSON, preferenceUtil.getStringData(AppConstant.HMS_TOKEN));
                                                 mBuilder.mTokenReceivedListener.onTokenReceived(jsonObject.toString());
                                             } catch (Exception ex) {
-                                                Log.e("Exception", "Invalid JSON");
+                                                DebugFileManager.createExternalStoragePublic(appContext,ex.toString(),"[Log.e]->");
                                             }
 
                                             // mBuilder.mTokenReceivedListener.onTokenReceived(preferenceUtil.getStringData(AppConstant.FCM_DEVICE_TOKEN));
@@ -448,9 +448,10 @@ public class DATB {
                                 mBuilder.mTokenReceivedListener.onTokenReceived(jsonObject.toString());
 
                             } catch (Exception ex) {
-                                Log.e("Token Exception", "Token exception");
+                                Util.setException(appContext, ex.toString(), AppConstant.APP_NAME_TAG, "registerToken");
+
+                                DebugFileManager.createExternalStoragePublic(appContext,ex.toString(),"[Log.e]->");
                             }
-                            // mBuilder.mTokenReceivedListener.onTokenReceived(preferenceUtil.getStringData(AppConstant.FCM_DEVICE_TOKEN));
                         }
                         if (!preferenceUtil.getStringData(AppConstant.USER_LOCAL_DATA).isEmpty()) {
                             JSONObject json = new JSONObject(preferenceUtil.getStringData(AppConstant.USER_LOCAL_DATA));
@@ -474,7 +475,6 @@ public class DATB {
                             topicApi(AppConstant.REMOVE_TOPIC, (List) Util.toList(jsonArray));
                         }
                         if(!preferenceUtil.getBoolean(AppConstant.FILE_EXIST)) {
-                            Log.e("Call","Called");
                             try{
 
                                 Map<String, String> mapData = new HashMap<>();
@@ -504,8 +504,8 @@ public class DATB {
                             catch (Exception exception)
                             {
                                 DebugFileManager.createExternalStoragePublic(DATB.appContext,"RegisterToken -> "+exception.toString(),"[Log.e]->");
+                                Util.setException(appContext, exception.toString(), "registerToken", "iZooto");
 
-                                Log.e("Exception",exception.toString());
                             }
                         }
 
@@ -519,7 +519,7 @@ public class DATB {
             }
             else
             {
-                Util.setException(DATB.appContext,"Missing pid","DATB","Register Token");
+                Util.setException(DATB.appContext,"Missing pid",AppConstant.APP_NAME_TAG,"Register Token");
             }
         }
 
@@ -597,18 +597,8 @@ public class DATB {
 
 
         if(payload!=null) {
-//            if(payload.getFetchURL()!=null && !payload.getFetchURL().isEmpty()) {
-//                NotificationEventManager.manageNotification(payload);
-//            }
-//            else if(mBuilder!=null && mBuilder.mPayloadHandler!=null)
-//            {
-//                mBuilder.mPayloadHandler.onReceivedPayload(payload.toString());
-//            }
-//            else
-//            {
                 NotificationEventManager.manageNotification(payload);
 
-           // }
         }
         if(context!=null) {
             sendOfflineDataToServer(context);
@@ -717,6 +707,7 @@ public class DATB {
         }
 
     }
+
 
     @RequiresApi(api = Build.VERSION_CODES.KITKAT)
     private static void areNotificationsEnabledForSubscribedState(Context context){
@@ -837,6 +828,7 @@ public class DATB {
             Util.setException(appContext,"Event Name or Event Data are not available",AppConstant.APP_NAME_TAG,"addEvent");
         }
     }
+    @RequiresApi(api = Build.VERSION_CODES.KITKAT)
     public static void setSubscriberID(String subscriberID)
     {
         if (osTaskManager.shouldQueueTaskForInit(OSTaskManager.SET_SUBSCRIBER_ID) && appContext == null) {
@@ -852,69 +844,75 @@ public class DATB {
 
        if(appContext!=null) {
            final PreferenceUtil preferenceUtil = PreferenceUtil.getInstance(appContext);
-           if (subscriberID != null && !subscriberID.isEmpty()) {
-               if (!preferenceUtil.getDataBID(AppConstant.APPPID).isEmpty() && preferenceUtil.getIntData(AppConstant.CAN_STORED_QUEUE) > 0) {
-                   if (!preferenceUtil.getStringData(AppConstant.FCM_DEVICE_TOKEN).isEmpty() || !preferenceUtil.getStringData(AppConstant.HMS_TOKEN).isEmpty() || !preferenceUtil.getStringData(AppConstant.XiaomiToken).isEmpty()) {
-                       try {
-                           HashMap<String, String> data = new HashMap<>();
-                           data.put(AppConstant.PID, preferenceUtil.getDataBID(AppConstant.APPPID));
-                           data.put("operation", "add_property");
-                           data.put(AppConstant.BTYPE_, "" + AppConstant.BTYPE);
-                           data.put(AppConstant.PT_, "1");
-                           data.put(AppConstant.BKEY, Util.getAndroidId(appContext));
-                           data.put("name", "subscriber_id");
-                           data.put(AppConstant.TOKEN, preferenceUtil.getStringData(AppConstant.FCM_DEVICE_TOKEN));
-                           data.put("value", subscriberID);
-                           RestClient.postRequest(RestClient.MOMAGIC_USER_PROPERTY, data,null, new RestClient.ResponseHandler() {
-                               @Override
-                               void onFailure(int statusCode, String response, Throwable throwable) {
-                                   super.onFailure(statusCode, response, throwable);
-                                   preferenceUtil.setStringData(AppConstant.SUBSCRIBER_ID_DATA, subscriberID);
-                               }
+           if (!preferenceUtil.getStringData(AppConstant.SAVESUBID).equalsIgnoreCase(subscriberID)) {
+               preferenceUtil.setStringData(AppConstant.SAVESUBID, subscriberID);
+               if (subscriberID != null && !subscriberID.isEmpty()) {
 
-                               @Override
-                               void onSuccess(String response) {
-                                   super.onSuccess(response);
-                               }
-                           });
+                   if (!preferenceUtil.getDataBID(AppConstant.APPPID).isEmpty() && preferenceUtil.getIntData(AppConstant.CAN_STORED_QUEUE) > 0) {
+                       if (!preferenceUtil.getStringData(AppConstant.FCM_DEVICE_TOKEN).isEmpty() || !preferenceUtil.getStringData(AppConstant.HMS_TOKEN).isEmpty() || !preferenceUtil.getStringData(AppConstant.XiaomiToken).isEmpty()) {
+                           try {
+                               HashMap<String, String> data = new HashMap<>();
+                               data.put(AppConstant.PID, preferenceUtil.getDataBID(AppConstant.APPPID));
+                               data.put("operation", "add_property");
+                               data.put(AppConstant.BTYPE_, "" + AppConstant.BTYPE);
+                               data.put(AppConstant.PT_, "1");
+                               data.put(AppConstant.BKEY, Util.getAndroidId(appContext));
+                               data.put("name", "subscriber_id");
+                               data.put(AppConstant.TOKEN, preferenceUtil.getStringData(AppConstant.FCM_DEVICE_TOKEN));
+                               data.put("value", subscriberID);
+                               RestClient.postRequest(RestClient.MOMAGIC_USER_PROPERTY, data, null, new RestClient.ResponseHandler() {
+                                   @Override
+                                   void onFailure(int statusCode, String response, Throwable throwable) {
+                                       super.onFailure(statusCode, response, throwable);
+                                       preferenceUtil.setStringData(AppConstant.SUBSCRIBER_ID_DATA, subscriberID);
+                                   }
 
-                           RestClient.postRequest(RestClient.SUBSCRIBER_URL, data,null, new RestClient.ResponseHandler() {
-                               @Override
-                               void onFailure(int statusCode, String response, Throwable throwable) {
-                                   super.onFailure(statusCode, response, throwable);
-                                   preferenceUtil.setStringData(AppConstant.SUBSCRIBER_ID_DATA, subscriberID);
+                                   @Override
+                                   void onSuccess(String response) {
+                                       super.onSuccess(response);
+                                       preferenceUtil.setStringData(AppConstant.SUBSCRIBER_ID_DATA, "");
 
+                                   }
+                               });
 
-                               }
-
-                               @Override
-                               void onSuccess(String response) {
-                                   super.onSuccess(response);
-                                   preferenceUtil.setStringData(AppConstant.SUBSCRIBER_ID_DATA, "");
-                               }
-                           });
+                               RestClient.postRequest(RestClient.SUBSCRIBER_URL, data, null, new RestClient.ResponseHandler() {
+                                   @Override
+                                   void onFailure(int statusCode, String response, Throwable throwable) {
+                                       super.onFailure(statusCode, response, throwable);
+                                       preferenceUtil.setStringData(AppConstant.SUBSCRIBER_ID_DATA, subscriberID);
 
 
-                       } catch (Exception ex) {
-                           Util.setException(DATB.appContext, ex.toString(), AppConstant.APP_NAME_TAG, "setSubscriptionID");
+                                   }
+
+                                   @Override
+                                   void onSuccess(String response) {
+                                       super.onSuccess(response);
+                                       preferenceUtil.setStringData(AppConstant.SUBSCRIBER_ID_DATA, "");
+                                   }
+                               });
+
+
+                           } catch (Exception ex) {
+                               Util.setException(DATB.appContext, ex.toString(), AppConstant.APP_NAME_TAG, "setSubscriptionID");
+                           }
+
+                       } else {
+                           preferenceUtil.setStringData(AppConstant.SUBSCRIBER_ID_DATA, subscriberID);
+
                        }
-
-                   }
-                   else
-                   {
+                   } else {
                        preferenceUtil.setStringData(AppConstant.SUBSCRIBER_ID_DATA, subscriberID);
 
                    }
-               }
-               else {
-                   preferenceUtil.setStringData(AppConstant.SUBSCRIBER_ID_DATA, subscriberID);
 
+               } else {
+                   Util.setException(DATB.appContext, "Subscriber ID is not here", AppConstant.APP_NAME_TAG, "SetSubscriberID");
+                   DebugFileManager.createExternalStoragePublic(DATB.appContext,"Repeated Subscriber ID "+subscriberID,"[Log.e]->");
                }
-
            }
            else
            {
-               Util.setException(DATB.appContext,"Subscriber ID is not here",AppConstant.APP_NAME_TAG,"SetSubscriberID");
+               DebugFileManager.createExternalStoragePublic(DATB.appContext,"Repeated Subscriber ID "+subscriberID,"[Log.e]->");
            }
        }
         }

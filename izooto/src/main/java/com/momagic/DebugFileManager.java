@@ -60,14 +60,12 @@ public class DebugFileManager {
 
                     File fileDirectory = Environment.getExternalStoragePublicDirectory(AppConstant.DIRECTORYNAME);
                     if (fileDirectory.exists() && fileDirectory.isDirectory()) {
-                        Log.e("File is already created", "File");
                         // File outputDirectory = new File(fileDirectory, Util.getPackageName(DATB.appContext));
 
                     } else {
                         if (!fileDirectory.exists()) {
                             if (fileDirectory.mkdir()) ;
                             createExternalStoragePublic(context, "", "");
-                            Log.e("File is created", "Created");
                             PreferenceUtil.getInstance(context).setBooleanData(AppConstant.FILE_EXIST, false);
 
                         }
@@ -90,8 +88,6 @@ public class DebugFileManager {
                     File fileDirectory = Environment.getExternalStoragePublicDirectory(AppConstant.DIRECTORYNAME);
                     if (fileDirectory.exists() && fileDirectory.isDirectory()) {
                         if (!fileDirectory.isDirectory()) {
-
-                            Log.v("Not a directory ", fileDirectory.getAbsolutePath());
                         }
 
                         File[] files = fileDirectory.listFiles();
@@ -104,7 +100,6 @@ public class DebugFileManager {
                             } else {
                                 boolean deleted = file.delete();
                                 if (!deleted) {
-                                    Log.e("Not a directory ", fileDirectory.getAbsolutePath());
                                 }
                             }
                         }
@@ -185,8 +180,6 @@ public class DebugFileManager {
                     String path = String.valueOf(Environment.getExternalStoragePublicDirectory(AppConstant.DIRECTORYNAME + "/pid.debug"));
                     File file = new File(path);
                     Uri uri = FileProvider.getUriForFile(context, context.getApplicationContext().getPackageName() + ".provider", file);
-                    Log.e("FileLocation", "\n" + uri.toString());
-                    // Uri path1 = Uri.fromFile(new File("file://" + fileLocation));
                     Intent emailIntent = new Intent(Intent.ACTION_SEND);
                     emailIntent.addFlags(Intent.FLAG_GRANT_READ_URI_PERMISSION);
                     emailIntent.addFlags(Intent.FLAG_GRANT_WRITE_URI_PERMISSION);

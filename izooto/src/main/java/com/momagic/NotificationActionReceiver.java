@@ -44,12 +44,14 @@ public class NotificationActionReceiver extends BroadcastReceiver {
     public  static  String medClick="";
     private String pushType;
     private int cfg;
+    String GLOBAL_ACTION_DISMISS_NOTIFICATION_SHADE = "15";
+
     @RequiresApi(api = Build.VERSION_CODES.KITKAT)
     @SuppressLint("MissingPermission")
     @Override
     public void onReceive(Context context, Intent intent) {
         if(context!=null) {
-            Intent it = new Intent(Intent.ACTION_CLOSE_SYSTEM_DIALOGS);
+            Intent it = new Intent(GLOBAL_ACTION_DISMISS_NOTIFICATION_SHADE);
             context.sendBroadcast(it);
             getBundleData(context, intent);
             mUrl.replace(AppConstant.BROWSERKEYID, PreferenceUtil.getInstance(context).getStringData(AppConstant.FCM_DEVICE_TOKEN));
