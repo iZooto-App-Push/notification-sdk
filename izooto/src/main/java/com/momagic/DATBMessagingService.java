@@ -154,8 +154,8 @@ public class DATBMessagingService extends FirebaseMessagingService {
                            JSONObject jsonObject = new JSONObject(data.get(AppConstant.GLOBAL));
                            String cid = jsonObject.optString(ShortpayloadConstant.ID);
                            String rid = jsonObject.optString(ShortpayloadConstant.RID);
-                           int cfg=jsonObject.optInt(ShortpayloadConstant.CFG);
-                           String cfgData=Util.getIntegerToBinary(cfg);
+                             int cfg=jsonObject.optInt(ShortpayloadConstant.CFG);
+                             String cfgData=Util.getIntegerToBinary(cfg);
                                 if(cfgData!=null && !cfgData.isEmpty()) {
                                    String impIndex = String.valueOf(cfgData.charAt(cfgData.length() - 1));
                                    if(impIndex.equalsIgnoreCase("1"))
@@ -169,7 +169,6 @@ public class DATBMessagingService extends FirebaseMessagingService {
 
                            JSONObject jsonObject1=new JSONObject(data.toString());
                            AdMediation.getMediationData(this, jsonObject1,"fcm","");
-                          // AdMediation.getAdNotificationData(this,jsonObject1,"FCM");
                            preferenceUtil.setBooleanData(AppConstant.MEDIATION, true);
                        }
                        catch (Exception ex)

@@ -125,8 +125,8 @@ public class Util {
          trimmedName = trimmedName.replace("//", "/");
          trimmedName = trimmedName.replace("http:/", "https://");
          trimmedName = trimmedName.replace("https:/", "https://");
-         if(trimmedName.contains(".jpeg") || trimmedName.contains(".jpg") || trimmedName.contains(".png")) {
-             if (trimmedName.startsWith("http://") || trimmedName.startsWith("https://")) {
+        if(trimmedName.contains(".jpeg") || trimmedName.contains(".jpg") || trimmedName.contains(".png") || trimmedName.contains(".webp")) {
+            if (trimmedName.startsWith("http://") || trimmedName.startsWith("https://")) {
                  Bitmap bmp =getBitMap(trimmedName);
                  if(bmp!=null) {
                      return bmp;
@@ -135,7 +135,6 @@ public class Util {
          }
          else
          {
-             Log.e("Database",""+name);
              DebugFileManager.createExternalStoragePublic(DATB.appContext,name,"[Log-> e]->getBitmapFromURL");
 
              return null;
