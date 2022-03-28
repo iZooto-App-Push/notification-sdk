@@ -32,10 +32,8 @@ public class AppController extends Application implements TokenReceivedListener,
                 .handlePayloadListener(this)
                 .build();
 
-    HashMap<String,Object> data = new HashMap<>();
-    data.put("language","Marathi");
-    DATB.setSubscriberID("ABCD");
-    DATB.setDefaultTemplate(PushTemplate.TEXT_OVERLAY);
+
+    DATB.setDefaultTemplate(PushTemplate.DEFAULT);
 
 
     }

@@ -116,6 +116,7 @@ public class DATB {
                                     mAppId = jsonObject.getString(AppConstant.APPPID);
                                     preferenceUtil.setDataBID(AppConstant.APPPID, mAppId);
                                     trackAdvertisingId();
+                                    Log.e("Device Name",jsonObject.toString());
                                     if (!mKey.isEmpty() && !mId.isEmpty() && Build.MANUFACTURER.equalsIgnoreCase("Xiaomi")) {
                                         XiaomiSDKHandler xiaomiSDKHandler = new XiaomiSDKHandler(DATB.appContext, mId, mKey);
                                         xiaomiSDKHandler.onMIToken();
@@ -511,9 +512,8 @@ public class DATB {
 
 
                     } catch (Exception e) {
-                        DebugFileManager.createExternalStoragePublic(DATB.appContext,"RegisterToken -> "+e.toString(),"[Log.e]->");
-
-                        Util.setException(appContext, e.toString(), "registerToken", "iZooto");
+                        DebugFileManager.createExternalStoragePublic(DATB.appContext,"RegisterToken -> "+"Error","[Log.e]->");
+                        Util.setException(appContext, "Register error", "registerToken", "iZooto");
                     }
                 }
             }
@@ -1365,24 +1365,24 @@ public class DATB {
                 });
                 return;
             }
-        if (topicName != null && !topicName.isEmpty()) {
+        if (topicName != null && !topicName.isEmpty() && FCMTokenGenerator.firebaseApp!=null) {
             final PreferenceUtil preferenceUtil = PreferenceUtil.getInstance(appContext);
             if (preferenceUtil.getStringData(AppConstant.SENDERID) != null) {
-                FirebaseOptions firebaseOptions =
-                        new FirebaseOptions.Builder()
-                                .setGcmSenderId(preferenceUtil.getStringData(AppConstant.SENDERID)) //senderID
-                                .setApplicationId(get_App_ID()) //application ID
-                                .setApiKey(getAPI_KEY()) //Application Key
-                                .setProjectId(get_Project_ID()) //Project ID
-                                .build();
-                try {
-                    FirebaseApp firebaseApp = FirebaseApp.getInstance(AppConstant.FCMDEFAULT);
-                    if (firebaseApp == null) {
-                        FirebaseApp.initializeApp(appContext, firebaseOptions, AppConstant.FCMDEFAULT);
-                    }
-                } catch (IllegalStateException ex) {
-                    FirebaseApp.initializeApp(appContext, firebaseOptions, AppConstant.FCMDEFAULT);
-                }
+//                FirebaseOptions firebaseOptions =
+//                        new FirebaseOptions.Builder()
+//                                .setGcmSenderId(preferenceUtil.getStringData(AppConstant.SENDERID)) //senderID
+//                                .setApplicationId(get_App_ID()) //application ID
+//                                .setApiKey(getAPI_KEY()) //Application Key
+//                                .setProjectId(get_Project_ID()) //Project ID
+//                                .build();
+//                try {
+//                    FirebaseApp firebaseApp = FirebaseApp.getInstance(AppConstant.FCMDEFAULT);
+//                    if (firebaseApp == null) {
+//                        FirebaseApp.initializeApp(appContext, firebaseOptions, AppConstant.FCMDEFAULT);
+//                    }
+//                } catch (IllegalStateException ex) {
+//                    FirebaseApp.initializeApp(appContext, firebaseOptions, AppConstant.FCMDEFAULT);
+//                }
                 List<String> topicList = new ArrayList<String>();
                 for (final String filterTopicName : topicName) {
                     if (filterTopicName != null && !filterTopicName.isEmpty()) {
@@ -1418,25 +1418,25 @@ public class DATB {
                 });
                 return;
             }
-        if (topicName != null && !topicName.isEmpty()) {
+        if (topicName != null && !topicName.isEmpty() && FCMTokenGenerator.firebaseApp!=null) {
             final PreferenceUtil preferenceUtil = PreferenceUtil.getInstance(appContext);
             if (preferenceUtil.getStringData(AppConstant.SENDERID) != null ) {
 
-                FirebaseOptions firebaseOptions =
-                        new FirebaseOptions.Builder()
-                                .setGcmSenderId(preferenceUtil.getStringData(AppConstant.SENDERID)) //senderID
-                                .setApplicationId(get_App_ID()) //application ID
-                                .setApiKey(getAPI_KEY()) //Application Key
-                                .setProjectId(get_Project_ID()) //Project ID
-                                .build();
-                try {
-                    FirebaseApp firebaseApp = FirebaseApp.getInstance(AppConstant.FCMDEFAULT);
-                    if (firebaseApp == null) {
-                        FirebaseApp.initializeApp(appContext, firebaseOptions, AppConstant.FCMDEFAULT);
-                    }
-                } catch (IllegalStateException ex) {
-                    FirebaseApp.initializeApp(appContext, firebaseOptions, AppConstant.FCMDEFAULT);
-                }
+//                FirebaseOptions firebaseOptions =
+//                        new FirebaseOptions.Builder()
+//                                .setGcmSenderId(preferenceUtil.getStringData(AppConstant.SENDERID)) //senderID
+//                                .setApplicationId(get_App_ID()) //application ID
+//                                .setApiKey(getAPI_KEY()) //Application Key
+//                                .setProjectId(get_Project_ID()) //Project ID
+//                                .build();
+//                try {
+//                    FirebaseApp firebaseApp = FirebaseApp.getInstance(AppConstant.FCMDEFAULT);
+//                    if (firebaseApp == null) {
+//                        FirebaseApp.initializeApp(appContext, firebaseOptions, AppConstant.FCMDEFAULT);
+//                    }
+//                } catch (IllegalStateException ex) {
+//                    FirebaseApp.initializeApp(appContext, firebaseOptions, AppConstant.FCMDEFAULT);
+//                }
                 List<String> topicList = new ArrayList<String>();
                 for (final String filterTopicName : topicName) {
                     if (filterTopicName != null && !filterTopicName.isEmpty()) {

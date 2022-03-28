@@ -1388,8 +1388,6 @@ public class NotificationEventManager {
                         }
                     } catch (Exception e) {
                         Util.setException(DATB.appContext,e.toString(),AppConstant.APPName_2,"impressionNotification");
-
-
                     }
                 }
 
@@ -1415,7 +1413,6 @@ public class NotificationEventManager {
         }
 
     }
-
      static String getPhone(String getActLink){
         String phone;
 
@@ -1427,15 +1424,12 @@ public class NotificationEventManager {
         return phone;
     }
      static int getBadgeIcon(String setBadgeIcon){
-
              int bIicon;
            try{
             if (DATB.icon != 0) {
                 bIicon = DATB.icon;
             } else {
-
                 if(setBadgeIcon!=null && !setBadgeIcon.isEmpty()) {
-
                     if (setBadgeIcon.equalsIgnoreCase(AppConstant.DEFAULT_ICON)) {
                         bIicon = R.drawable.ic_notifications_black_24dp;
                     } else {

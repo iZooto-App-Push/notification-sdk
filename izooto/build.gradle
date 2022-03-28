@@ -4,8 +4,8 @@ android {
     defaultConfig {
         minSdkVersion 19
         targetSdkVersion 31
-        versionCode 15
-        versionName "1.4.1"
+        versionCode 16
+        versionName "1.4.2"
         testInstrumentationRunner "androidx.test.runner.AndroidJUnitRunner"
     }
     compileOptions {
@@ -21,10 +21,10 @@ android {
 }
 dependencies {
     implementation fileTree(include: ['*.jar'], dir: 'libs')
-    implementation 'androidx.appcompat:appcompat:1.4.0'
+    implementation 'androidx.appcompat:appcompat:1.4.1'
     api 'androidx.legacy:legacy-support-v4:1.0.0'
 
-    implementation 'com.google.android.gms:play-services-ads-identifier:17.1.0'
+    implementation 'com.google.android.gms:play-services-ads-identifier:18.0.1'
 // Handle the all latest version in FCM
     implementation platform('com.google.firebase:firebase-bom:29.0.0')
     implementation 'com.google.firebase:firebase-messaging'
@@ -32,7 +32,7 @@ dependencies {
     implementation files('libs/MiPush_SDK_Client_4_8_3.jar')
     implementation 'org.jetbrains:annotations:15.0'
     testImplementation 'org.testng:testng:7.3.0'
-    compileOnly 'com.huawei.hms:push:6.1.0.300'
+    compileOnly 'com.huawei.hms:push:6.3.0.302'
     compileOnly 'androidx.browser:browser:1.4.0'
 
 

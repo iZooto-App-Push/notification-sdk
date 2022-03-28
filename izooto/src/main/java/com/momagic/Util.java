@@ -307,7 +307,6 @@ public class Util {
                 }
             }
             intValue = intValue + (((int) numChar[index - 1] - 48) * (decimal));
-            System.out.println((int) numChar[index - 1] - 48 + " " + (decimal));
             decimal = decimal * 10;
         }
         return intValue;

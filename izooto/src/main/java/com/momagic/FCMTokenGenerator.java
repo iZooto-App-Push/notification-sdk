@@ -16,7 +16,7 @@ import com.google.firebase.messaging.FirebaseMessaging;
 /* Developed By Amit Gupta */
 public class FCMTokenGenerator implements TokenGenerator {
 
-    private FirebaseApp firebaseApp;
+    static FirebaseApp firebaseApp;
 
 @Override
 public void getToken(final Context context, final String senderId, final String apiKey, final String appId, final TokenGenerationHandler callback) {
@@ -34,6 +34,7 @@ public void getToken(final Context context, final String senderId, final String 
         public void run() {
             try {
                 initFireBaseApp(senderId);
+
                 FirebaseMessaging messageApp = firebaseApp.get(FirebaseMessaging.class);
                 messageApp.getToken()
                         .addOnCompleteListener(new OnCompleteListener<String>() {
@@ -63,7 +64,6 @@ public void getToken(final Context context, final String senderId, final String 
                                     }
 
                                 } catch (Exception e) {
-                                    Util.setException(context, e.getMessage(), "getToken", "FCMTokenGenerator");
                                     if (callback != null)
                                         callback.failure(e.getMessage());
                                 }
@@ -71,7 +71,7 @@ public void getToken(final Context context, final String senderId, final String 
                         });
 
             } catch (Exception e) {
-                Util.setException(context, e.getMessage(), "getToken", "FCMTokenGenerator");
+
                 if (callback != null)
                     callback.failure(e.getMessage());
             }
@@ -79,26 +79,24 @@ public void getToken(final Context context, final String senderId, final String 
     }).start();
 
 }
-    public   void initFireBaseApp(final String senderId) {
-        if(DATB.appContext!=null) {
-            if (firebaseApp != null)
-                return;
-            if (get_Project_ID() != "" && get_Project_ID() != "" && getAPI_KEY() != "" && senderId != "") {
-                FirebaseOptions firebaseOptions =
-                        new FirebaseOptions.Builder()
-                                .setGcmSenderId(senderId) //senderID
-                                .setApplicationId(get_App_ID()) //application ID
-                                .setApiKey(getAPI_KEY()) //Application Key
-                                .setProjectId(get_Project_ID()) //Project ID
-                                .build();
-                firebaseApp = FirebaseApp.initializeApp(DATB.appContext, firebaseOptions, AppConstant.SDKNAME);
-                Lg.d(AppConstant.FCMNAME, firebaseApp.getName());
-            } else {
-                Log.e(AppConstant.APP_NAME_TAG, "missing google-service.json file");
-            }
+    public void initFireBaseApp(final String senderId) {
+        if (firebaseApp != null)
+            return;
+
+        if(get_Project_ID()!="" && get_Project_ID()!="" && getAPI_KEY()!="" && senderId!="") {
+            FirebaseOptions firebaseOptions =
+                    new FirebaseOptions.Builder()
+                            .setGcmSenderId(senderId) //senderID
+                            .setApplicationId(get_App_ID()) //application ID
+                            .setApiKey(getAPI_KEY()) //Application Key
+                            .setProjectId(get_Project_ID()) //Project ID
+                            .build();
+            firebaseApp = FirebaseApp.initializeApp(DATB.appContext, firebaseOptions, AppConstant.SDKNAME);
+            Lg.d(AppConstant.FCMNAME, firebaseApp.getName());
+        } else {
+            Log.w("SDK ","missing google-service.json file");
         }
-    }
-    private static String  getAPI_KEY()
+    }    private static String  getAPI_KEY()
     {
        if(DATB.appContext!=null) {
            try {
