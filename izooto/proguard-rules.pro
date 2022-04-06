@@ -23,7 +23,5 @@
 
 -keep class com.momagic.XiaomiPushReceiver{*;}
 -dontwarn com.xiaomi.push.**
--dontwarn com.huawei.**
--keep class com.momagic.HmsMessagingService{*;}
--keep class com.momagic.HMSTokenGenerator{*;}
+
 

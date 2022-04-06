@@ -231,25 +231,6 @@ public class Util {
         return icon;
     }
 
-    public static boolean hasHMSLibraries() {
-        return hasHMSAGConnectLibrary() && hasHMSPushKitLibrary();
-    }
-
-    private static boolean hasHMSAGConnectLibrary() {
-        try {
-            return com.huawei.agconnect.config.AGConnectServicesConfig.class != null;
-        } catch (NoClassDefFoundError e) {
-            return false;
-        }
-    }
-
-    private static boolean hasHMSPushKitLibrary() {
-        try {
-            return com.huawei.hms.aaid.HmsInstanceId.class != null;
-        } catch (NoClassDefFoundError e) {
-            return false;
-        }
-    }
 
     public static boolean CheckValidationString(String optString) {
         if (optString.length() > 32) {
