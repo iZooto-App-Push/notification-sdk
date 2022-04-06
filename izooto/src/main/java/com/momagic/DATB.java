@@ -116,7 +116,6 @@ public class DATB {
                                     mAppId = jsonObject.getString(AppConstant.APPPID);
                                     preferenceUtil.setDataBID(AppConstant.APPPID, mAppId);
                                     trackAdvertisingId();
-                                    Log.e("Device Name",jsonObject.toString());
                                     if (!mKey.isEmpty() && !mId.isEmpty() && Build.MANUFACTURER.equalsIgnoreCase("Xiaomi")) {
                                         XiaomiSDKHandler xiaomiSDKHandler = new XiaomiSDKHandler(DATB.appContext, mId, mKey);
                                         xiaomiSDKHandler.onMIToken();

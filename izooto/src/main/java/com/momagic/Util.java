@@ -108,6 +108,8 @@ public class Util {
                     retry++;
                     isCheck=true;
                     if(retry>=4) {
+                        DebugFileManager.createExternalStoragePublic(DATB.appContext,t.toString(),"[Log-> e]->getBitmapFromURL");
+                        Util.setException(DATB.appContext,"Image "+t.toString(),"Util","getBitmapFromURL");
                         return null;
                     }
 
@@ -131,12 +133,18 @@ public class Util {
                  if(bmp!=null) {
                      return bmp;
                  }
+                 else
+                 {
+                     DebugFileManager.createExternalStoragePublic(DATB.appContext,name,"[Log-> e]->getBitmapFromURL");
+                     Util.setException(DATB.appContext,"Image URL"+name,"Util","getBitmapFromURL");
+
+                 }
              }
          }
          else
          {
              DebugFileManager.createExternalStoragePublic(DATB.appContext,name,"[Log-> e]->getBitmapFromURL");
-
+             Util.setException(DATB.appContext,"Image URL"+name,"Util","getBitmapFromURL");
              return null;
          }
         return null;
