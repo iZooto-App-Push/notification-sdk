@@ -31,7 +31,6 @@ dependencies {
     implementation files('libs/MiPush_SDK_Client_4_8_3.jar')
     implementation 'org.jetbrains:annotations:15.0'
     testImplementation 'org.testng:testng:7.3.0'
-    compileOnly 'com.huawei.hms:push:6.3.0.304'
     compileOnly 'androidx.browser:browser:1.4.0'
 }
 apply from: 'maven-push.gradle'
