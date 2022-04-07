@@ -21,7 +21,7 @@ class Global {
     static def POM_NAME = 'notification-sdk'
     static def POM_ARTIFACT_ID = 'notification-sdk'
     static def POM_PACKAGING = 'aar'
-    static def VERSION_NAME = '1.4.4'
+    static def VERSION_NAME = '1.4.5'
     static def GROUP_ID = 'com.momagic'
     static def POM_DESCRIPTION = 'Push Notification service'
     static def POM_URL = 'https://github.com/izooto-mobile-sdk/notification-sdk'
@@ -32,7 +32,7 @@ class Global {
     static def POM_LICENCE_URL='https://raw.githubusercontent.com/izooto-mobile-sdk/notification-sdk/master/LICENSE'
     static def POM_LICENCE_DIST = 'notification-sdk'
     static def POM_DEVELOPER_ID = 'iZootoAndroidSDK'
-    static def POM_DEVELOPER_NAME = 'Amit Kumar Gupta'
+    static def POM_DEVELOPER_NAME = 'Datability Technology Private Limited'
     static def SNAPSHOT_REPOSITORY_URL = 'https://oss.sonatype.org/content/repositories/snapshots'
     static def RELEASE_REPOSITORY_URL = 'https://oss.sonatype.org/service/local/staging/deploy/maven2'
 }
