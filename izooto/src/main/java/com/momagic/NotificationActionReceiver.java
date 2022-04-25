@@ -169,7 +169,6 @@ public class NotificationActionReceiver extends BroadcastReceiver {
                                         browserIntent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TASK);
                                         context.startActivity(browserIntent);
 
-
                                     } else {
                                             Intent browserIntent = new Intent(Intent.ACTION_VIEW, Uri.parse(mUrl));
                                             browserIntent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TASK);
