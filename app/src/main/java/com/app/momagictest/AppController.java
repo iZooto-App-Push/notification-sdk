@@ -25,16 +25,10 @@ public class AppController extends Application implements TokenReceivedListener,
     @Override
     public void onCreate() {
         super.onCreate();
-        DATB.initialize(this).build();
-
-//        DATB.initialize(getApplicationContext())
-//                .setNotificationReceiveListener(this)
-//                .setTokenReceivedListener(this)
-//                .handlePayloadListener(this)
-//                .build();
-
-
-   // DATB.setDefaultTemplate(PushTemplate.DEFAULT);
+        DATB.initialize(this)
+                .setNotificationReceiveListener(this)
+                .build();
+        DATB.setDefaultTemplate(PushTemplate.DEFAULT);
 
 
     }

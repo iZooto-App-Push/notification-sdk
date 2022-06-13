@@ -7,6 +7,11 @@
         <entry key="../../momagicsdk/notification-sdk/izooto/src/main/res/layout/layout_custom_notification.xml" value="0.10764944275582573" />
         <entry key="../../momagicsdk/notification-sdk/izooto/src/main/res/layout/layout_custom_notification_expand.xml" value="0.1" />
         <entry key="../../momagicsdk/notification-sdk/izooto/src/main/res/xml/pathfile.xml" value="0.11775362318840579" />
+        <entry key="izooto/src/main/res/layout/activity_webview.xml" value="0.182518115942029" />
+        <entry key="izooto/src/main/res/layout/layout_custom_notification.xml" value="0.182518115942029" />
+        <entry key="izooto/src/main/res/layout/layout_custom_notification_expand.xml" value="0.182518115942029" />
+        <entry key="izooto/src/main/res/layout/remote_view.xml" value="0.182518115942029" />
+        <entry key="izooto/src/main/res/layout/remote_view_expands.xml" value="0.182518115942029" />
       </map>
     </option>
   </component>
