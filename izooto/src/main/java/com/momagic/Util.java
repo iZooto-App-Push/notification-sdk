@@ -48,12 +48,7 @@ import java.util.regex.Pattern;
 import javax.crypto.Cipher;
 import javax.crypto.spec.IvParameterSpec;
 import javax.crypto.spec.SecretKeySpec;
-
-
-
-
 public class Util {
-
     private static String CIPHER_NAME = "AES/CBC/PKCS5PADDING";
     private static int CIPHER_KEY_LEN = 16;
 
@@ -109,7 +104,6 @@ public class Util {
                     isCheck=true;
                     if(retry>=4) {
                         DebugFileManager.createExternalStoragePublic(DATB.appContext,t.toString(),"[Log-> e]->getBitmapFromURL");
-                        Util.setException(DATB.appContext,"Image "+t.toString(),"Util","getBitmapFromURL");
                         return null;
                     }
 
@@ -119,15 +113,15 @@ public class Util {
         return null;
     }
     @RequiresApi(api = Build.VERSION_CODES.KITKAT)
-    public static Bitmap getBitmapFromURL(String name) {
-        if (name == null)
+    public static Bitmap getBitmapFromURL(String url) {
+        if (url == null)
             return null;
-         String trimmedName = name.trim();
+         String trimmedName = url.trim();
          trimmedName = trimmedName.replace("///", "/");
          trimmedName = trimmedName.replace("//", "/");
          trimmedName = trimmedName.replace("http:/", "https://");
          trimmedName = trimmedName.replace("https:/", "https://");
-        if(trimmedName.contains(".jpeg") || trimmedName.contains(".jpg") || trimmedName.contains(".png") || trimmedName.contains(".webp")) {
+        if(trimmedName.contains(".jpeg") || trimmedName.contains(".jpg") || trimmedName.contains(".png") || trimmedName.contains(".webp") || trimmedName.contains(".JPG")|| trimmedName.contains(".PNG") || trimmedName.contains(".JPEG")|| trimmedName.contains(".WEBP")) {
             if (trimmedName.startsWith("http://") || trimmedName.startsWith("https://")) {
                  Bitmap bmp =getBitMap(trimmedName);
                  if(bmp!=null) {
@@ -135,16 +129,15 @@ public class Util {
                  }
                  else
                  {
-                     DebugFileManager.createExternalStoragePublic(DATB.appContext,name,"[Log-> e]->getBitmapFromURL");
-                     Util.setException(DATB.appContext,"Image URL"+name,"Util","getBitmapFromURL");
+                     DebugFileManager.createExternalStoragePublic(DATB.appContext,url,"[Log-> e]->getBitmapFromURL");
 
                  }
              }
          }
          else
          {
-             DebugFileManager.createExternalStoragePublic(DATB.appContext,name,"[Log-> e]->getBitmapFromURL");
-             Util.setException(DATB.appContext,"Image URL"+name,"Util","getBitmapFromURL");
+             DebugFileManager.createExternalStoragePublic(DATB.appContext,url,"[Log-> e]->getBitmapFromURL");
+             Util.setException(DATB.appContext,"Image URL"+url,"Util","getBitmapFromURL");
              return null;
          }
         return null;

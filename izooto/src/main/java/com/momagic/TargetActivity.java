@@ -155,12 +155,16 @@ public class TargetActivity extends AppCompatActivity {
                 hashMap.put(AppConstant.ACTION_TYPE, String.valueOf(btnCount));
                 JSONObject jsonObject = new JSONObject(hashMap);
                 DATB.notificationActionHandler(jsonObject.toString());
+                finish();
             } else {
                 if (inApp == 1 && phoneNumber.equalsIgnoreCase(AppConstant.NO)) {
                     if (DATB.mBuilder != null && DATB.mBuilder.mWebViewListener != null) {
                         DATB.notificationInAppAction(mUrl);
-                    } else
+                        finish();
+                    } else {
                         DATBWebViewActivity.startActivity(context, mUrl);
+                        finish();
+                    }
 
                 } else {
                     try {
