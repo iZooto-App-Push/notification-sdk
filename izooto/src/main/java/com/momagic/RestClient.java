@@ -65,7 +65,6 @@ public class RestClient {
 
     static void postRequest(final String url, final Map<String,String> data,JSONObject jsonObject, final ResponseHandler responseHandler) {
         new Thread(new Runnable() {
-            @RequiresApi(api = Build.VERSION_CODES.KITKAT)
             @Override
             public void run() {
                 makeApiCall(url, AppConstant.POST, data,jsonObject, responseHandler, GET_TIMEOUT);
@@ -75,7 +74,6 @@ public class RestClient {
     public static void makeApiCall(final String url, final String method, final Map<String,String> data,JSONObject jsonObject, final ResponseHandler responseHandler, final int timeout) {
         ExecutorService es = Executors.newSingleThreadExecutor();
         es.submit(new Runnable() {
-            @RequiresApi(api = Build.VERSION_CODES.KITKAT)
             @Override
             public void run() {
 
@@ -84,8 +82,6 @@ public class RestClient {
         });
 
     }
-
-    @RequiresApi(api = Build.VERSION_CODES.KITKAT)
     private static void startHTTPConnection(String url, String method, final Map<String,String> data,JSONObject jsonBody, ResponseHandler responseHandler, int timeout) {
         HttpURLConnection con = null;
         int httpResponse = -1;

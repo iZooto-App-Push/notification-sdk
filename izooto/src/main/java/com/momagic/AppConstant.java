@@ -258,7 +258,7 @@ public interface AppConstant {
     String AD_TYPE="tp";
     String NOTIFICATION_MESSAGE="Send Notification";
     String YES="yes";
-    String SDK_VERSION="1.4.5";
+    String SDK_VERSION="1.4.8";
     String QSDK_VERSION="av";
     String SDK="SDKVERSION";
     String PACKAGE_NAME="mpn";
@@ -278,7 +278,7 @@ public interface AppConstant {
     String PUSH_HMS="hms";
     String PUSH_FCM="fcm";
     String PUSH_XIAOMI="xiaomi";
-    String Check_Notification="CheckData";
+    String Check_Notification="checkData";
     String Check_YES="true";
     String Check_NO="false";
     String XIAOMITOKEN = "mt";
