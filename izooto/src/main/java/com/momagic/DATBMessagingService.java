@@ -250,7 +250,6 @@ public class DATBMessagingService extends FirebaseMessagingService {
                     }
                     Handler mainHandler = new Handler(Looper.getMainLooper());
                     Runnable myRunnable = new Runnable() {
-                        @RequiresApi(api = Build.VERSION_CODES.KITKAT)
                         @Override
                         public void run() {
                             NotificationEventManager.handleImpressionAPI(payload,AppConstant.PUSH_FCM);

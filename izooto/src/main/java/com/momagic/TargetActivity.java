@@ -132,8 +132,14 @@ public class TargetActivity extends AppCompatActivity {
 
                 }
             }
-            if (medClick != "") {
-                callMediationClicks(medClick, 0);
+//            if (medClick != "") {
+//                callMediationClicks(medClick, 0);
+//            }
+            if(preferenceUtil.getStringData("MEDIATIONCLICKDATA")!="")
+            {
+                String medClickData = preferenceUtil.getStringData("MEDIATIONCLICKDATA");
+                callMediationClicks(medClickData,0);
+
             }
 
             if (additionalData.equalsIgnoreCase("")) {
@@ -449,9 +455,13 @@ public class TargetActivity extends AppCompatActivity {
 
 
                             }
+                            preferenceUtil.setStringData("MEDIATIONCLICKDATA","");
+
                         }
                         else {
-                            NotificationActionReceiver.medClick = "";
+                            preferenceUtil.setStringData("MEDIATIONCLICKDATA","");
+
+                           // NotificationActionReceiver.medClick = "";
                         }
                     }
                     @Override

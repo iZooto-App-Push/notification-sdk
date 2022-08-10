@@ -112,7 +112,6 @@ public class DATB {
                                     String apiKey = jsonObject.getString(AppConstant.APIKEY);
                                     String mKey = jsonObject.optString(AppConstant.MIAPIKEY);
                                     String mId = jsonObject.optString(AppConstant.MIAPPID);
-                                    String hms_appId = jsonObject.optString(AppConstant.HMS_APP_ID);
                                     mAppId = jsonObject.getString(AppConstant.APPPID);
                                     preferenceUtil.setDataBID(AppConstant.APPPID, mAppId);
                                     trackAdvertisingId();
@@ -120,9 +119,6 @@ public class DATB {
                                         XiaomiSDKHandler xiaomiSDKHandler = new XiaomiSDKHandler(DATB.appContext, mId, mKey);
                                         xiaomiSDKHandler.onMIToken();
                                     }
-//                                    if (!hms_appId.isEmpty() && Build.MANUFACTURER.equalsIgnoreCase("Huawei")) {
-//                                        initHmsService(appContext);
-//                                    }
 
                                     if (senderId != null && !senderId.isEmpty()) {
                                         init(context, apiKey, appId);
@@ -1700,7 +1696,7 @@ public class DATB {
                          if(jsonObject.getString(AppConstant.STORE_MED_API).equals(AppConstant.MED_CLICK))
                          {
                              String jsonData= jsonObject.getString(AppConstant.STORE_MED_DATA);
-                             NotificationActionReceiver.callMediationClicks(jsonData,i);
+                             NotificationActionReceiver.callMediationClicks(context,jsonData,i);
                          }
                      }
 

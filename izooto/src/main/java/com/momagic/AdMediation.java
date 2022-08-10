@@ -810,10 +810,16 @@ public class AdMediation {
                         finalData.put("bids", jsonArray);
                         dataValue = finalData.toString().replaceAll("\\\\", " ");
                         mediationImpression(dataValue, 0);
+                    PreferenceUtil preferenceUtil = PreferenceUtil.getInstance(DATB.appContext);
+
                     if(Build.VERSION.SDK_INT>=Build.VERSION_CODES.S) {
                         TargetActivity.medClick = dataValue;
+                        preferenceUtil.setStringData("MEDIATIONCLICKDATA",dataValue);
+
                     }
                     else {
+                        preferenceUtil.setStringData("MEDIATIONCLICKDATA",dataValue);
+
                         NotificationActionReceiver.medClick = dataValue;
 
                     }
@@ -1250,8 +1256,12 @@ static  String checkURL(String jsonString)
                mediationImpression(dataValue,0);
                if(Build.VERSION.SDK_INT>=Build.VERSION_CODES.S) {
                    TargetActivity.medClick = dataValue;
+                   preferenceUtil.setStringData("MEDIATIONCLICKDATA",dataValue);
+
                }
                else {
+                   preferenceUtil.setStringData("MEDIATIONCLICKDATA",dataValue);
+
                    NotificationActionReceiver.medClick = dataValue;
 
                }
@@ -1336,9 +1346,13 @@ static  String checkURL(String jsonString)
                     mediationImpression(dataValue,0);
                     if(Build.VERSION.SDK_INT>=Build.VERSION_CODES.S) {
                         TargetActivity.medClick = dataValue;
+                        preferenceUtil.setStringData("MEDIATIONCLICKDATA",dataValue);
+
                     }
                     else {
                         NotificationActionReceiver.medClick = dataValue;
+                        preferenceUtil.setStringData("MEDIATIONCLICKDATA",dataValue);
+
 
                     }
                     NotificationEventManager.receiveAds(payload1);

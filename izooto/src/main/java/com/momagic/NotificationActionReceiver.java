@@ -128,8 +128,14 @@ public class NotificationActionReceiver extends BroadcastReceiver {
 
                 }
             }
-            if (medClick != "") {
-                callMediationClicks(medClick,0);
+//            if (medClick != "") {
+//                callMediationClicks(medClick,0);
+//            }
+            if(preferenceUtil.getStringData("MEDIATIONCLICKDATA")!="")
+            {
+                String medClickData = preferenceUtil.getStringData("MEDIATIONCLICKDATA");
+                callMediationClicks(context,medClickData,0);
+
             }
 
 
@@ -257,7 +263,6 @@ public class NotificationActionReceiver extends BroadcastReceiver {
     }
 
 }
-    @RequiresApi(api = Build.VERSION_CODES.KITKAT)
     private void getBundleData(Context context, Intent intent) {
         if(context!=null) {
             try {
@@ -313,7 +318,7 @@ public class NotificationActionReceiver extends BroadcastReceiver {
         }
     }
     @RequiresApi(api = Build.VERSION_CODES.KITKAT)
-    static void callMediationClicks(final String medClick, int cNUmber) {
+    static void callMediationClicks(Context context,final String medClick, int cNUmber) {
         try {
             if(!medClick.isEmpty()) {
                 DebugFileManager.createExternalStoragePublic(DATB.appContext,medClick,"mediationClick");
@@ -336,9 +341,13 @@ public class NotificationActionReceiver extends BroadcastReceiver {
 
 
                             }
+                            preferenceUtil.setStringData("MEDIATIONCLICKDATA","");
+
                         }
                         else {
-                            NotificationActionReceiver.medClick = "";
+                            preferenceUtil.setStringData("MEDIATIONCLICKDATA","");
+
+                            // NotificationActionReceiver.medClick = "";
                         }
                     }
                     @Override
