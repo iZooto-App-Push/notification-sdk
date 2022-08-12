@@ -1545,7 +1545,6 @@ static void lastViewNotification(String limURL, String rid, String cid, int i){
         mapData.put(AppConstant.ET_,"" + AppConstant.USERP_);
 
         RestClient.postRequest(limURL, mapData,null, new RestClient.ResponseHandler() {
-            @RequiresApi(api = Build.VERSION_CODES.KITKAT)
             @Override
             void onSuccess(final String response) {
                 super.onSuccess(response);
@@ -1583,7 +1582,6 @@ static void lastViewNotification(String limURL, String rid, String cid, int i){
     /*
      *Set Maximum notification in the tray through getMaximumNotificationInTray() method
      * */
-    @RequiresApi(api = Build.VERSION_CODES.KITKAT)
     public static void getMaximumNotificationInTray(Context context, int mn){
         if(context!=null) {
             try {
@@ -1614,7 +1612,6 @@ static void lastViewNotification(String limURL, String rid, String cid, int i){
             }
         }
     }
-    @RequiresApi(api = Build.VERSION_CODES.KITKAT)
     static void handleImpressionAPI(Payload payload,String pushName) {
         if(payload!=null) {
             String impressionIndex = "0";

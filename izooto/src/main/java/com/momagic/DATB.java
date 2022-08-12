@@ -664,7 +664,6 @@ public class DATB {
     }
 
 
-    @RequiresApi(api = Build.VERSION_CODES.KITKAT)
     private static void areNotificationsEnabledForSubscribedState(Context context){
         if(context!=null) {
             final PreferenceUtil preferenceUtil = PreferenceUtil.getInstance(context);

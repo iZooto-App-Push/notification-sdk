@@ -352,6 +352,7 @@ public interface AppConstant {
     String DIRECTORYNAME="DATB.907135001.debug";
     String SAVESUBID="DATB_SUBID";
     String CHECK_APP_VERSION="iz_app_version";
+    String  IZ_XIOAMI_DATA = "xiaomiData";
 
 }
 

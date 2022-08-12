@@ -383,7 +383,6 @@ public class NotificationActionReceiver extends BroadcastReceiver {
             });
         }
     }
-    @RequiresApi(api = Build.VERSION_CODES.KITKAT)
     static void notificationClickAPI(Context context, String clkURL, String cid, String rid, int btnCount, int i,String pushType) {
         if (context == null)
             return;
@@ -403,7 +402,6 @@ public class NotificationActionReceiver extends BroadcastReceiver {
             DebugFileManager.createExternalStoragePublic(DATB.appContext,mapData.toString(),"clickData");
 
             RestClient.postRequest(clkURL, mapData,null, new RestClient.ResponseHandler() {
-                @RequiresApi(api = Build.VERSION_CODES.KITKAT)
                 @Override
                 void onSuccess(final String response) {
                     super.onSuccess(response);
@@ -454,7 +452,6 @@ public class NotificationActionReceiver extends BroadcastReceiver {
                     }
                 }
 
-                @RequiresApi(api = Build.VERSION_CODES.KITKAT)
                 @Override
                 void onSuccess(String response) {
                     super.onSuccess(response);
