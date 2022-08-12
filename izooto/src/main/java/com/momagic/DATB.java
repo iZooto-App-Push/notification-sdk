@@ -99,7 +99,6 @@ public class DATB {
                             super.onFailure(statusCode, response, throwable);
                         }
 
-                        @RequiresApi(api = Build.VERSION_CODES.KITKAT)
                         @Override
                         void onSuccess(String response) {
                             super.onSuccess(response);
@@ -300,7 +299,6 @@ public class DATB {
     }
 
 
-    @RequiresApi(api = Build.VERSION_CODES.KITKAT)
     private static void registerToken() {
         if(appContext!=null) {
 
@@ -520,36 +518,6 @@ public class DATB {
         }
 
     }
-
-//    private static void initHmsService(final Context context){
-//        if (context == null)
-//            return;
-//
-//        HMSTokenGenerator hmsTokenGenerator = new HMSTokenGenerator();
-//        hmsTokenGenerator.getHMSToken(context, new HMSTokenListener.HMSTokenGeneratorHandler() {
-//            @RequiresApi(api = Build.VERSION_CODES.LOLLIPOP)
-//            @Override
-//            public void complete(String id) {
-//                Log.i(AppConstant.APP_NAME_TAG, "HMS Token - " + id);
-//                PreferenceUtil preferenceUtil = PreferenceUtil.getInstance(context);
-//                if (id != null && !id.isEmpty()) {
-//                    if (!preferenceUtil.getBoolean(AppConstant.IS_UPDATED_HMS_TOKEN)) {
-//                        preferenceUtil.setBooleanData(AppConstant.IS_UPDATED_HMS_TOKEN, true);
-//                        preferenceUtil.setBooleanData(AppConstant.IS_TOKEN_UPDATED, false);
-//                        DATB.registerToken();
-//                    }
-//                }
-//            }
-//
-//            @RequiresApi(api = Build.VERSION_CODES.KITKAT)
-//            @Override
-//            public void failure(String errorMessage) {
-//                DebugFileManager.createExternalStoragePublic(DATB.appContext,errorMessage,"[Log.v]->");
-//                Lg.v(AppConstant.APP_NAME_TAG, errorMessage);
-//            }
-//        });
-//    }
-    @RequiresApi(api = Build.VERSION_CODES.KITKAT)
     static void onActivityResumed(Activity activity){
         if(appContext!=null) {
             final PreferenceUtil preferenceUtil = PreferenceUtil.getInstance(appContext);
@@ -585,22 +553,13 @@ public class DATB {
     private static boolean isContextActivity(Context context) {
         return context instanceof Activity;
     }
-
-
-    @RequiresApi(api = Build.VERSION_CODES.KITKAT)
     public static void processNotificationReceived(Context context,Payload payload) {
-
-
-
         if(payload!=null) {
                 NotificationEventManager.manageNotification(payload);
-
         }
         if(context!=null) {
             sendOfflineDataToServer(context);
         }
-
-
     }
 
     public static void notificationView(Payload payload)

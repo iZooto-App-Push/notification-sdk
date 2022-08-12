@@ -1358,7 +1358,6 @@ public class NotificationEventManager {
         }
     }
 
-    @RequiresApi(api = Build.VERSION_CODES.KITKAT)
     static void impressionNotification(String impURL, String cid, String rid, int i,String pushName){
         if (DATB.appContext == null)
             return;
@@ -1375,41 +1374,19 @@ public class NotificationEventManager {
             mapData.put(AppConstant.PUSH,pushName);
 
             RestClient.postRequest(impURL, mapData,null, new RestClient.ResponseHandler() {
-                @RequiresApi(api = Build.VERSION_CODES.KITKAT)
                 @Override
                 void onSuccess(final String response) {
                     super.onSuccess(response);
-
-                    try {
-                        if (!preferenceUtil.getStringData(AppConstant.IZ_NOTIFICATION_VIEW_OFFLINE).isEmpty() && i >= 0) {
-                            JSONArray jsonArrayOffline = new JSONArray(preferenceUtil.getStringData(AppConstant.IZ_NOTIFICATION_VIEW_OFFLINE));
-                            jsonArrayOffline.remove(i);
-                            preferenceUtil.setStringData(AppConstant.IZ_NOTIFICATION_VIEW_OFFLINE, null);
-                        }
-                    } catch (Exception e) {
-                        Util.setException(DATB.appContext,e.toString(),AppConstant.APPName_2,"impressionNotification");
-                    }
                 }
 
                 @Override
                 void onFailure(int statusCode, String response, Throwable throwable) {
                     super.onFailure(statusCode, response, throwable);
-                    try {
-                        if (!preferenceUtil.getStringData(AppConstant.IZ_NOTIFICATION_VIEW_OFFLINE).isEmpty()) {
-                            JSONArray jsonArrayOffline = new JSONArray(preferenceUtil.getStringData(AppConstant.IZ_NOTIFICATION_VIEW_OFFLINE));
-                            if (!Util.ridExists(jsonArrayOffline, rid)) {
-                                Util.trackClickOffline(DATB.appContext, impURL, AppConstant.IZ_NOTIFICATION_VIEW_OFFLINE, rid, cid, 0);
-                            }
-                        } else
-                            Util.trackClickOffline(DATB.appContext, impURL, AppConstant.IZ_NOTIFICATION_VIEW_OFFLINE, rid, cid, 0);
-                    } catch (Exception e) {
-                        Util.setException(DATB.appContext,e.toString(),AppConstant.APPName_2,"impressionNotification");
-                    }
                 }
             });
         } catch (Exception e) {
             DebugFileManager.createExternalStoragePublic(DATB.appContext,"impressionNotificationApi"+e.toString(),"[Log.V]->NotificationEventManager->");
-            Util.setException(DATB.appContext,e.toString(),AppConstant.APPName_2,"impressionNotification");
+            Util.setException(DATB.appContext,e.toString()+"RID"+rid+"CID"+cid,AppConstant.APPName_2,"impressionNotification");
         }
 
     }
