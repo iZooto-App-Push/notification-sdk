@@ -63,7 +63,6 @@ public class NotificationEventManager {
         }
 
     }
-    @RequiresApi(api = Build.VERSION_CODES.KITKAT)
     private static void allAdPush(Payload payload) {
         if(DATB.appContext!=null) {
             try {
@@ -441,6 +440,7 @@ public class NotificationEventManager {
                         if(Build.VERSION.SDK_INT>=Build.VERSION_CODES.S) {
                             receivedNotification(payload);
 
+
                         }
                         else
                         {
@@ -450,6 +450,7 @@ public class NotificationEventManager {
 
                     else {
                         receivedNotification(payload);
+
                     }
                 }else if (DATB.inAppOption.equalsIgnoreCase(AppConstant.INAPPALERT)){
                     showAlert(payload);
@@ -458,6 +459,7 @@ public class NotificationEventManager {
                 if (payload.getDefaultNotificationPreview() == 1 || preferenceUtil.getIntData(AppConstant.NOTIFICATION_PREVIEW)==PushTemplate.TEXT_OVERLAY) {
                     if(Build.VERSION.SDK_INT>=Build.VERSION_CODES.S) {
                         receivedNotification(payload);
+
                     }
                     else
                     {
@@ -465,14 +467,15 @@ public class NotificationEventManager {
                     }
                 }
                 else {
-                    receivedNotification(payload);
+
+                     receivedNotification(payload);
+
                 }
             }
         }
     }
 
     public static void receiveAds(final Payload payload){
-
         final Handler handler = new Handler(Looper.getMainLooper());
         final Runnable notificationRunnable = new Runnable() {
             @RequiresApi(api = Build.VERSION_CODES.O)
@@ -534,7 +537,7 @@ public class NotificationEventManager {
                         .setContentTitle(payload.getTitle())
                         .setContentText(payload.getMessage())
                         .setContentIntent(pendingIntent)
-                        .setStyle(new NotificationCompat.BigTextStyle().bigText(payload.getMessage()))
+                        //.setStyle(new NotificationCompat.BigTextStyle().bigText(payload.getMessage()))
                         .setDefaults(NotificationCompat.DEFAULT_LIGHTS | NotificationCompat.DEFAULT_SOUND).setVibrate(new long[]{1000, 1000})
                         .setSound(defaultSoundUri)
                         .setVisibility(lockScreenVisibility)
@@ -593,10 +596,11 @@ public class NotificationEventManager {
                             .bigPicture(notificationBanner)
                             .bigLargeIcon(notificationIcon).setSummaryText(payload.getMessage()));
 
-                }else if (notificationBanner != null && payload.getMessage().isEmpty()){
+                }
+                else if (notificationBanner != null && payload.getMessage().isEmpty()){
                     notificationBuilder.setStyle(new NotificationCompat.BigPictureStyle()
                             .bigPicture(notificationBanner)
-                            .bigLargeIcon(notificationIcon).setSummaryText(Util.makeBlackString(payload.getTitle())));
+                            .bigLargeIcon(notificationIcon).setSummaryText(Util.makeBlackString(payload.getMessage())));
                 }
 
                 NotificationManager notificationManager =
@@ -904,6 +908,7 @@ public class NotificationEventManager {
                     else {
                         if (notificationBanner != null)
                             notificationBuilder.setLargeIcon(notificationBanner);
+
                     }
                 }
 

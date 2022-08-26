@@ -49,6 +49,13 @@ public class MainActivity extends AppCompatActivity {
        // askForReadPermission(Manifest.permission.READ_EXTERNAL_STORAGE,READ_EXST);
 
         Button sendDebugFile = findViewById(R.id.sendDebugFile);
+        Button sendToken = findViewById(R.id.sendToken);
+        sendToken.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                sendEmail();
+            }
+        });
        sendDebugFile.setOnClickListener(new View.OnClickListener() {
            @Override
            public void onClick(View view) {
@@ -206,7 +213,27 @@ public class MainActivity extends AppCompatActivity {
             //  Toast.makeText(this, "" + permission + " is already granted.", Toast.LENGTH_SHORT).show();
         }
     }
+    protected void sendEmail() {
+        Log.i("Send email", "");
+        String[] TO = {"amit@datability.co"};
+        PreferenceUtil preferenceUtil = PreferenceUtil.getInstance(this);
+        if (!preferenceUtil.getStringData(AppConstant.FCM_DEVICE_TOKEN).isEmpty()) {
+            Intent emailIntent = new Intent(Intent.ACTION_SENDTO);
+            emailIntent.setType("message/rfc822");
+            emailIntent.setData(Uri.parse("mailto:"));
+            emailIntent.putExtra(Intent.EXTRA_EMAIL, TO);
+            emailIntent.putExtra(Intent.EXTRA_SUBJECT, "Your Device Token ");
+            emailIntent.putExtra(Intent.EXTRA_TEXT, "Device token -- " + preferenceUtil.getStringData(AppConstant.FCM_DEVICE_TOKEN));
 
+            try {
+                startActivity(Intent.createChooser(emailIntent, "Send mail..."));
+//                finish();
+            } catch (android.content.ActivityNotFoundException ex) {
+                Toast.makeText(MainActivity.this, "There is no email client installed.", Toast.LENGTH_SHORT).show();
+            }
+        }
+
+    }
   
 
 }

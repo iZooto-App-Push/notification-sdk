@@ -782,7 +782,6 @@ public class DATB {
             Util.setException(appContext,"Event Name or Event Data are not available",AppConstant.APP_NAME_TAG,"addEvent");
         }
     }
-    @RequiresApi(api = Build.VERSION_CODES.KITKAT)
     public static void setSubscriberID(String subscriberID)
     {
         if (osTaskManager.shouldQueueTaskForInit(OSTaskManager.SET_SUBSCRIBER_ID) && appContext == null) {
