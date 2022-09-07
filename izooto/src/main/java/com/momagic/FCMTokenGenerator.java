@@ -29,12 +29,10 @@ public void getToken(final Context context, final String senderId, final String 
         return;
     }
     new Thread(new Runnable() {
-        @RequiresApi(api = Build.VERSION_CODES.KITKAT)
         @Override
         public void run() {
             try {
                 initFireBaseApp(senderId);
-
                 FirebaseMessaging messageApp = firebaseApp.get(FirebaseMessaging.class);
                 messageApp.getToken()
                         .addOnCompleteListener(new OnCompleteListener<String>() {
@@ -64,6 +62,7 @@ public void getToken(final Context context, final String senderId, final String 
                                     }
 
                                 } catch (Exception e) {
+
                                     if (callback != null)
                                         callback.failure(e.getMessage());
                                 }
@@ -71,7 +70,11 @@ public void getToken(final Context context, final String senderId, final String 
                         });
 
             } catch (Exception e) {
-
+                if(!preferenceUtil.getBoolean("FCMEXCEPTION"))
+                {
+                    preferenceUtil.setBooleanData("FCMEXCEPTION",true);
+                    Util.setException(context,e.getMessage()+senderId,"FCMGenerator","getToken");
+                }
                 if (callback != null)
                     callback.failure(e.getMessage());
             }

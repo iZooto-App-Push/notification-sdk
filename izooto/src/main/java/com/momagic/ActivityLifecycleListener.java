@@ -23,7 +23,6 @@ public class ActivityLifecycleListener implements Application.ActivityLifecycleC
     }
     @Override
     public void onActivityCreated(@NonNull Activity activity, @Nullable Bundle savedInstanceState) {
-
     }
 
     @Override

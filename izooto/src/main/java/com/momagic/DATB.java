@@ -163,6 +163,7 @@ public class DATB {
 
     private static void init(final Context context, String apiKey, String appId) {
         if(context!=null) {
+
             try {
                 FCMTokenGenerator fcmTokenGenerator = new FCMTokenGenerator();
                 fcmTokenGenerator.getToken(context, senderId, apiKey, appId, new TokenGenerator.TokenGenerationHandler() {

@@ -6,16 +6,15 @@ import android.app.NotificationManager;
 import android.app.PendingIntent;
 import android.content.Context;
 import android.content.Intent;
-import android.content.res.Configuration;
 import android.graphics.Bitmap;
 import android.graphics.Color;
+import android.media.AudioAttributes;
 import android.media.RingtoneManager;
 import android.net.Uri;
 import android.os.Build;
 import android.os.Handler;
 import android.os.Looper;
 import android.util.Base64;
-import android.util.Log;
 import android.view.View;
 import android.widget.RemoteViews;
 
@@ -27,11 +26,10 @@ import java.io.UnsupportedEncodingException;
 import java.util.Random;
 
 public class NotificationPreview {
-    private static Bitmap notificationIcon, notificationBanner, shareIcon;
+    private static Bitmap notificationIcon, notificationBanner;
     private static int icon;
     private static  int badgeColor;
     private static int priority,lockScreenVisibility;
-    public static String DATBReceivedPayload;
 
     static void receiveCustomNotification(final Payload payload){
         if(DATB.appContext !=null) {
@@ -75,7 +73,6 @@ public class NotificationPreview {
                         String channelId = DATB.appContext.getString(R.string.default_notification_channel_id);
                         NotificationCompat.Builder notificationBuilder = null;
                         Notification summaryNotification = null;
-                        int SUMMARY_ID = 0;
                         Intent intent = null;
 
                         icon = NotificationEventManager.getBadgeIcon(payload.getBadgeicon());
@@ -98,31 +95,69 @@ public class NotificationPreview {
                         /*---------------------------collapsed view----------------------- */
                         RemoteViews collapsedView = new RemoteViews(DATB.appContext.getPackageName(), R.layout.layout_custom_notification);
                         collapsedView.setTextViewText(R.id.tv_message, "" + payload.getTitle());
-                        collapsedView.setTextViewText(R.id.tv_display_time, "" + Util.getTimeWithoutDate());
-                        if (notificationIcon != null)
-                            collapsedView.setImageViewBitmap(R.id.iv_large_icon, notificationIcon);
+                        if(Build.VERSION.SDK_INT>=Build.VERSION_CODES.S)
+                        {
+                            collapsedView.setViewVisibility(R.id.iv_large_icon,View.GONE);
+
+                        }
                         else {
-                            if (DATB.appContext.getApplicationInfo().icon != 0)
-                                collapsedView.setImageViewResource(R.id.iv_large_icon, DATB.appContext.getApplicationInfo().icon);
+                            collapsedView.setTextViewText(R.id.tv_display_time, "" + Util.getTimeWithoutDate());
+
+                            if (notificationIcon != null)
+                                collapsedView.setImageViewBitmap(R.id.iv_large_icon, notificationIcon);
+                            else {
+                                if (DATB.appContext.getApplicationInfo().icon != 0)
+                                    collapsedView.setImageViewResource(R.id.iv_large_icon, DATB.appContext.getApplicationInfo().icon);
+                            }
                         }
 
 
                         /*---------------------------expanded view----------------------- */
                         RemoteViews expandedView = new RemoteViews(DATB.appContext.getPackageName(), R.layout.layout_custom_notification_expand);
                         expandedView.setTextViewText(R.id.tv_notification_title, "" + payload.getTitle());
-                        if (notificationIcon != null)
-                            expandedView.setImageViewBitmap(R.id.iv_large_icon, notificationIcon);
+                        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.S) {
+                            if ((payload.getAct1name() == null || payload.getAct1name().isEmpty()) && (payload.getAct2name() == null || payload.getAct2name().isEmpty())) {
+                                expandedView.setViewVisibility(R.id.iz_tv_layout, View.GONE);
+                            }
+                        }
+
+
+                        // notification large icon
+                        if (notificationIcon != null) {
+                            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.S) {
+                                expandedView.setViewVisibility(R.id.iv_large_icon, View.GONE);
+                            } else {
+                                expandedView.setImageViewBitmap(R.id.iv_large_icon, notificationIcon);
+                            }
+                        }
                         else {
                             if (DATB.appContext.getApplicationInfo().icon != 0)
-                                expandedView.setImageViewResource(R.id.iv_large_icon, DATB.appContext.getApplicationInfo().icon);
+                                if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.S){
+                                    expandedView.setImageViewResource(R.id.iv_large_icon, 0);
+                                }else {
+                                    expandedView.setImageViewResource(R.id.iv_large_icon, DATB.appContext.getApplicationInfo().icon);
+                                }
                         }
-                        if (notificationBanner != null)
+                        // banner image
+                        if (notificationBanner != null) {
                             expandedView.setImageViewBitmap(R.id.iv_banner_ig, notificationBanner);
-                        else {
-                            if (DATB.bannerImage != 0)
-                                expandedView.setImageViewResource(R.id.iv_banner_ig, DATB.bannerImage);
                         }
-                        expandedView.setTextViewText(R.id.tv_display_time, "" + Util.getTimeWithoutDate());
+                        else {
+                            if (DATB.bannerImage != 0) {
+                                expandedView.setImageViewResource(R.id.iv_banner_ig, DATB.bannerImage);
+                            }
+                            else
+                            {
+                                expandedView.setImageViewResource(R.id.iv_banner_ig, DATB.appContext.getApplicationInfo().icon);
+                            }
+                        }
+                        // Diplay time
+                        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.S){
+                            expandedView.setViewVisibility(R.id.tv_display_time, View.GONE);
+                        }else {
+                            expandedView.setTextViewText(R.id.tv_display_time, "" + Util.getTimeWithoutDate());
+                        }
+
 
                         notificationBuilder = new NotificationCompat.Builder(DATB.appContext, channelId)
                                 .setSmallIcon(icon)
@@ -171,7 +206,7 @@ public class NotificationPreview {
                             } else {
                                 button1 = payload.getAct1name();
                             }
-                            expandedView.setTextViewText(R.id.tv_btn1, "" + button1);
+                            expandedView.setTextViewText(R.id.tv_btn1, "" + button1.replace("~",""));
                             String phone = NotificationEventManager.getPhone(payload.getAct1link());
                             Intent btn1 = cnotificationClick(payload, payload.getAct1link(), payload.getLink(), payload.getAct2link(), phone, clickIndex, lastclickIndex, notificaitionId, 1);
                             if(Build.VERSION.SDK_INT>=Build.VERSION_CODES.S) {
@@ -199,7 +234,7 @@ public class NotificationPreview {
                             } else {
                                 button2 = payload.getAct2name();
                             }
-                            expandedView.setTextViewText(R.id.tv_btn2, "" + button2);
+                            expandedView.setTextViewText(R.id.tv_btn2, "" + button2.replace("~",""));
                             String phone = NotificationEventManager.getPhone(payload.getAct2link());
                             Intent btn2 = NotificationEventManager.notificationClick(payload, payload.getAct2link(), payload.getLink(), payload.getAct1link(), phone, clickIndex, lastclickIndex, notificaitionId, 2);
 
@@ -239,9 +274,13 @@ public class NotificationPreview {
                                 priority = NotificationManagerCompat.IMPORTANCE_HIGH;
                                 channel = new NotificationChannel(channelId,
                                         AppConstant.CHANNEL_NAME, priority);
+                                AudioAttributes audioAttributes = new AudioAttributes.Builder()
+                                        .setContentType(AudioAttributes.CONTENT_TYPE_SONIFICATION)
+                                        .setUsage(AudioAttributes.USAGE_ALARM)
+                                        .build();
                                 Uri uri = Util.getSoundUri(DATB.appContext, DATB.soundID);
                                 if (uri != null)
-                                    channel.setSound(uri, null);
+                                    channel.setSound(uri, audioAttributes);
                                 else
                                     channel.setSound(null, null);
                             } else {
@@ -260,7 +299,8 @@ public class NotificationPreview {
                         if (lastViewIndex.equalsIgnoreCase("1") || lastSeventhIndex.equalsIgnoreCase("1")) {
                             NotificationEventManager.lastViewNotificationApi(payload, lastViewIndex, lastSeventhIndex, lastNinthIndex);
                         }
-                            DATB.notificationView(payload);
+
+                        DATB.notificationView(payload);
 
 
                         //Set Max notification in tray
@@ -274,7 +314,6 @@ public class NotificationPreview {
 
                     notificationBanner = null;
                     notificationIcon = null;
-                    shareIcon = null;
                 /*link = "";
                 link1 = "";
                 link2 = "";*/

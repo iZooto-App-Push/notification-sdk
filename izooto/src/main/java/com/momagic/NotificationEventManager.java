@@ -289,7 +289,6 @@ public class NotificationEventManager {
                    }
                }
 
-               @RequiresApi(api = Build.VERSION_CODES.KITKAT)
                @Override
                void onFailure(int statusCode, String response, Throwable throwable) {
                    super.onFailure(statusCode, response, throwable);
@@ -304,9 +303,6 @@ public class NotificationEventManager {
 
        }
     }
-
-
-     @RequiresApi(api = Build.VERSION_CODES.KITKAT)
      static void parseJson(Payload payload, JSONObject jsonObject) {
         try {
             if(payload.getLink()!=null && !payload.getLink().isEmpty())
@@ -354,7 +350,6 @@ public class NotificationEventManager {
                  }
     }
 
-    @RequiresApi(api = Build.VERSION_CODES.KITKAT)
     private static String getParsedValue(JSONObject jsonObject, String sourceString) {
         try {
             if (sourceString.startsWith("~"))
@@ -435,10 +430,10 @@ public class NotificationEventManager {
         }else {
             final PreferenceUtil preferenceUtil = PreferenceUtil.getInstance(DATB.appContext);
             if (Util.isAppInForeground(DATB.appContext)){
-                if (DATB.inAppOption==null || DATB.inAppOption.equalsIgnoreCase(AppConstant.NOTIFICATION_)){
+                if (DATB.inAppOption==null || DATB.inAppOption.equalsIgnoreCase(AppConstant.NOTIFICATION_) || DATB.inAppOption.equalsIgnoreCase("None")){
                     if (payload.getDefaultNotificationPreview() == 1 || preferenceUtil.getIntData(AppConstant.NOTIFICATION_PREVIEW)== PushTemplate.TEXT_OVERLAY) {
                         if(Build.VERSION.SDK_INT>=Build.VERSION_CODES.S) {
-                            receivedNotification(payload);
+                            NotificationPreview.receiveCustomNotification(payload);
 
 
                         }
@@ -447,10 +442,8 @@ public class NotificationEventManager {
                             NotificationPreview.receiveCustomNotification(payload);
                         }
                     }
-
                     else {
                         receivedNotification(payload);
-
                     }
                 }else if (DATB.inAppOption.equalsIgnoreCase(AppConstant.INAPPALERT)){
                     showAlert(payload);
@@ -458,7 +451,9 @@ public class NotificationEventManager {
             }else {
                 if (payload.getDefaultNotificationPreview() == 1 || preferenceUtil.getIntData(AppConstant.NOTIFICATION_PREVIEW)==PushTemplate.TEXT_OVERLAY) {
                     if(Build.VERSION.SDK_INT>=Build.VERSION_CODES.S) {
-                        receivedNotification(payload);
+                        //receivedNotification(payload);
+                        NotificationPreview.receiveCustomNotification(payload);
+
 
                     }
                     else
@@ -1204,6 +1199,7 @@ public class NotificationEventManager {
     }
 
     private static void showAlert(final Payload payload){
+
         final Activity activity = DATB.curActivity;
         if (activity!=null) {
             activity.runOnUiThread(new Runnable() {
@@ -1250,9 +1246,19 @@ public class NotificationEventManager {
                                 public void onClick(DialogInterface dialog, int which) {
 
                                     dialog.dismiss();
-                                    Intent intent = notificationClick(payload, payload.getLink(), payload.getAct1link(), payload.getAct2link(), AppConstant.NO, finalClickIndex1, lastView_Click, 100, 0);
-                                    activity.sendBroadcast(intent);
+                                    if(Build.VERSION.SDK_INT>=Build.VERSION_CODES.S) {
+                                        Intent intent = notificationClick(payload, payload.getLink(), payload.getAct1link(), payload.getAct2link(), AppConstant.NO, finalClickIndex1, lastView_Click, 100, 0);
+                                        activity.startActivity(intent);
+                                        activity.finish();
+
+                                    }
+                                    else
+                                    {
+                                        Intent intent = notificationClick(payload, payload.getLink(), payload.getAct1link(), payload.getAct2link(), AppConstant.NO, finalClickIndex1, lastView_Click, 100, 0);
+                                        activity.sendBroadcast(intent);
+                                    }
                                 }
+
                             });
 
 
@@ -1262,9 +1268,7 @@ public class NotificationEventManager {
                     alertDialog.show();
                     try {
 
-//                        if(impressionIndex.equalsIgnoreCase("1")) {
-//                            viewNotificationApi(payload);
-//                        }
+
                         if (lastView_Click.equalsIgnoreCase("1") || lastSeventhIndex.equalsIgnoreCase("1")){
                             lastViewNotificationApi(payload, lastView_Click, lastSeventhIndex, lastNinthIndex);
                         }
@@ -1273,11 +1277,12 @@ public class NotificationEventManager {
                     } catch (Exception e) {
                         if(activity!=null) {
                             Util.setException(activity, e.toString(), AppConstant.APPName_2, "showAlert");
-                        }                    }
+                        }                   }
 
                 }
             });
         }
+
 
     }
 

@@ -182,8 +182,6 @@ public interface AppConstant {
     String ACT1ID="act1id";
     String ACT2ID ="act2id";
     String CFG="cfg";
-
-
     String NOTIFICATIONBODY="notifcationbody";
     String FIREBASEEXCEPTION ="exception";
     String FCMNAME = "FireBase Name";
@@ -258,7 +256,7 @@ public interface AppConstant {
     String AD_TYPE="tp";
     String NOTIFICATION_MESSAGE="Send Notification";
     String YES="yes";
-    String SDK_VERSION="1.5.1";
+    String SDK_VERSION="1.5.2";
     String QSDK_VERSION="av";
     String SDK="SDKVERSION";
     String PACKAGE_NAME="mpn";
@@ -353,7 +351,6 @@ public interface AppConstant {
     String SAVESUBID="DATB_SUBID";
     String CHECK_APP_VERSION="iz_app_version";
     String  IZ_XIOAMI_DATA = "xiaomiData";
-
 }
 
 

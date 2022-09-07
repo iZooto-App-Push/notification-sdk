@@ -225,7 +225,6 @@ public class NotificationActionReceiver extends BroadcastReceiver {
         mapData.put(AppConstant.ET_,"" + AppConstant.USERP_);
 
         RestClient.postRequest(lciURL, mapData,null, new RestClient.ResponseHandler() {
-            @RequiresApi(api = Build.VERSION_CODES.KITKAT)
             @Override
             void onSuccess(final String response) {
                 super.onSuccess(response);
@@ -239,7 +238,6 @@ public class NotificationActionReceiver extends BroadcastReceiver {
                     DebugFileManager.createExternalStoragePublic(DATB.appContext,"LastClick"+e.toString(),"[Log.V]->");
                 }
             }
-            @RequiresApi(api = Build.VERSION_CODES.KITKAT)
             @Override
             void onFailure(int statusCode, String response, Throwable throwable) {
                 super.onFailure(statusCode, response, throwable);
