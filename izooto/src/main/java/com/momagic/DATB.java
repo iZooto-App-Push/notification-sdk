@@ -17,7 +17,6 @@ import androidx.annotation.RequiresApi;
 import com.google.firebase.FirebaseApp;
 import com.google.firebase.FirebaseOptions;
 import com.google.firebase.messaging.FirebaseMessaging;
-import com.momagic.db.DatabaseHandler;
 import com.momagic.shortcutbadger.ShortcutBadger;
 
 import org.json.JSONArray;
@@ -114,6 +113,7 @@ public class DATB {
                                     mAppId = jsonObject.getString(AppConstant.APPPID);
                                     preferenceUtil.setDataBID(AppConstant.APPPID, mAppId);
                                     trackAdvertisingId();
+                                    Log.e("JSONObject",jsonObject.toString());
                                     if (!mKey.isEmpty() && !mId.isEmpty() && Build.MANUFACTURER.equalsIgnoreCase("Xiaomi")) {
                                         XiaomiSDKHandler xiaomiSDKHandler = new XiaomiSDKHandler(DATB.appContext, mId, mKey);
                                         xiaomiSDKHandler.onMIToken();
@@ -250,21 +250,6 @@ public class DATB {
         void onAdvertisingIdClientFail(Exception exception);
     }
 
-    public static List<Payload> getNotificationList(Context context)
-    {
-        DatabaseHandler databaseHandler=new DatabaseHandler(context);
-        if(databaseHandler.isTableExists(true))
-        {
-            List<Payload> data=databaseHandler.getAllNotification();
-
-            return data;
-        }
-        else
-        {
-            return null;
-
-        }
-    }
 
     protected static void invokeFinish(final String adverID, final String registrationID) {
         mHandler = new Handler(Looper.getMainLooper());

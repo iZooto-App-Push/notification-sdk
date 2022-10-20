@@ -112,34 +112,36 @@ public class Util {
 
         return null;
     }
-    @RequiresApi(api = Build.VERSION_CODES.KITKAT)
     public static Bitmap getBitmapFromURL(String url) {
         if (url == null)
             return null;
-         String trimmedName = url.trim();
-         trimmedName = trimmedName.replace("///", "/");
-         trimmedName = trimmedName.replace("//", "/");
-         trimmedName = trimmedName.replace("http:/", "https://");
-         trimmedName = trimmedName.replace("https:/", "https://");
-        if(trimmedName.contains(".jpeg") || trimmedName.contains(".jpg") || trimmedName.contains(".png") || trimmedName.contains(".webp") || trimmedName.contains(".JPG")|| trimmedName.contains(".PNG") || trimmedName.contains(".JPEG")|| trimmedName.contains(".WEBP")) {
-            if (trimmedName.startsWith("http://") || trimmedName.startsWith("https://")) {
-                 Bitmap bmp =getBitMap(trimmedName);
-                 if(bmp!=null) {
-                     return bmp;
-                 }
-                 else
-                 {
-                     DebugFileManager.createExternalStoragePublic(DATB.appContext,url,"[Log-> e]->getBitmapFromURL");
+        if(url != "" &&  !url.isEmpty()) {
+            String trimmedName = url.trim();
+            trimmedName = trimmedName.replace("///", "/");
+            trimmedName = trimmedName.replace("//", "/");
+            trimmedName = trimmedName.replace("http:/", "https://");
+            trimmedName = trimmedName.replace("https:/", "https://");
+            if (trimmedName.contains(".jpeg") || trimmedName.contains(".jpg") || trimmedName.contains(".png") || trimmedName.contains(".webp") || trimmedName.contains(".JPG") || trimmedName.contains(".PNG") || trimmedName.contains(".JPEG") || trimmedName.contains(".WEBP")) {
+                if (trimmedName.startsWith("http://") || trimmedName.startsWith("https://")) {
+                    Bitmap bmp = getBitMap(trimmedName);
+                    if (bmp != null) {
+                        return bmp;
+                    } else {
+                        DebugFileManager.createExternalStoragePublic(DATB.appContext, url, "[Log-> e]->getBitmapFromURL");
 
-                 }
-             }
-         }
-         else
-         {
-             DebugFileManager.createExternalStoragePublic(DATB.appContext,url,"[Log-> e]->getBitmapFromURL");
-             Util.setException(DATB.appContext,"Image URL"+url,"Util","getBitmapFromURL");
-             return null;
-         }
+                    }
+                }
+            } else {
+                DebugFileManager.createExternalStoragePublic(DATB.appContext, url, "[Log-> e]->getBitmapFromURL");
+                Util.setException(DATB.appContext, "Image URL" + url, "Util", "getBitmapFromURL");
+                return null;
+            }
+        }
+        else
+        {
+            DebugFileManager.createExternalStoragePublic(DATB.appContext, "Image URL"+url, "[Log-> e]->getBitmapFromURL");
+            return null;
+        }
         return null;
 
     }

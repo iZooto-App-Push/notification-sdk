@@ -29,16 +29,12 @@ import android.os.Build;
 import android.os.Handler;
 import android.os.Looper;
 import android.util.Log;
-
 import androidx.annotation.NonNull;
 import androidx.annotation.RequiresApi;
 import androidx.core.app.NotificationCompat;
-
 import com.google.android.datatransport.cct.internal.LogEvent;
 import com.google.firebase.messaging.FirebaseMessagingService;
 import com.google.firebase.messaging.RemoteMessage;
-import com.momagic.db.DatabaseHandler;
-
 import org.json.JSONObject;
 import java.util.Map;
 import java.util.Objects;
@@ -47,7 +43,6 @@ public class DATBMessagingService extends FirebaseMessagingService {
     private  Payload payload = null;
     private final String Name="DATBMessagingService";
     private static Bitmap bitmap;
-    @RequiresApi(api = Build.VERSION_CODES.KITKAT)
     @Override
     public void onMessageReceived(@NonNull RemoteMessage remoteMessage) {
         try {
@@ -109,7 +104,6 @@ public class DATBMessagingService extends FirebaseMessagingService {
     public   void handleNow(final Map<String, String> data) {
         Log.d(AppConstant.APP_NAME_TAG, AppConstant.NOTIFICATIONRECEIVED);
         PreferenceUtil preferenceUtil =PreferenceUtil.getInstance(this);
-        DatabaseHandler db =new DatabaseHandler(this);
                try {
                 if(data.get(AppConstant.AD_NETWORK) !=null || data.get(AppConstant.GLOBAL)!=null || data.get(AppConstant.GLOBAL_PUBLIC_KEY)!=null)
                 {
@@ -245,9 +239,7 @@ public class DATBMessagingService extends FirebaseMessagingService {
                     }
                     if (DATB.appContext == null)
                         DATB.appContext = this;
-                    if(db.isTableExists(true)) {
-                            db.addNotificationInDB(payload);
-                    }
+
                     Handler mainHandler = new Handler(Looper.getMainLooper());
                     Runnable myRunnable = new Runnable() {
                         @Override
@@ -264,7 +256,7 @@ public class DATBMessagingService extends FirebaseMessagingService {
 
                } catch (Exception e) {
                    DebugFileManager.createExternalStoragePublic(DATB.appContext,data.toString(),"[Log.v]->");
-                   Util.setException(this, e.toString(), Name, "handleNow");
+                   Util.setException(this, e.toString()+"Payload"+data.toString(), Name, "handleNow");
             }
     }
 }

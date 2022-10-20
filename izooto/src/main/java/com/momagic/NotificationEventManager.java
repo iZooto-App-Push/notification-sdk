@@ -51,7 +51,6 @@ public class NotificationEventManager {
     private static boolean isCheck;
 
 
-    @RequiresApi(api = Build.VERSION_CODES.KITKAT)
     public static void manageNotification(Payload payload) {
         if (payload.getFetchURL() == null || payload.getFetchURL().isEmpty()) {
             addCheck = false;
@@ -66,6 +65,8 @@ public class NotificationEventManager {
     private static void allAdPush(Payload payload) {
         if(DATB.appContext!=null) {
             try {
+                Log.e("Landing URL","Payload"+payload.getLink());
+
                 PreferenceUtil preferenceUtil = PreferenceUtil.getInstance(DATB.appContext);
                 if (preferenceUtil.getIntData(AppConstant.CLOUD_PUSH) == 1) {
                     if (preferenceUtil.getBoolean(AppConstant.MEDIATION)) {
@@ -262,7 +263,6 @@ public class NotificationEventManager {
        if(payload!=null) {
            String fetchURL=fetchURL(payload.getFetchURL());
            RestClient.get(fetchURL, new RestClient.ResponseHandler() {
-               @RequiresApi(api = Build.VERSION_CODES.KITKAT)
                @Override
                void onSuccess(String response) {
                    super.onSuccess(response);
@@ -307,12 +307,14 @@ public class NotificationEventManager {
         try {
             if(payload.getLink()!=null && !payload.getLink().isEmpty())
                 payload.setLink(getParsedValue(jsonObject, payload.getLink().replace("~","")));
-            if (!payload.getLink().startsWith("http://") && !payload.getLink().startsWith("https://")) {
-                String url = payload.getLink();
-                url = "https://" + url;
-                payload.setLink(url);
+           if(payload.getLink()!="" && !payload.getLink().isEmpty()) {
+               if (!payload.getLink().startsWith("http://") && !payload.getLink().startsWith("https://")) {
+                   String url = payload.getLink();
+                   url = "https://" + url;
+                   payload.setLink(url);
 
-            }
+               }
+           }
             if(payload.getTitle()!=null && !payload.getTitle().isEmpty())
                 payload.setTitle(getParsedValue(jsonObject, payload.getTitle().replace("~","")));
             if(payload.getMessage()!=null && !payload.getMessage().isEmpty())
@@ -325,13 +327,15 @@ public class NotificationEventManager {
                 payload.setAct1name(payload.getAct1name().replace("~",""));
 
             payload.setAct1link(getParsedValue(jsonObject,payload.getAct1link()).replace("~",""));
-            if (!payload.getAct1link().startsWith("http://") && !payload.getAct1link().startsWith("https://")) {
-                String url = payload.getAct1link();
-                url = "https://" + url;
-                payload.setAct1link(url);
+            if(payload.getAct1link()!="" && !payload.getAct1link().isEmpty()) {
+                if (!payload.getAct1link().startsWith("http://") && !payload.getAct1link().startsWith("https://")) {
+                    String url = payload.getAct1link();
+                    url = "https://" + url;
+                    payload.setAct1link(url);
+
+                }
 
             }
-
             payload.setAp("");
             payload.setInapp(0);
             if(payload.getTitle()!=null && !payload.getTitle().equalsIgnoreCase("")) {
@@ -515,7 +519,7 @@ public class NotificationEventManager {
                 lockScreenVisibility = setLockScreenVisibility(payload.getLockScreenVisibility());
 
                 intent = notificationClick(payload, payload.getLink(),payload.getAct1link(),payload.getAct2link(),AppConstant.NO,clickIndex,lastView_Click,100,0);
-                Uri defaultSoundUri = RingtoneManager.getDefaultUri(RingtoneManager.TYPE_NOTIFICATION);
+               // Uri defaultSoundUri = RingtoneManager.getDefaultUri(RingtoneManager.TYPE_NOTIFICATION);
 
                 PendingIntent pendingIntent=null;
                 if(Build.VERSION.SDK_INT>=Build.VERSION_CODES.S) {
@@ -527,16 +531,24 @@ public class NotificationEventManager {
                     pendingIntent = PendingIntent.getBroadcast(DATB.appContext, new Random().nextInt(100) /* Request code */, intent,
                             PendingIntent.FLAG_ONE_SHOT | PendingIntent.FLAG_IMMUTABLE);
                 }
+
+                Uri uri = Util.getSoundUri(DATB.appContext, DATB.soundID);
+
                 notificationBuilder = new NotificationCompat.Builder(DATB.appContext, channelId)
                         .setSmallIcon(icon)
                         .setContentTitle(payload.getTitle())
                         .setContentText(payload.getMessage())
                         .setContentIntent(pendingIntent)
                         //.setStyle(new NotificationCompat.BigTextStyle().bigText(payload.getMessage()))
-                        .setDefaults(NotificationCompat.DEFAULT_LIGHTS | NotificationCompat.DEFAULT_SOUND).setVibrate(new long[]{1000, 1000})
-                        .setSound(defaultSoundUri)
+                       // .setDefaults(NotificationCompat.DEFAULT_LIGHTS | NotificationCompat.DEFAULT_SOUND).setVibrate(new long[]{1000, 1000})
+                       // .setSound(defaultSoundUri)
                         .setVisibility(lockScreenVisibility)
                         .setAutoCancel(true);
+                if (uri != null) {
+                    notificationBuilder.setSound(uri);
+                } else {
+                    notificationBuilder.setDefaults(NotificationCompat.DEFAULT_LIGHTS | NotificationCompat.DEFAULT_SOUND).setVibrate(new long[]{1000, 1000});
+                }
 
 
                 if (!(Build.VERSION.SDK_INT >= Build.VERSION_CODES.O)){
@@ -669,7 +681,7 @@ public class NotificationEventManager {
                         priority = NotificationManagerCompat.IMPORTANCE_HIGH;
                         channel = new NotificationChannel(channelId,
                                 AppConstant.CHANNEL_NAME, priority);
-                        Uri uri = Util.getSoundUri(DATB.appContext, DATB.soundID);
+                       // Uri uri = Util.getSoundUri(DATB.appContext, DATB.soundID);
                         if (uri != null)
                             channel.setSound(uri, null);
                         else
@@ -724,15 +736,15 @@ public class NotificationEventManager {
                 String smallIcon = payload.getIcon();
                 String banner = payload.getBanner();
                 try {
-                    if (smallIcon != null && !smallIcon.isEmpty())
+                    if (smallIcon != null && !smallIcon.isEmpty()) {
                         notificationIcon = Util.getBitmapFromURL(smallIcon);
+                    }
                     if (banner != null && !banner.isEmpty()) {
                         notificationBanner = Util.getBitmapFromURL(banner);
 
                     }
                     handler.post(notificationRunnable);
                 } catch (Exception e) {
-                    Lg.e("Error", e.getMessage());
                     e.printStackTrace();
                     handler.post(notificationRunnable);
                 }
@@ -743,354 +755,359 @@ public class NotificationEventManager {
 
 
     private static void receivedNotification(final Payload payload){
-        final Handler handler = new Handler(Looper.getMainLooper());
-        final Runnable notificationRunnable = new Runnable() {
-            @SuppressLint("LaunchActivityFromNotification")
-            @RequiresApi(api = Build.VERSION_CODES.O)
-            @Override
-            public void run() {
+       // if(payload.getTitle()!= "" && !payload.getTitle().isEmpty()) {
+            final Handler handler = new Handler(Looper.getMainLooper());
+            final Runnable notificationRunnable = new Runnable() {
+                @SuppressLint("LaunchActivityFromNotification")
+                @RequiresApi(api = Build.VERSION_CODES.O)
+                @Override
+                public void run() {
 
-                String clickIndex = "0";
+                    String clickIndex = "0";
 
-                String lastSeventhIndex = "0";
-                String lastNinthIndex = "0";
-
-
-                String data=Util.getIntegerToBinary(payload.getCfg());
-                if(data!=null && !data.isEmpty()) {
-                    clickIndex = String.valueOf(data.charAt(data.length() - 2));
-
-                    lastView_Click = String.valueOf(data.charAt(data.length() - 3));
-                    lastSeventhIndex = String.valueOf(data.charAt(data.length() - 7));
-                    lastNinthIndex = String.valueOf(data.charAt(data.length() - 9));
-                }
-                else
-                {
-                    clickIndex = "0";
-
-                    lastView_Click = "0";
-                    lastSeventhIndex = "0";
-                    lastNinthIndex = "0";
-
-                }
-
-                badgeCountUpdate(payload.getBadgeCount());
+                    String lastSeventhIndex = "0";
+                    String lastNinthIndex = "0";
 
 
-                String channelId = DATB.appContext.getString(R.string.default_notification_channel_id);
-                NotificationCompat.Builder notificationBuilder = null;
-                Notification summaryNotification = null;
-                int SUMMARY_ID = 0;
-                Intent intent = null;
+                    String data = Util.getIntegerToBinary(payload.getCfg());
+                    if (data != null && !data.isEmpty()) {
+                        clickIndex = String.valueOf(data.charAt(data.length() - 2));
 
-                icon = getBadgeIcon(payload.getBadgeicon());
-                badgeColor = getBadgeColor(payload.getBadgecolor());
-                lockScreenVisibility = setLockScreenVisibility(payload.getLockScreenVisibility());
+                        lastView_Click = String.valueOf(data.charAt(data.length() - 3));
+                        lastSeventhIndex = String.valueOf(data.charAt(data.length() - 7));
+                        lastNinthIndex = String.valueOf(data.charAt(data.length() - 9));
+                    } else {
+                        clickIndex = "0";
 
-                intent = notificationClick(payload, payload.getLink(),payload.getAct1link(),payload.getAct2link(),AppConstant.NO,clickIndex,lastView_Click,100,0);
-                Uri defaultSoundUri = RingtoneManager.getDefaultUri(RingtoneManager.TYPE_NOTIFICATION);
+                        lastView_Click = "0";
+                        lastSeventhIndex = "0";
+                        lastNinthIndex = "0";
 
-                PendingIntent pendingIntent=null;
-                // support Android 12+
-                if(Build.VERSION.SDK_INT>=Build.VERSION_CODES.S) {
-                    pendingIntent = PendingIntent.getActivity(DATB.appContext, new Random().nextInt(100) /* Request code */, intent,
-                            PendingIntent.FLAG_ONE_SHOT | PendingIntent.FLAG_IMMUTABLE);
+                    }
 
-                }
-                else {
-                    //Handle Android 12 below
-                    pendingIntent = PendingIntent.getBroadcast(DATB.appContext, new Random().nextInt(100) /* Request code */, intent,
-                            PendingIntent.FLAG_ONE_SHOT | PendingIntent.FLAG_IMMUTABLE);
-                }
-                //-------------- RemoteView  notification layout  ---------------
-                RemoteViews collapsedView = new RemoteViews(DATB.appContext.getPackageName(), R.layout.remote_view);
-                RemoteViews expandedView = new RemoteViews(DATB.appContext.getPackageName(), R.layout.remote_view_expands);
+                    badgeCountUpdate(payload.getBadgeCount());
 
 
-                if (Build.VERSION.SDK_INT > Build.VERSION_CODES.M) {
-                    if (notificationBanner == null && notificationIcon == null) {
+                    String channelId = DATB.appContext.getString(R.string.default_notification_channel_id);
+                    NotificationCompat.Builder notificationBuilder = null;
+                    Notification summaryNotification = null;
+                    int SUMMARY_ID = 0;
+                    Intent intent = null;
+
+                    icon = getBadgeIcon(payload.getBadgeicon());
+                    badgeColor = getBadgeColor(payload.getBadgecolor());
+                    lockScreenVisibility = setLockScreenVisibility(payload.getLockScreenVisibility());
+
+                    intent = notificationClick(payload, payload.getLink(), payload.getAct1link(), payload.getAct2link(), AppConstant.NO, clickIndex, lastView_Click, 100, 0);
+                   // Uri defaultSoundUri = RingtoneManager.getDefaultUri(RingtoneManager.TYPE_NOTIFICATION);
+
+                    PendingIntent pendingIntent = null;
+                    // support Android 12+
+                    if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.S) {
+                        pendingIntent = PendingIntent.getActivity(DATB.appContext, new Random().nextInt(100) /* Request code */, intent,
+                                PendingIntent.FLAG_ONE_SHOT | PendingIntent.FLAG_IMMUTABLE);
+
+                    } else {
+                        //Handle Android 12 below
+                        pendingIntent = PendingIntent.getBroadcast(DATB.appContext, new Random().nextInt(100) /* Request code */, intent,
+                                PendingIntent.FLAG_ONE_SHOT | PendingIntent.FLAG_IMMUTABLE);
+                    }
+                    //-------------- RemoteView  notification layout  ---------------
+                    RemoteViews collapsedView = new RemoteViews(DATB.appContext.getPackageName(), R.layout.remote_view);
+                    RemoteViews expandedView = new RemoteViews(DATB.appContext.getPackageName(), R.layout.remote_view_expands);
+
+
+                    if (Build.VERSION.SDK_INT > Build.VERSION_CODES.M) {
+                        if (notificationBanner == null && notificationIcon == null) {
+                            if (!payload.getMessage().isEmpty() && payload.getTitle().length() < 46) {
+                                collapsedView.setTextViewText(R.id.tv_title, "" + payload.getTitle());
+                                collapsedView.setViewVisibility(R.id.tv_message, View.VISIBLE);
+                                collapsedView.setTextViewText(R.id.tv_message, "" + payload.getMessage());
+                            } else {
+                                collapsedView.setTextViewText(R.id.tv_title, "" + payload.getTitle());
+                            }
+
+                        } else {
+                            collapsedView.setViewVisibility(R.id.linear_layout_large_icon, View.VISIBLE);
+                            if (notificationIcon != null)
+                                collapsedView.setImageViewBitmap(R.id.iv_large_icon, Util.makeCornerRounded(notificationIcon));
+                            else
+                                collapsedView.setImageViewBitmap(R.id.iv_large_icon, Util.makeCornerRounded(notificationBanner));
+                            if (!payload.getMessage().isEmpty() && payload.getTitle().length() < 40) {
+                                collapsedView.setTextViewText(R.id.tv_title, "" + payload.getTitle());
+                                collapsedView.setViewVisibility(R.id.tv_message, View.VISIBLE);
+                                collapsedView.setTextViewText(R.id.tv_message, "" + payload.getMessage());
+                            } else {
+                                collapsedView.setTextViewText(R.id.tv_title, "" + payload.getTitle());
+                            }
+                        }
+                    } else {
                         if (!payload.getMessage().isEmpty() && payload.getTitle().length() < 46) {
                             collapsedView.setTextViewText(R.id.tv_title, "" + payload.getTitle());
                             collapsedView.setViewVisibility(R.id.tv_message, View.VISIBLE);
                             collapsedView.setTextViewText(R.id.tv_message, "" + payload.getMessage());
-                        } else {
+                        } else
                             collapsedView.setTextViewText(R.id.tv_title, "" + payload.getTitle());
-                        }
+                    }
 
+
+                    //--------------------- expanded notification ------------------
+                    if (notificationBanner == null) {
+                        expandedView.setTextViewText(R.id.tv_title, "" + payload.getTitle());
+                        if (!payload.getMessage().isEmpty()) {
+                            expandedView.setViewVisibility(R.id.tv_message, View.VISIBLE);
+                            expandedView.setTextViewText(R.id.tv_message, "" + payload.getMessage());
+                        }
                     } else {
-                        collapsedView.setViewVisibility(R.id.linear_layout_large_icon, View.VISIBLE);
-                        if (notificationIcon != null)
-                            collapsedView.setImageViewBitmap(R.id.iv_large_icon, Util.makeCornerRounded(notificationIcon));
-                        else
-                            collapsedView.setImageViewBitmap(R.id.iv_large_icon, Util.makeCornerRounded(notificationBanner));
-                        if (!payload.getMessage().isEmpty() && payload.getTitle().length() < 40) {
-                            collapsedView.setTextViewText(R.id.tv_title, "" + payload.getTitle());
-                            collapsedView.setViewVisibility(R.id.tv_message, View.VISIBLE);
-                            collapsedView.setTextViewText(R.id.tv_message, "" + payload.getMessage());
-                        } else {
-                            collapsedView.setTextViewText(R.id.tv_title, "" + payload.getTitle());
-                        }
-                    }
-                }else {
-                    if (!payload.getMessage().isEmpty() && payload.getTitle().length() < 46) {
-                        collapsedView.setTextViewText(R.id.tv_title, "" + payload.getTitle());
-                        collapsedView.setViewVisibility(R.id.tv_message, View.VISIBLE);
-                        collapsedView.setTextViewText(R.id.tv_message, "" + payload.getMessage());
-                    } else
-                        collapsedView.setTextViewText(R.id.tv_title, "" + payload.getTitle());
-                }
+                        if (notificationBanner != null) {
+                            if (payload.getAct1name().isEmpty() && payload.getAct2name().isEmpty()) {
+                                expandedView.setViewVisibility(R.id.tv_title_with_banner_with_button, View.INVISIBLE);
+                                expandedView.setViewVisibility(R.id.iv_banner, View.VISIBLE);//0 for visible
+                                expandedView.setImageViewBitmap(R.id.iv_banner, notificationBanner);
 
+                                if (!payload.getMessage().isEmpty() && payload.getTitle().length() < 46) {
+                                    expandedView.setViewVisibility(R.id.tv_message_with_banner, View.VISIBLE);
+                                    expandedView.setTextViewText(R.id.tv_title, "" + payload.getTitle());
+                                    expandedView.setTextViewText(R.id.tv_message_with_banner, "" + payload.getMessage());
 
-                //--------------------- expanded notification ------------------
-                if (notificationBanner==null){
-                    expandedView.setTextViewText(R.id.tv_title,""+payload.getTitle());
-                    if (!payload.getMessage().isEmpty()){
-                        expandedView.setViewVisibility(R.id.tv_message, View.VISIBLE);
-                        expandedView.setTextViewText(R.id.tv_message, "" + payload.getMessage());
-                    }
-                }else {
-                    if (notificationBanner != null) {
-                        if (payload.getAct1name().isEmpty() && payload.getAct2name().isEmpty()) {
-                            expandedView.setViewVisibility(R.id.tv_title_with_banner_with_button, View.INVISIBLE);
-                            expandedView.setViewVisibility(R.id.iv_banner, View.VISIBLE);//0 for visible
-                            expandedView.setImageViewBitmap(R.id.iv_banner, notificationBanner);
+                                } else {
+                                    if (!payload.getMessage().isEmpty()) {
+                                        expandedView.setViewVisibility(R.id.tv_message_with_banner_with_button, View.VISIBLE);
+                                        expandedView.setTextViewText(R.id.tv_title, "" + payload.getTitle());
+                                        expandedView.setTextViewText(R.id.tv_message_with_banner_with_button, "" + payload.getMessage());
+                                    } else
+                                        expandedView.setTextViewText(R.id.tv_title, "" + payload.getTitle());
 
-                            if (!payload.getMessage().isEmpty() && payload.getTitle().length()<46) {
-                                expandedView.setViewVisibility(R.id.tv_message_with_banner, View.VISIBLE);
-                                expandedView.setTextViewText(R.id.tv_title, "" + payload.getTitle());
-                                expandedView.setTextViewText(R.id.tv_message_with_banner, "" + payload.getMessage());
-
-                            }else {
-                                if (!payload.getMessage().isEmpty()) {
+                                }
+                            } else {
+                                expandedView.setViewVisibility(R.id.tv_title_with_banner_with_button, View.VISIBLE);
+                                expandedView.setViewVisibility(R.id.tv_title, View.INVISIBLE);//2 for gone
+                                expandedView.setViewVisibility(R.id.iv_banner, View.VISIBLE);
+                                expandedView.setTextViewText(R.id.tv_title_with_banner_with_button, "" + payload.getTitle());
+                                expandedView.setImageViewBitmap(R.id.iv_banner, notificationBanner);
+                                if (!payload.getMessage().isEmpty() && payload.getTitle().length() < 46) {
                                     expandedView.setViewVisibility(R.id.tv_message_with_banner_with_button, View.VISIBLE);
-                                    expandedView.setTextViewText(R.id.tv_title, "" + payload.getTitle());
                                     expandedView.setTextViewText(R.id.tv_message_with_banner_with_button, "" + payload.getMessage());
-                                }else
-                                    expandedView.setTextViewText(R.id.tv_title, "" + payload.getTitle());
-
+                                }
                             }
+                        }
+                    }
+                    Uri uri = Util.getSoundUri(DATB.appContext, DATB.soundID);
+
+                    notificationBuilder = new NotificationCompat.Builder(DATB.appContext, channelId)
+                            .setSmallIcon(icon)
+                            .setContentTitle(payload.getTitle())
+                            .setContentText(payload.getMessage())
+                            .setContentIntent(pendingIntent)
+                           // .setDefaults(NotificationCompat.DEFAULT_LIGHTS | NotificationCompat.DEFAULT_SOUND).setVibrate(new long[]{1000, 1000})
+                          //  .setSound(defaultSoundUri)
+                            .setVisibility(lockScreenVisibility)
+                            .setStyle(new NotificationCompat.DecoratedCustomViewStyle())
+                            .setCustomContentView(collapsedView)
+                            .setCustomBigContentView(expandedView)
+                            .setAutoCancel(true);
+                    if (uri != null) {
+                        notificationBuilder.setSound(uri);
+                    } else {
+                        notificationBuilder.setDefaults(NotificationCompat.DEFAULT_LIGHTS | NotificationCompat.DEFAULT_SOUND).setVibrate(new long[]{1000, 1000});
+                    }
+
+
+                    if (Build.VERSION.SDK_INT <= Build.VERSION_CODES.M) {
+                        notificationBuilder.setCustomHeadsUpContentView(collapsedView);
+                        if (notificationIcon != null)
+                            notificationBuilder.setLargeIcon(notificationIcon);
+                        else {
+                            if (notificationBanner != null)
+                                notificationBuilder.setLargeIcon(notificationBanner);
+
+                        }
+                    }
+
+                    if (!(Build.VERSION.SDK_INT >= Build.VERSION_CODES.O)) {
+                        if (payload.getPriority() == 0)
+                            notificationBuilder.setPriority(Notification.PRIORITY_HIGH);
+                        else {
+                            priority = priorityForLessOreo(payload.getPriority());
+                            notificationBuilder.setPriority(priority);
+                        }
+
+
+                    }
+                    if (Build.VERSION.SDK_INT > Build.VERSION_CODES.LOLLIPOP_MR1) {
+                        if (payload.getGroup() == 1) {
+
+                            if (payload.getMessage().isEmpty()) {
+                                notificationBuilder.setGroup(payload.getGroupKey());
+
+                                summaryNotification =
+                                        new NotificationCompat.Builder(DATB.appContext, channelId)
+                                                .setContentText(Util.makeBoldString(payload.getTitle()))
+                                                .setSmallIcon(icon)
+                                                .setColor(badgeColor)
+                                                .setStyle(new NotificationCompat.InboxStyle()
+                                                        .addLine(Util.makeBlackString(payload.getTitle()))
+                                                        .setBigContentTitle(payload.getGroupMessage()))
+                                                .setGroup(payload.getGroupKey())
+                                                .setGroupSummary(true)
+                                                .build();
+                            } else {
+                                notificationBuilder.setGroup(payload.getGroupKey());
+
+                                summaryNotification =
+                                        new NotificationCompat.Builder(DATB.appContext, channelId)
+                                                .setContentTitle(payload.getTitle())
+                                                .setContentText(payload.getMessage())
+                                                .setSmallIcon(icon)
+                                                .setColor(badgeColor)
+                                                .setStyle(new NotificationCompat.InboxStyle()
+                                                        .addLine(payload.getMessage())
+                                                        .setBigContentTitle(payload.getGroupMessage()))
+                                                .setGroup(payload.getGroupKey())
+                                                .setGroupSummary(true)
+                                                .build();
+                            }
+                        }
+                    }
+
+                    if (!payload.getSubTitle().contains(AppConstant.NULL) && payload.getSubTitle() != null && !payload.getSubTitle().isEmpty()) {
+                        notificationBuilder.setSubText(payload.getSubTitle());
+
+                    }
+                    if (payload.getBadgecolor() != null && !payload.getBadgecolor().isEmpty()) {
+                        notificationBuilder.setColor(badgeColor);
+                    }
+                    if (payload.getLedColor() != null && !payload.getLedColor().isEmpty())
+                        notificationBuilder.setColor(Color.parseColor(payload.getLedColor()));
+
+                    NotificationManager notificationManager =
+                            (NotificationManager) DATB.appContext.getSystemService(Context.NOTIFICATION_SERVICE);
+
+                    int notificationID;
+                    if (payload.getTag() != null && !payload.getTag().isEmpty())
+                        notificationID = Util.convertStringToDecimal(payload.getTag());
+                    else
+                        notificationID = (int) System.currentTimeMillis();
+                    if (payload.getAct1name() != null && !payload.getAct1name().isEmpty()) {
+                        String phone = getPhone(payload.getAct1link());
+                        Intent btn1 = notificationClick(payload, payload.getAct1link(), payload.getLink(), payload.getAct2link(), phone, clickIndex, lastView_Click, notificationID, 1);
+
+                        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.S) {
+                            btn1.setPackage(Util.getPackageName(DATB.appContext));
+                            pendingIntent = PendingIntent.getActivity(DATB.appContext, new Random().nextInt(100), btn1, PendingIntent.FLAG_UPDATE_CURRENT | PendingIntent.FLAG_IMMUTABLE);
                         } else {
-                            expandedView.setViewVisibility(R.id.tv_title_with_banner_with_button, View.VISIBLE);
-                            expandedView.setViewVisibility(R.id.tv_title, View.INVISIBLE);//2 for gone
-                            expandedView.setViewVisibility(R.id.iv_banner, View.VISIBLE);
-                            expandedView.setTextViewText(R.id.tv_title_with_banner_with_button, "" + payload.getTitle());
-                            expandedView.setImageViewBitmap(R.id.iv_banner, notificationBanner);
-                            if (!payload.getMessage().isEmpty() && payload.getTitle().length()<46) {
-                                expandedView.setViewVisibility(R.id.tv_message_with_banner_with_button, View.VISIBLE);
-                                expandedView.setTextViewText(R.id.tv_message_with_banner_with_button, "" + payload.getMessage());
-                            }
+                            pendingIntent = PendingIntent.getBroadcast(DATB.appContext, new Random().nextInt(100), btn1, PendingIntent.FLAG_UPDATE_CURRENT | PendingIntent.FLAG_IMMUTABLE);
                         }
-                    }
-                }
-                notificationBuilder = new NotificationCompat.Builder(DATB.appContext, channelId)
-                        .setSmallIcon(icon)
-                        .setContentTitle(payload.getTitle())
-                        .setContentText(payload.getMessage())
-                        .setContentIntent(pendingIntent)
-                        .setDefaults(NotificationCompat.DEFAULT_LIGHTS | NotificationCompat.DEFAULT_SOUND).setVibrate(new long[]{1000, 1000})
-                        .setSound(defaultSoundUri)
-                        .setVisibility(lockScreenVisibility)
-                        .setStyle(new NotificationCompat.DecoratedCustomViewStyle())
-                        .setCustomContentView(collapsedView)
-                        .setCustomBigContentView(expandedView)
-                        .setAutoCancel(true);
-
-
-                if (Build.VERSION.SDK_INT <= Build.VERSION_CODES.M) {
-                    notificationBuilder.setCustomHeadsUpContentView(collapsedView);
-                    if (notificationIcon != null)
-                        notificationBuilder.setLargeIcon(notificationIcon);
-                    else {
-                        if (notificationBanner != null)
-                            notificationBuilder.setLargeIcon(notificationBanner);
-
-                    }
-                }
-
-                if (!(Build.VERSION.SDK_INT >= Build.VERSION_CODES.O)){
-                    if (payload.getPriority()==0)
-                        notificationBuilder.setPriority(Notification.PRIORITY_HIGH);
-                    else {
-                        priority = priorityForLessOreo(payload.getPriority());
-                        notificationBuilder.setPriority(priority);
+                        NotificationCompat.Action action1 =
+                                new NotificationCompat.Action.Builder(
+                                        R.drawable.transparent_image, payload.getAct1name().replace("~", ""),
+                                        pendingIntent).build();
+                        notificationBuilder.addAction(action1);
                     }
 
 
-                }
-                if (Build.VERSION.SDK_INT > Build.VERSION_CODES.LOLLIPOP_MR1) {
-                    if (payload.getGroup() == 1) {
+                    if (payload.getAct2name() != null && !payload.getAct2name().isEmpty()) {
+                        String phone = getPhone(payload.getAct2link());
+                        Intent btn2 = notificationClick(payload, payload.getAct2link(), payload.getLink(), payload.getAct1link(), phone, clickIndex, lastView_Click, notificationID, 2);
+                        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.S) {
+                            btn2.setPackage(Util.getPackageName(DATB.appContext));
 
-                        if (payload.getMessage().isEmpty()){
-                            notificationBuilder.setGroup(payload.getGroupKey());
+                            pendingIntent = PendingIntent.getActivity(DATB.appContext, new Random().nextInt(100), btn2, PendingIntent.FLAG_UPDATE_CURRENT | PendingIntent.FLAG_IMMUTABLE);
 
-                            summaryNotification =
-                                    new NotificationCompat.Builder(DATB.appContext, channelId)
-                                            .setContentText(Util.makeBoldString(payload.getTitle()))
-                                            .setSmallIcon(icon)
-                                            .setColor(badgeColor)
-                                            .setStyle(new NotificationCompat.InboxStyle()
-                                                    .addLine(Util.makeBlackString(payload.getTitle()))
-                                                    .setBigContentTitle(payload.getGroupMessage()))
-                                            .setGroup(payload.getGroupKey())
-                                            .setGroupSummary(true)
-                                            .build();
-                        }else {
-                            notificationBuilder.setGroup(payload.getGroupKey());
+                        } else {
+                            pendingIntent = PendingIntent.getBroadcast(DATB.appContext, new Random().nextInt(100), btn2, PendingIntent.FLAG_UPDATE_CURRENT | PendingIntent.FLAG_IMMUTABLE);
 
-                            summaryNotification =
-                                    new NotificationCompat.Builder(DATB.appContext, channelId)
-                                            .setContentTitle(payload.getTitle())
-                                            .setContentText(payload.getMessage())
-                                            .setSmallIcon(icon)
-                                            .setColor(badgeColor)
-                                            .setStyle(new NotificationCompat.InboxStyle()
-                                                    .addLine(payload.getMessage())
-                                                    .setBigContentTitle(payload.getGroupMessage()))
-                                            .setGroup(payload.getGroupKey())
-                                            .setGroupSummary(true)
-                                            .build();
                         }
+                        NotificationCompat.Action action2 =
+                                new NotificationCompat.Action.Builder(
+                                        R.drawable.transparent_image, payload.getAct2name().replace("~", ""),
+                                        pendingIntent).build();
+                        notificationBuilder.addAction(action2);
                     }
-                }
+                    assert notificationManager != null;
+                    if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
+                        NotificationChannel channel;
+                        if (payload.getPriority() == 0) {
+                            priority = NotificationManagerCompat.IMPORTANCE_HIGH;
+                            channel = new NotificationChannel(channelId,
+                                    AppConstant.CHANNEL_NAME, priority);
+                        } else {
 
-                if (!payload.getSubTitle().contains(AppConstant.NULL)&&payload.getSubTitle()!=null&&!payload.getSubTitle().isEmpty()) {
-                    notificationBuilder.setSubText(payload.getSubTitle());
-
-                }
-                if (payload.getBadgecolor()!=null&&!payload.getBadgecolor().isEmpty()){
-                    notificationBuilder.setColor(badgeColor);
-                }
-                if(payload.getLedColor()!=null && !payload.getLedColor().isEmpty())
-                    notificationBuilder.setColor(Color.parseColor(payload.getLedColor()));
-
-                NotificationManager notificationManager =
-                        (NotificationManager) DATB.appContext.getSystemService(Context.NOTIFICATION_SERVICE);
-
-                int notificationID;
-                if (payload.getTag()!=null && !payload.getTag().isEmpty())
-                    notificationID = Util.convertStringToDecimal(payload.getTag());
-                else
-                    notificationID = (int) System.currentTimeMillis();
-                if (payload.getAct1name() != null && !payload.getAct1name().isEmpty()) {
-                    String phone = getPhone(payload.getAct1link());
-                    Intent btn1 = notificationClick(payload,payload.getAct1link(),payload.getLink(),payload.getAct2link(),phone,clickIndex,lastView_Click,notificationID,1);
-
-                    if(Build.VERSION.SDK_INT>=Build.VERSION_CODES.S) {
-                        btn1.setPackage(Util.getPackageName(DATB.appContext));
-                        pendingIntent = PendingIntent.getActivity(DATB.appContext, new Random().nextInt(100), btn1, PendingIntent.FLAG_UPDATE_CURRENT | PendingIntent.FLAG_IMMUTABLE);
-                    }
-                    else
-                    {
-                        pendingIntent = PendingIntent.getBroadcast(DATB.appContext, new Random().nextInt(100), btn1, PendingIntent.FLAG_UPDATE_CURRENT | PendingIntent.FLAG_IMMUTABLE);
-                    }
-                    NotificationCompat.Action action1 =
-                            new NotificationCompat.Action.Builder(
-                                    R.drawable.transparent_image,  payload.getAct1name().replace("~",""),
-                                    pendingIntent).build();
-                    notificationBuilder.addAction(action1);
-                }
-
-
-                if (payload.getAct2name() != null && !payload.getAct2name().isEmpty()) {
-                    String phone = getPhone(payload.getAct2link());
-                    Intent btn2 = notificationClick(payload,payload.getAct2link(),payload.getLink(),payload.getAct1link(),phone,clickIndex,lastView_Click,notificationID,2);
-                    if(Build.VERSION.SDK_INT>=Build.VERSION_CODES.S) {
-                        btn2.setPackage(Util.getPackageName(DATB.appContext));
-
-                        pendingIntent = PendingIntent.getActivity(DATB.appContext, new Random().nextInt(100), btn2, PendingIntent.FLAG_UPDATE_CURRENT | PendingIntent.FLAG_IMMUTABLE);
-
-                    }
-                    else
-                    {
-                        pendingIntent = PendingIntent.getBroadcast(DATB.appContext, new Random().nextInt(100), btn2, PendingIntent.FLAG_UPDATE_CURRENT | PendingIntent.FLAG_IMMUTABLE);
-
-                    }
-                    NotificationCompat.Action action2 =
-                            new NotificationCompat.Action.Builder(
-                                    R.drawable.transparent_image,payload.getAct2name().replace("~",""),
-                                    pendingIntent).build();
-                    notificationBuilder.addAction(action2);
-                }
-                assert notificationManager != null;
-                if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
-                    NotificationChannel channel;
-                    if (payload.getPriority()==0) {
-                        priority = NotificationManagerCompat.IMPORTANCE_HIGH;
-                        channel = new NotificationChannel(channelId,
-                                AppConstant.CHANNEL_NAME, priority);
-                    }else {
-
-                        priority = priorityForImportance(payload.getPriority());
-                        channel = new NotificationChannel(channelId,
-                                AppConstant.CHANNEL_NAME, priority);
-                    }
-                    if(DATB.soundID!=null) {
-                        priority = NotificationManagerCompat.IMPORTANCE_HIGH;
-                        channel = new NotificationChannel(channelId,
-                                AppConstant.CHANNEL_NAME, priority);
-                        Uri uri = Util.getSoundUri(DATB.appContext, DATB.soundID);
-                        if (uri != null)
-                            channel.setSound(uri, null);
-                        else
+                            priority = priorityForImportance(payload.getPriority());
+                            channel = new NotificationChannel(channelId,
+                                    AppConstant.CHANNEL_NAME, priority);
+                        }
+                        if (DATB.soundID != null) {
+                            priority = NotificationManagerCompat.IMPORTANCE_HIGH;
+                            channel = new NotificationChannel(channelId,
+                                    AppConstant.CHANNEL_NAME, priority);
+                           // Uri uri = Util.getSoundUri(DATB.appContext, DATB.soundID);
+                            if (uri != null)
+                                channel.setSound(uri, null);
+                            else
+                                channel.setSound(null, null);
+                        } else {
                             channel.setSound(null, null);
-                    }
-                    else
-                    {
-                        channel.setSound(null, null);
 
+                        }
+
+                        notificationManager.createNotificationChannel(channel);
+                    }
+                    if (Build.VERSION.SDK_INT > Build.VERSION_CODES.LOLLIPOP_MR1) {
+                        if (payload.getGroup() == 1) {
+                            notificationManager.notify(SUMMARY_ID, summaryNotification);
+                        }
+                    }
+                    notificationManager.notify(notificationID, notificationBuilder.build());
+                    try {
+
+
+                        if (lastView_Click.equalsIgnoreCase("1") || lastSeventhIndex.equalsIgnoreCase("1")) {
+                            lastViewNotificationApi(payload, lastView_Click, lastSeventhIndex, lastNinthIndex);
+                        }
+                        DATB.notificationView(payload);
+
+                        if (payload.getMaxNotification() != 0) {
+                            getMaximumNotificationInTray(DATB.appContext, payload.getMaxNotification());
+                        }
+
+                    } catch (Exception e) {
+                        e.printStackTrace();
                     }
 
-                    notificationManager.createNotificationChannel(channel);
+                    notificationBanner = null;
+                    notificationIcon = null;
+
+
                 }
-                if (Build.VERSION.SDK_INT > Build.VERSION_CODES.LOLLIPOP_MR1) {
-                    if (payload.getGroup() == 1) {
-                        notificationManager.notify(SUMMARY_ID, summaryNotification);
+
+            };
+
+
+            new AppExecutors().networkIO().execute(new Runnable() {
+                @Override
+                public void run() {
+                    String smallIcon = payload.getIcon();
+                    String banner = payload.getBanner();
+                    try {
+                        if (smallIcon != null && !smallIcon.isEmpty()) {
+                            notificationIcon = Util.getBitmapFromURL(smallIcon);
+                        }
+                        if (banner != null && !banner.isEmpty()) {
+                            notificationBanner = Util.getBitmapFromURL(banner);
+                        }
+                        handler.post(notificationRunnable);
+                    } catch (Exception e) {
+                        e.printStackTrace();
+                        handler.post(notificationRunnable);
                     }
                 }
-                notificationManager.notify(notificationID, notificationBuilder.build());
-                try {
-
-
-                    if (lastView_Click.equalsIgnoreCase("1") || lastSeventhIndex.equalsIgnoreCase("1")){
-                        lastViewNotificationApi(payload, lastView_Click, lastSeventhIndex, lastNinthIndex);
-                    }
-                    DATB.notificationView(payload);
-
-                    if (payload.getMaxNotification() != 0){
-                        getMaximumNotificationInTray(DATB.appContext, payload.getMaxNotification());}
-
-                } catch (Exception e) {
-                    e.printStackTrace();
-                }
-
-                notificationBanner = null;
-                notificationIcon = null;
-
-
-            }
-
-        };
-
-
-        new AppExecutors().networkIO().execute(new Runnable() {
-            @Override
-            public void run() {
-                String smallIcon = payload.getIcon();
-                String banner = payload.getBanner();
-                try {
-                    if (smallIcon != null && !smallIcon.isEmpty())
-                        notificationIcon = Util.getBitmapFromURL(smallIcon);
-                    if (banner != null && !banner.isEmpty()) {
-                        notificationBanner = Util.getBitmapFromURL(banner);
-
-                    }
-                    handler.post(notificationRunnable);
-                } catch (Exception e) {
-                    e.printStackTrace();
-                    handler.post(notificationRunnable);
-                }
-            }
-        });
+            });
+//        }
+//        else
+//        {
+//            Util.setException(DATB.appContext,"Payload error  Payload title->"+payload.getTitle()+"->Campaign ID ->"+payload.getId()+"->Rid->"+payload.getRid(),"NotificationEvent Manager","receivedNotification");
+//        }
     }
 
     public static boolean isInt(String s) {

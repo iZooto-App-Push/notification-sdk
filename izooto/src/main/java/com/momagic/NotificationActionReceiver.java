@@ -56,6 +56,8 @@ public class NotificationActionReceiver extends BroadcastReceiver {
             getBundleData(context, intent);
             mUrl.replace(AppConstant.BROWSERKEYID, PreferenceUtil.getInstance(context).getStringData(AppConstant.FCM_DEVICE_TOKEN));
             getBundleData(context, intent);
+            Log.e("Landing URL","ABC"+mUrl);
+
             try {
                 final PreferenceUtil preferenceUtil = PreferenceUtil.getInstance(context);
                 if (clickIndex.equalsIgnoreCase("1")) {
