@@ -20,11 +20,8 @@ public class AppController extends Application implements TokenReceivedListener,
     public void onCreate() {
         super.onCreate();
         DATB.initialize(this)
-                //.inAppNotificationBehaviour(DATB.OSInAppDisplayOption.InAppAlert)
-               // .setNotificationReceiveListener(this)
+                .setNotificationReceiveListener(this)
                 .build();
-       // DATB.setIcon(R.drawable.splash_image);
-       // DATB.setDefaultTemplate(PushTemplate.DEFAULT);
 
 
     }

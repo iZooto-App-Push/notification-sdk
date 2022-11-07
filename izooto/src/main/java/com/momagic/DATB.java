@@ -67,9 +67,7 @@ public class DATB {
     public static DATB.Builder initialize(Context context) {
         return new DATB.Builder(context);
     }
-    public enum OSInAppDisplayOption {
-        None, InAppAlert, Notification
-    }
+
     @RequiresApi(api = Build.VERSION_CODES.KITKAT)
     private static void init(Builder builder) {
         final Context context = builder.mContext;
@@ -113,7 +111,6 @@ public class DATB {
                                     mAppId = jsonObject.getString(AppConstant.APPPID);
                                     preferenceUtil.setDataBID(AppConstant.APPPID, mAppId);
                                     trackAdvertisingId();
-                                    Log.e("JSONObject",jsonObject.toString());
                                     if (!mKey.isEmpty() && !mId.isEmpty() && Build.MANUFACTURER.equalsIgnoreCase("Xiaomi")) {
                                         XiaomiSDKHandler xiaomiSDKHandler = new XiaomiSDKHandler(DATB.appContext, mId, mKey);
                                         xiaomiSDKHandler.onMIToken();
@@ -603,8 +600,6 @@ public class DATB {
         private NotificationHelperListener mNotificationHelper;
         public NotificationWebViewListener mWebViewListener;
         public PayloadHandler mPayloadHandler;
-
-        OSInAppDisplayOption mDisplayOption;
         private Builder(Context context) {
             mContext = context;
         }
@@ -618,11 +613,7 @@ public class DATB {
             return this;
         }
 
-        public Builder inAppNotificationBehaviour(OSInAppDisplayOption displayOption) {
-            mDisplayOption = displayOption;
-            inAppOption = displayOption.toString();
-            return this;
-        }
+
         public Builder setLandingURLListener(NotificationWebViewListener mNotificationWebViewListener){
             mWebViewListener = mNotificationWebViewListener;
             return this;
@@ -721,9 +712,7 @@ public class DATB {
 
 
 
-    public static void setInAppNotificationBehaviour(OSInAppDisplayOption displayOption) {
-        inAppOption = displayOption.toString();
-    }
+
 
 
 
@@ -1063,11 +1052,6 @@ public class DATB {
         }
         return newList;
     }
-    public static void setIcon(int icon1)
-    {
-        icon=icon1;
-    }
-    @RequiresApi(api = Build.VERSION_CODES.KITKAT)
     public static void setSubscription(Boolean enable) {
         if (osTaskManager.shouldQueueTaskForInit(OSTaskManager.SET_SUBSCRIPTION) && appContext == null) {
             osTaskManager.addTaskToQueue(new Runnable() {

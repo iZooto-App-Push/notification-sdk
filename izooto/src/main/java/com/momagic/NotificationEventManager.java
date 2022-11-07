@@ -65,8 +65,6 @@ public class NotificationEventManager {
     private static void allAdPush(Payload payload) {
         if(DATB.appContext!=null) {
             try {
-                Log.e("Landing URL","Payload"+payload.getLink());
-
                 PreferenceUtil preferenceUtil = PreferenceUtil.getInstance(DATB.appContext);
                 if (preferenceUtil.getIntData(AppConstant.CLOUD_PUSH) == 1) {
                     if (preferenceUtil.getBoolean(AppConstant.MEDIATION)) {
@@ -433,45 +431,19 @@ public class NotificationEventManager {
 
         }else {
             final PreferenceUtil preferenceUtil = PreferenceUtil.getInstance(DATB.appContext);
-            if (Util.isAppInForeground(DATB.appContext)){
-                if (DATB.inAppOption==null || DATB.inAppOption.equalsIgnoreCase(AppConstant.NOTIFICATION_) || DATB.inAppOption.equalsIgnoreCase("None")){
-                    if (payload.getDefaultNotificationPreview() == 1 || preferenceUtil.getIntData(AppConstant.NOTIFICATION_PREVIEW)== PushTemplate.TEXT_OVERLAY) {
-                        if(Build.VERSION.SDK_INT>=Build.VERSION_CODES.S) {
-                            NotificationPreview.receiveCustomNotification(payload);
-
-
-                        }
-                        else
-                        {
-                            NotificationPreview.receiveCustomNotification(payload);
-                        }
-                    }
-                    else {
-                        receivedNotification(payload);
-                    }
-                }else if (DATB.inAppOption.equalsIgnoreCase(AppConstant.INAPPALERT)){
-                    showAlert(payload);
+            if (payload.getDefaultNotificationPreview() == 1 || preferenceUtil.getIntData(AppConstant.NOTIFICATION_PREVIEW) == PushTemplate.TEXT_OVERLAY) {
+                if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.S) {
+                    NotificationPreview.receiveCustomNotification(payload);
+                } else {
+                    NotificationPreview.receiveCustomNotification(payload);
                 }
-            }else {
-                if (payload.getDefaultNotificationPreview() == 1 || preferenceUtil.getIntData(AppConstant.NOTIFICATION_PREVIEW)==PushTemplate.TEXT_OVERLAY) {
-                    if(Build.VERSION.SDK_INT>=Build.VERSION_CODES.S) {
-                        //receivedNotification(payload);
-                        NotificationPreview.receiveCustomNotification(payload);
+            } else {
 
+                receivedNotification(payload);
 
-                    }
-                    else
-                    {
-                        NotificationPreview.receiveCustomNotification(payload);
-                    }
-                }
-                else {
-
-                     receivedNotification(payload);
-
-                }
             }
         }
+
     }
 
     public static void receiveAds(final Payload payload){
@@ -514,7 +486,6 @@ public class NotificationEventManager {
                 int SUMMARY_ID = 0;
                 Intent intent = null;
 
-                icon = getBadgeIcon(payload.getBadgeicon());
                 badgeColor = getBadgeColor(payload.getBadgecolor());
                 lockScreenVisibility = setLockScreenVisibility(payload.getLockScreenVisibility());
 
@@ -535,7 +506,7 @@ public class NotificationEventManager {
                 Uri uri = Util.getSoundUri(DATB.appContext, DATB.soundID);
 
                 notificationBuilder = new NotificationCompat.Builder(DATB.appContext, channelId)
-                        .setSmallIcon(icon)
+                        .setSmallIcon(getDefaultSmallIconId())
                         .setContentTitle(payload.getTitle())
                         .setContentText(payload.getMessage())
                         .setContentIntent(pendingIntent)
@@ -569,7 +540,7 @@ public class NotificationEventManager {
                                 new NotificationCompat.Builder(DATB.appContext, channelId)
                                         .setContentTitle(payload.getTitle())
                                         .setContentText(payload.getMessage())
-                                        .setSmallIcon(icon)
+                                        .setSmallIcon(getDefaultSmallIconId())
                                         .setColor(badgeColor)
                                         .setStyle(new NotificationCompat.InboxStyle()
                                                 .addLine(payload.getMessage())
@@ -794,7 +765,6 @@ public class NotificationEventManager {
                     int SUMMARY_ID = 0;
                     Intent intent = null;
 
-                    icon = getBadgeIcon(payload.getBadgeicon());
                     badgeColor = getBadgeColor(payload.getBadgecolor());
                     lockScreenVisibility = setLockScreenVisibility(payload.getLockScreenVisibility());
 
@@ -895,7 +865,7 @@ public class NotificationEventManager {
                     Uri uri = Util.getSoundUri(DATB.appContext, DATB.soundID);
 
                     notificationBuilder = new NotificationCompat.Builder(DATB.appContext, channelId)
-                            .setSmallIcon(icon)
+                            .setSmallIcon(getDefaultSmallIconId())
                             .setContentTitle(payload.getTitle())
                             .setContentText(payload.getMessage())
                             .setContentIntent(pendingIntent)
@@ -943,7 +913,7 @@ public class NotificationEventManager {
                                 summaryNotification =
                                         new NotificationCompat.Builder(DATB.appContext, channelId)
                                                 .setContentText(Util.makeBoldString(payload.getTitle()))
-                                                .setSmallIcon(icon)
+                                                .setSmallIcon(getDefaultSmallIconId())
                                                 .setColor(badgeColor)
                                                 .setStyle(new NotificationCompat.InboxStyle()
                                                         .addLine(Util.makeBlackString(payload.getTitle()))
@@ -958,7 +928,7 @@ public class NotificationEventManager {
                                         new NotificationCompat.Builder(DATB.appContext, channelId)
                                                 .setContentTitle(payload.getTitle())
                                                 .setContentText(payload.getMessage())
-                                                .setSmallIcon(icon)
+                                                .setSmallIcon(getDefaultSmallIconId())
                                                 .setColor(badgeColor)
                                                 .setStyle(new NotificationCompat.InboxStyle()
                                                         .addLine(payload.getMessage())
@@ -1147,8 +1117,6 @@ public class NotificationEventManager {
     }
     public static String decodeURL(String url)
     {
-
-
         if(url.contains(AppConstant.URL_FWD)) {
             String[] arrOfStr = url.split(AppConstant.URL_FWD_);
             String[] second = arrOfStr[1].split(AppConstant.URL_BKEY);
@@ -1200,108 +1168,7 @@ public class NotificationEventManager {
         }
     }
 
-    private static boolean isAppInForeground(Context context) {
-        List<ActivityManager.RunningTaskInfo> task =
-                ((ActivityManager) context.getSystemService(Context.ACTIVITY_SERVICE))
-                        .getRunningTasks(1);
-        if (task.isEmpty()) {
-            // app is in background
-            return false;
-        }
-        return task
-                .get(0)
-                .topActivity
-                .getPackageName()
-                .equalsIgnoreCase(context.getPackageName());
-    }
 
-    private static void showAlert(final Payload payload){
-
-        final Activity activity = DATB.curActivity;
-        if (activity!=null) {
-            activity.runOnUiThread(new Runnable() {
-                @Override
-                public void run() {
-                    AlertDialog.Builder mBuilder = new AlertDialog.Builder(activity);
-                    mBuilder.setTitle(payload.getTitle());
-                    mBuilder.setMessage(payload.getMessage());
-
-                    if (Util.getApplicationIcon(DATB.appContext)!=null){
-                        mBuilder.setIcon(Util.getApplicationIcon(DATB.appContext));
-                    }
-
-                    String clickIndex = "0";
-                    String lastSeventhIndex = "0";
-                    String lastNinthIndex = "0";
-
-
-                    String data=Util.getIntegerToBinary(payload.getCfg());
-                    if(data!=null && !data.isEmpty()) {
-                        clickIndex = String.valueOf(data.charAt(data.length() - 2));
-                        lastView_Click = String.valueOf(data.charAt(data.length() - 3));
-                        lastSeventhIndex = String.valueOf(data.charAt(data.length() - 7));
-                        lastNinthIndex = String.valueOf(data.charAt(data.length() - 9));
-                    }
-                    else
-                    {
-                        clickIndex = "0";
-                        lastView_Click = "0";
-                        lastSeventhIndex = "0";
-                        lastNinthIndex = "0";
-
-                    }
-                    mBuilder.setNeutralButton(AppConstant.DIALOG_DISMISS, new DialogInterface.OnClickListener() {
-                        @Override
-                        public void onClick(DialogInterface dialog, int which) {
-                            dialog.dismiss();
-                        }
-                    });
-                    final String finalClickIndex1 = clickIndex;
-                    mBuilder.setPositiveButton(AppConstant.DIALOG_OK,
-                            new DialogInterface.OnClickListener() {
-                                @Override
-                                public void onClick(DialogInterface dialog, int which) {
-
-                                    dialog.dismiss();
-                                    if(Build.VERSION.SDK_INT>=Build.VERSION_CODES.S) {
-                                        Intent intent = notificationClick(payload, payload.getLink(), payload.getAct1link(), payload.getAct2link(), AppConstant.NO, finalClickIndex1, lastView_Click, 100, 0);
-                                        activity.startActivity(intent);
-                                        activity.finish();
-
-                                    }
-                                    else
-                                    {
-                                        Intent intent = notificationClick(payload, payload.getLink(), payload.getAct1link(), payload.getAct2link(), AppConstant.NO, finalClickIndex1, lastView_Click, 100, 0);
-                                        activity.sendBroadcast(intent);
-                                    }
-                                }
-
-                            });
-
-
-                    mBuilder.setCancelable(true);
-                    AlertDialog alertDialog = mBuilder.create();
-                    alertDialog.setCanceledOnTouchOutside(false);
-                    alertDialog.show();
-                    try {
-
-
-                        if (lastView_Click.equalsIgnoreCase("1") || lastSeventhIndex.equalsIgnoreCase("1")){
-                            lastViewNotificationApi(payload, lastView_Click, lastSeventhIndex, lastNinthIndex);
-                        }
-                        DATB.notificationView(payload);
-
-                    } catch (Exception e) {
-                        if(activity!=null) {
-                            Util.setException(activity, e.toString(), AppConstant.APPName_2, "showAlert");
-                        }                   }
-
-                }
-            });
-        }
-
-
-    }
 
     static Intent notificationClick(Payload payload, String getLink ,String getLink1, String getLink2, String phone, String finalClickIndex, String lastClick, int notificationId, int button){
         String link = getLink;
@@ -1715,7 +1582,17 @@ static void lastViewNotification(String limURL, String rid, String cid, int i){
         }
     }
 
+    private static int getDefaultSmallIconId() {
+        int notificationIcon = getDrawableId("ic_stat_datb_default");
+        if (notificationIcon != 0) {
+            return notificationIcon;
+        }
+        return android.R.drawable.ic_popup_reminder;
+    }
 
+    private static int getDrawableId(String name) {
+        return DATB.appContext.getResources().getIdentifier(name, "drawable", DATB.appContext.getPackageName());
+    }
 
 
 }

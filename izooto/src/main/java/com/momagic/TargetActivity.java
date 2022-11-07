@@ -30,7 +30,7 @@ public class TargetActivity extends AppCompatActivity {
     private String phoneNumber;
     private String act1ID;
     private String act2ID;
-    private String langingURL;
+    private String landingURL;
     private String act2URL;
     private String act1URL;
     private String btn1Title;
@@ -154,7 +154,7 @@ public class TargetActivity extends AppCompatActivity {
                 hashMap.put(AppConstant.BUTTON_TITLE_1, btn1Title);
                 hashMap.put(AppConstant.BUTTON_URL_1, act1URL);
                 hashMap.put(AppConstant.ADDITIONAL_DATA, additionalData);
-                hashMap.put(AppConstant.LANDING_URL, langingURL);
+                hashMap.put(AppConstant.LANDING_URL, landingURL);
                 hashMap.put(AppConstant.BUTTON_ID_2, act2ID);
                 hashMap.put(AppConstant.BUTTON_TITLE_2, btn2Title);
                 hashMap.put(AppConstant.BUTTON_URL_2, act2URL);
@@ -163,7 +163,7 @@ public class TargetActivity extends AppCompatActivity {
                 DATB.notificationActionHandler(jsonObject.toString());
                 finish();
             } else {
-                if (inApp == 1 && phoneNumber.equalsIgnoreCase(AppConstant.NO)) {
+                if (inApp == 1 && phoneNumber.equalsIgnoreCase(AppConstant.NO) && landingURL!=null && !landingURL.isEmpty()) {
                     if (DATB.mBuilder != null && DATB.mBuilder.mWebViewListener != null) {
                         DATB.notificationInAppAction(mUrl);
                         finish();
@@ -193,12 +193,10 @@ public class TargetActivity extends AppCompatActivity {
                                 }
 
                             }
-
                             else
                             {
-
-                                Util.setException(context, "URL is not defined"+mUrl+"Browser is not present", AppConstant.APPName_3, "onReceived");
-
+                               launchApp(DATB.appContext);
+                               this.finish();
                             }
                         } else {
                             Intent browserIntent = new Intent(Intent.ACTION_DIAL, Uri.parse(phoneNumber));
@@ -208,7 +206,8 @@ public class TargetActivity extends AppCompatActivity {
                         }
 
                     } catch (Exception ex) {
-                        Util.setException(context, ex.toString(), AppConstant.APPName_3, "onReceived");
+                        launchApp(DATB.appContext);
+                        this.finish();
                     }
                 }
             }
@@ -236,7 +235,7 @@ public class TargetActivity extends AppCompatActivity {
             if(tempBundle.containsKey(AppConstant.KEY_IN_ACT2ID))
                 act2ID=tempBundle.getString(AppConstant.KEY_IN_ACT2ID);
             if(tempBundle.containsKey(AppConstant.LANDINGURL))
-                langingURL=tempBundle.getString(AppConstant.LANDINGURL);
+                landingURL=tempBundle.getString(AppConstant.LANDINGURL);
             if(tempBundle.containsKey(AppConstant.ACT1URL))
                 act1URL=tempBundle.getString(AppConstant.ACT1URL);
             if(tempBundle.containsKey(AppConstant.ACT2URL))
@@ -263,7 +262,6 @@ public class TargetActivity extends AppCompatActivity {
             }
         }
     }
-    @RequiresApi(api = Build.VERSION_CODES.KITKAT)
     static void notificationClickAPI(Context context, String clkURL, String cid, String rid, int btnCount, int i,String pushType) {
         if (context == null)
             return;
@@ -283,7 +281,6 @@ public class TargetActivity extends AppCompatActivity {
             DebugFileManager.createExternalStoragePublic(DATB.appContext,mapData.toString(),"clickData");
 
             RestClient.postRequest(clkURL, mapData,null, new RestClient.ResponseHandler() {
-                @RequiresApi(api = Build.VERSION_CODES.KITKAT)
                 @Override
                 void onSuccess(final String response) {
                     super.onSuccess(response);
@@ -334,7 +331,6 @@ public class TargetActivity extends AppCompatActivity {
                     }
                 }
 
-                @RequiresApi(api = Build.VERSION_CODES.KITKAT)
                 @Override
                 void onSuccess(String response) {
                     super.onSuccess(response);
@@ -376,7 +372,6 @@ public class TargetActivity extends AppCompatActivity {
             mapData.put(AppConstant.ET_,"" + AppConstant.USERP_);
 
             RestClient.postRequest(lciURL, mapData,null, new RestClient.ResponseHandler() {
-                @RequiresApi(api = Build.VERSION_CODES.KITKAT)
                 @Override
                 void onSuccess(final String response) {
                     super.onSuccess(response);
@@ -390,7 +385,6 @@ public class TargetActivity extends AppCompatActivity {
                         DebugFileManager.createExternalStoragePublic(DATB.appContext,"LastClick"+e.toString(),"[Log.V]->");
                     }
                 }
-                @RequiresApi(api = Build.VERSION_CODES.KITKAT)
                 @Override
                 void onFailure(int statusCode, String response, Throwable throwable) {
                     super.onFailure(statusCode, response, throwable);
@@ -431,7 +425,6 @@ public class TargetActivity extends AppCompatActivity {
         }
     }
 
-    @RequiresApi(api = Build.VERSION_CODES.KITKAT)
     static void callMediationClicks(final String medClick, int cNUmber) {
         try {
             if(!medClick.isEmpty()) {
@@ -483,7 +476,6 @@ public class TargetActivity extends AppCompatActivity {
 
 
     static void launchApp(Context context){
-
         PackageManager pm = context.getPackageManager();
         Intent launchIntent = null;
         String name = "";
@@ -496,7 +488,15 @@ public class TargetActivity extends AppCompatActivity {
                 intentAppLaunch.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TASK);
                 context.startActivity(intentAppLaunch);
             }
-            Log.d(AppConstant.APP_NAME_TAG + "Found it:",name);
+            else
+            {
+                ApplicationInfo app = context.getPackageManager().getApplicationInfo(context.getPackageName(), 0);
+                name = (String) pm.getApplicationLabel(app);
+                launchIntent = pm.getLaunchIntentForPackage(context.getPackageName());
+                Intent intentAppLaunch = launchIntent; // new Intent();
+                intentAppLaunch.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TASK);
+                context.startActivity(intentAppLaunch);
+            }
         } catch (PackageManager.NameNotFoundException e) {
             Util.setException(context,e.toString(),AppConstant.APPName_3,"launch App");
 

@@ -10,6 +10,8 @@ import android.app.NotificationManager;
 import android.content.BroadcastReceiver;
 import android.content.Context;
 import android.content.Intent;
+import android.content.pm.ApplicationInfo;
+import android.content.pm.PackageManager;
 import android.net.Uri;
 import android.os.Build;
 import android.os.Bundle;
@@ -34,7 +36,7 @@ public class NotificationActionReceiver extends BroadcastReceiver {
     private String phoneNumber;
     private String act1ID;
     private String act2ID;
-    private String langingURL;
+    private String landingURL;
     private String act2URL;
     private String act1URL;
     private String btn1Title;
@@ -153,7 +155,7 @@ public class NotificationActionReceiver extends BroadcastReceiver {
                 hashMap.put(AppConstant.BUTTON_TITLE_1, btn1Title);
                 hashMap.put(AppConstant.BUTTON_URL_1, act1URL);
                 hashMap.put(AppConstant.ADDITIONAL_DATA, additionalData);
-                hashMap.put(AppConstant.LANDING_URL, langingURL);
+                hashMap.put(AppConstant.LANDING_URL, landingURL);
                 hashMap.put(AppConstant.BUTTON_ID_2, act2ID);
                 hashMap.put(AppConstant.BUTTON_TITLE_2, btn2Title);
                 hashMap.put(AppConstant.BUTTON_URL_2, act2URL);
@@ -161,7 +163,7 @@ public class NotificationActionReceiver extends BroadcastReceiver {
                 JSONObject jsonObject = new JSONObject(hashMap);
                 DATB.notificationActionHandler(jsonObject.toString());
             } else {
-                if (inApp == 1 && phoneNumber.equalsIgnoreCase(AppConstant.NO)) {
+                if (inApp == 1 && phoneNumber.equalsIgnoreCase(AppConstant.NO) && landingURL!="" && !landingURL.isEmpty()) {
                     if (DATB.mBuilder != null && DATB.mBuilder.mWebViewListener != null) {
                         DATB.notificationInAppAction(mUrl);
                     } else
@@ -170,7 +172,6 @@ public class NotificationActionReceiver extends BroadcastReceiver {
                     try {
                         if (phoneNumber.equalsIgnoreCase(AppConstant.NO)) {
                             if(mUrl!=null && !mUrl.isEmpty()) {
-
                                     if (!mUrl.startsWith("http://") && !mUrl.startsWith("https://")) {
                                         String url = "https://" + mUrl;
                                         Intent browserIntent = new Intent(Intent.ACTION_VIEW, Uri.parse(url));
@@ -184,11 +185,9 @@ public class NotificationActionReceiver extends BroadcastReceiver {
                                     }
 
                             }
-
                             else
                             {
-
-                                 Util.setException(context, "URL is not defined"+mUrl+"Browser is not present", AppConstant.APPName_3, "onReceived");
+                                launchApp(DATB.appContext);
 
                             }
                         } else {
@@ -198,10 +197,37 @@ public class NotificationActionReceiver extends BroadcastReceiver {
                         }
 
                     } catch (Exception ex) {
-                        Util.setException(context, ex.toString(), AppConstant.APPName_3, "onReceived");
+                        launchApp(DATB.appContext);
                     }
                 }
             }
+        }
+    }
+    static void launchApp(Context context){
+        PackageManager pm = context.getPackageManager();
+        Intent launchIntent = null;
+        String name = "";
+        try {
+            if (pm != null && !Util.isAppInForeground(context)) {
+                ApplicationInfo app = context.getPackageManager().getApplicationInfo(context.getPackageName(), 0);
+                name = (String) pm.getApplicationLabel(app);
+                launchIntent = pm.getLaunchIntentForPackage(context.getPackageName());
+                Intent intentAppLaunch = launchIntent; // new Intent();
+                intentAppLaunch.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TASK);
+                context.startActivity(intentAppLaunch);
+            }
+            else
+            {
+                ApplicationInfo app = context.getPackageManager().getApplicationInfo(context.getPackageName(), 0);
+                name = (String) pm.getApplicationLabel(app);
+                launchIntent = pm.getLaunchIntentForPackage(context.getPackageName());
+                Intent intentAppLaunch = launchIntent; // new Intent();
+                intentAppLaunch.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TASK);
+                context.startActivity(intentAppLaunch);
+            }
+        } catch (PackageManager.NameNotFoundException e) {
+            Util.setException(context,e.toString(),AppConstant.APPName_3,"launch App");
+
         }
     }
 
@@ -287,7 +313,7 @@ public class NotificationActionReceiver extends BroadcastReceiver {
                     if (tempBundle.containsKey(AppConstant.KEY_IN_ACT2ID))
                         act2ID = tempBundle.getString(AppConstant.KEY_IN_ACT2ID);
                     if (tempBundle.containsKey(AppConstant.LANDINGURL))
-                        langingURL = tempBundle.getString(AppConstant.LANDINGURL);
+                        landingURL = tempBundle.getString(AppConstant.LANDINGURL);
                     if (tempBundle.containsKey(AppConstant.ACT1URL))
                         act1URL = tempBundle.getString(AppConstant.ACT1URL);
                     if (tempBundle.containsKey(AppConstant.ACT2URL))
