@@ -27,7 +27,6 @@ import java.util.Random;
 
 public class NotificationPreview {
     private static Bitmap notificationIcon, notificationBanner;
-    private static int icon;
     private static  int badgeColor;
     private static int priority,lockScreenVisibility;
 
@@ -75,7 +74,7 @@ public class NotificationPreview {
                         Notification summaryNotification = null;
                         Intent intent = null;
 
-                        icon = NotificationEventManager.getBadgeIcon(payload.getBadgeicon());
+                      //  icon = NotificationEventManager.getBadgeIcon(payload.getBadgeicon());
                         badgeColor = NotificationEventManager.getBadgeColor(payload.getBadgecolor());
                         lockScreenVisibility = NotificationEventManager.setLockScreenVisibility(payload.getLockScreenVisibility());
 
@@ -160,7 +159,7 @@ public class NotificationPreview {
                         Uri uri = Util.getSoundUri(DATB.appContext, DATB.soundID);
 
                         notificationBuilder = new NotificationCompat.Builder(DATB.appContext, channelId)
-                                .setSmallIcon(icon)
+                                .setSmallIcon(getDefaultSmallIconId())
                                 .setContentTitle(payload.getTitle())
                                 .setContentText(payload.getMessage())
                                 .setContentIntent(pendingIntent)
@@ -456,5 +455,15 @@ public class NotificationPreview {
                 .build();
         return builtUri.toString();
     }
+    private static int getDefaultSmallIconId() {
+        int notificationIcon = getDrawableId("ic_stat_datb_default");
+        if (notificationIcon != 0) {
+            return notificationIcon;
+        }
+        return android.R.drawable.ic_popup_reminder;
+    }
 
+    private static int getDrawableId(String name) {
+        return DATB.appContext.getResources().getIdentifier(name, "drawable", DATB.appContext.getPackageName());
+    }
 }

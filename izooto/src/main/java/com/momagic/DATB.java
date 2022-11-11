@@ -540,9 +540,9 @@ public class DATB {
         if(payload!=null) {
                 NotificationEventManager.manageNotification(payload);
         }
-        if(context!=null) {
-            sendOfflineDataToServer(context);
-        }
+//        if(context!=null) {
+//            sendOfflineDataToServer(context);
+//        }
     }
 
     public static void notificationView(Payload payload)

@@ -48,7 +48,6 @@ public class NotificationActionReceiver extends BroadcastReceiver {
     private int cfg;
     String GLOBAL_ACTION_DISMISS_NOTIFICATION_SHADE = "15";
 
-    @RequiresApi(api = Build.VERSION_CODES.KITKAT)
     @SuppressLint("MissingPermission")
     @Override
     public void onReceive(Context context, Intent intent) {
