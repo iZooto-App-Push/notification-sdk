@@ -76,6 +76,8 @@ public class AdMediation {
                            payload.setSubTitle(payloadObj.optString(ShortpayloadConstant.SUBTITLE).replace("['", "").replace("']", ""));
                            payload.setGroup(payloadObj.optInt(ShortpayloadConstant.GROUP));
                            payload.setBadgeCount(payloadObj.optInt(ShortpayloadConstant.BADGE_COUNT));
+                           payload.setDefaultNotificationPreview(payloadObj.optInt(ShortpayloadConstant.TEXTOVERLAY));
+
                            if (jsonObject.has("b")) {
                                payload.setAct_num(jsonObject.optInt(ShortpayloadConstant.ACTNUM));
                                payload.setAct1name(jsonObject.optString(ShortpayloadConstant.ACT1NAME).replace("['", "").replace("']", ""));
@@ -622,7 +624,6 @@ public class AdMediation {
            String fetchURL=NotificationEventManager.fetchURL(payload.getFetchURL());
 
            RestClient.get(fetchURL, new RestClient.ResponseHandler() {
-               @RequiresApi(api = Build.VERSION_CODES.KITKAT)
                @Override
                void onSuccess(String response) {
                    super.onSuccess(response);
@@ -692,15 +693,16 @@ public class AdMediation {
         }
        return "";
     }
-    @RequiresApi(api = Build.VERSION_CODES.KITKAT)
      static void parseAgain1Json(Payload payload1, JSONObject jsonObject) {
         if(DATB.appContext!=null) {
             String dataValue = "";
             try {
-                if(payload1.getTitle()!=null && !payload1.getTitle().isEmpty())
-                payload1.setTitle(getParsedValue(jsonObject, payload1.getTitle()));
-                if(payload1.getMessage()!=null && !payload1.getMessage().isEmpty())
+                if(payload1.getTitle()!=null && !payload1.getTitle().isEmpty()) {
+                    payload1.setTitle(getParsedValue(jsonObject, payload1.getTitle()));
+                }
+                if(payload1.getMessage()!=null && !payload1.getMessage().isEmpty()) {
                     payload1.setMessage(getParsedValue(jsonObject, payload1.getMessage()));
+                }
 
                 payload1.setLink(getParsedValue(jsonObject, payload1.getLink()));
                 payload1.setCpc(getParsedValue(jsonObject, payload1.getCpc()));
@@ -824,8 +826,20 @@ public class AdMediation {
 
                     }
                     if(payload1.getTitle()!=null && !payload1.getTitle().isEmpty()) {
+                          //  NotificationEventManager.receiveAds(payload1);
+                        if(payload1.getDefaultNotificationPreview()==0 || payload1.getDefaultNotificationPreview()==1 )
+                        {
+                            NotificationEventManager.receivedNotification(payload1);
+                        }
+                        else if(payload1.getDefaultNotificationPreview()==2)
+                        {
+                            NotificationPreview.receiveCustomNotification(payload1);
+                        }
+                        if(payload1.getDefaultNotificationPreview()==3)
+                        {
                             NotificationEventManager.receiveAds(payload1);
-                            Log.v(AppConstant.NOTIFICATION_MESSAGE, AppConstant.YES);
+                        }
+                        Log.v(AppConstant.NOTIFICATION_MESSAGE, AppConstant.YES);
                         }
                      else{
                          String fallBackURL = callFallbackAPI(payload);
@@ -853,10 +867,8 @@ public class AdMediation {
             }
         }
     }
-    @RequiresApi(api = Build.VERSION_CODES.KITKAT)
     static  void globalPayload(String url, Payload payload, JSONObject globalPayloadObject) {
         if (url != null && DATB.appContext != null) {
-
             PreferenceUtil preferenceUtil = PreferenceUtil.getInstance(DATB.appContext);
             if (preferenceUtil.getStringData(AppConstant.STORAGE_PAYLOAD_DATA) != null && !url.equalsIgnoreCase(checkURL(preferenceUtil.getStringData(AppConstant.STORAGE_PAYLOAD_DATA)))) {
                 RestClient.get(url, new RestClient.ResponseHandler() {
@@ -978,6 +990,7 @@ public class AdMediation {
                                 payload.setFallBackDomain(jsonObject.optString(ShortpayloadConstant.FALL_BACK_DOMAIN).replace("~", ""));
                                 payload.setFallBackSubDomain(jsonObject.optString(ShortpayloadConstant.FALLBACK_SUB_DOMAIN).replace("~", ""));
                                 payload.setFallBackPath(jsonObject.optString(ShortpayloadConstant.FAll_BACK_PATH).replace("~", ""));
+                                payload.setDefaultNotificationPreview(jsonObject.optInt(ShortpayloadConstant.TEXTOVERLAY));
                                 DebugFileManager.createExternalStoragePublic(DATB.appContext,response,"gplpayload");
 
                                 if (payload.getTitle() != null && !payload.getTitle().isEmpty()) {
@@ -1128,6 +1141,7 @@ public class AdMediation {
                             payload.setFallBackDomain(jsonObject.optString(ShortpayloadConstant.FALL_BACK_DOMAIN).replace("~", ""));
                             payload.setFallBackSubDomain(jsonObject.optString(ShortpayloadConstant.FALLBACK_SUB_DOMAIN).replace("~", ""));
                             payload.setFallBackPath(jsonObject.optString(ShortpayloadConstant.FAll_BACK_PATH).replace("~", ""));
+                            payload.setDefaultNotificationPreview(jsonObject.optInt(ShortpayloadConstant.TEXTOVERLAY));
                             Log.v(AppConstant.NOTIFICATION_MESSAGE, "YES");
 
                             if (payload.getTitle() != null && !payload.getTitle().isEmpty()) {
@@ -1170,7 +1184,6 @@ static  String checkURL(String jsonString)
      static void ShowFallBackResponse(String fallBackAPI,  final Payload payload) {
        if(DATB.appContext!=null) {
            RestClient.get(fallBackAPI, new RestClient.ResponseHandler() {
-               @RequiresApi(api = Build.VERSION_CODES.KITKAT)
                @Override
                void onSuccess(String response) {
                    super.onSuccess(response);
@@ -1197,7 +1210,20 @@ static  String checkURL(String jsonString)
 
                            if(payload.getTitle() !=null && !payload.getTitle().isEmpty()) {
                                Log.v(AppConstant.NOTIFICATION_MESSAGE, "YES");
-                               NotificationEventManager.receiveAds(payload);
+                              // NotificationEventManager.receiveAds(payload);
+                               if(payload.getDefaultNotificationPreview()==0 || payload.getDefaultNotificationPreview()==1 )
+                               {
+                                   NotificationEventManager.receivedNotification(payload);
+                               }
+                               else if(payload.getDefaultNotificationPreview()==2)
+                               {
+                                   NotificationPreview.receiveCustomNotification(payload);
+                               }
+                               if(payload.getDefaultNotificationPreview()==3)
+                               {
+                                   NotificationEventManager.receiveAds(payload);
+                               }
+
                                ShowClickAndImpressionData(payload);
                            }
                            else
@@ -1355,7 +1381,23 @@ static  String checkURL(String jsonString)
 
 
                     }
-                    NotificationEventManager.receiveAds(payload1);
+
+                    if(payload1.getDefaultNotificationPreview()==0 || payload1.getDefaultNotificationPreview()==1 )
+                    {
+                        NotificationEventManager.receivedNotification(payload1);
+                    }
+                    else if(payload1.getDefaultNotificationPreview()==2)
+                    {
+                        NotificationPreview.receiveCustomNotification(payload1);
+                    }
+                    if(payload1.getDefaultNotificationPreview()==3)
+                    {
+                        NotificationEventManager.receiveAds(payload1);
+                    }
+
+
+
+                   // NotificationEventManager.receiveAds(payload1);
                     Log.v(AppConstant.NOTIFICATION_MESSAGE, AppConstant.YES);
                 } else {
                     String fallBackAPI = callFallbackAPI(payload1);
