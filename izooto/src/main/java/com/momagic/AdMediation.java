@@ -21,7 +21,6 @@ public class AdMediation {
     public static List<String> clicksData=new ArrayList<>();
     private static List<JSONObject> successList=new ArrayList<>();
 
-    @RequiresApi(api = Build.VERSION_CODES.KITKAT)
     public static void getMediationData(Context context , JSONObject data, String pushType, String globalPayloadObject)
     {
        if(context!=null) {
@@ -126,6 +125,7 @@ public class AdMediation {
                            payload.setTime_out(jsonObject.optInt(ShortpayloadConstant.TIME_OUT));
                            payload.setAdTimeOut(payloadObj.optInt(ShortpayloadConstant.AD_TIME_OUT));
                            payload.setCreated_Time(jsonObject.optString(ShortpayloadConstant.CREATEDON));
+                           payload.setDefaultNotificationPreview(jsonObject.optInt(ShortpayloadConstant.TEXTOVERLAY));
                            payload.setPush_type(pushType);
                            if (payload.getPassive_flag().equalsIgnoreCase("1") && jsonObject.optString(AppConstant.AD_TYPE).equalsIgnoreCase("6")) {
                                passiveList.add(payload);
@@ -172,8 +172,6 @@ public class AdMediation {
                        }
 
                }
-
-
            } catch (Exception ex) {
                DebugFileManager.createExternalStoragePublic(DATB.appContext,"JSONException"+ex.toString(),"[Log.e]->AdMediation");
 
@@ -181,17 +179,6 @@ public class AdMediation {
            }
        }
     }
-
-
-
-
-
-
-
-
-
-
-    @RequiresApi(api = Build.VERSION_CODES.KITKAT)
     static  void getMediationGPL(Context context , JSONObject payloadObj, String url)
     {
         if(context==null)
@@ -244,7 +231,6 @@ public class AdMediation {
 
         String fetchURL=NotificationEventManager.fetchURL(payload.getFetchURL());
         RestClient.getRequest(fetchURL,calculateTime*1000, new RestClient.ResponseHandler(){
-            @RequiresApi(api = Build.VERSION_CODES.KITKAT)
             @Override
             void onSuccess(String response) {
                 super.onSuccess(response);
@@ -349,9 +335,6 @@ public class AdMediation {
             }
         });
     }
-
-
-    @RequiresApi(api = Build.VERSION_CODES.KITKAT)
     private static void parseJson(Payload payload, JSONObject jsonObject, int adIndex, int adNetwork) {
         if(DATB.appContext !=null) {
             try {
@@ -556,14 +539,11 @@ public class AdMediation {
 
 
     }
-
     private static void fetchPassiveAPI(final Payload payload) {
        if(DATB.appContext!=null) {
            final long start = System.currentTimeMillis(); //fetch start time
            String fetchURL=NotificationEventManager.fetchURL(payload.getFetchURL());
-
            RestClient.get(fetchURL, new RestClient.ResponseHandler() {
-               @RequiresApi(api = Build.VERSION_CODES.KITKAT)
                @Override
                void onSuccess(String response) {
                    super.onSuccess(response);
@@ -616,7 +596,6 @@ public class AdMediation {
            });
        }
     }
-
     private static void finalAdPayload(final Payload payloadData)
     {
 
@@ -668,8 +647,6 @@ public class AdMediation {
        }
 
     }
-
-     @RequiresApi(api = Build.VERSION_CODES.KITKAT)
      static String callFallbackAPI(Payload payload) {
         String domain = "flbk.izooto.com";
         try {
@@ -827,18 +804,8 @@ public class AdMediation {
                     }
                     if(payload1.getTitle()!=null && !payload1.getTitle().isEmpty()) {
                           //  NotificationEventManager.receiveAds(payload1);
-                        if(payload1.getDefaultNotificationPreview()==0 || payload1.getDefaultNotificationPreview()==1 )
-                        {
-                            NotificationEventManager.receivedNotification(payload1);
-                        }
-                        else if(payload1.getDefaultNotificationPreview()==2)
-                        {
-                            NotificationPreview.receiveCustomNotification(payload1);
-                        }
-                        if(payload1.getDefaultNotificationPreview()==3)
-                        {
-                            NotificationEventManager.receiveAds(payload1);
-                        }
+                        NotificationEventManager.notificationPreview(DATB.appContext,payload1);
+
                         Log.v(AppConstant.NOTIFICATION_MESSAGE, AppConstant.YES);
                         }
                      else{
@@ -872,7 +839,6 @@ public class AdMediation {
             PreferenceUtil preferenceUtil = PreferenceUtil.getInstance(DATB.appContext);
             if (preferenceUtil.getStringData(AppConstant.STORAGE_PAYLOAD_DATA) != null && !url.equalsIgnoreCase(checkURL(preferenceUtil.getStringData(AppConstant.STORAGE_PAYLOAD_DATA)))) {
                 RestClient.get(url, new RestClient.ResponseHandler() {
-                    @RequiresApi(api = Build.VERSION_CODES.KITKAT)
                     @Override
                     void onSuccess(String response) {
                         super.onSuccess(response);
@@ -1184,6 +1150,7 @@ static  String checkURL(String jsonString)
      static void ShowFallBackResponse(String fallBackAPI,  final Payload payload) {
        if(DATB.appContext!=null) {
            RestClient.get(fallBackAPI, new RestClient.ResponseHandler() {
+               @SuppressLint("SuspiciousIndentation")
                @Override
                void onSuccess(String response) {
                    super.onSuccess(response);
@@ -1207,22 +1174,13 @@ static  String checkURL(String jsonString)
                            payload.setBadgecolor("");
                            payload.setBadgeicon("");
                            payload.setAct2link("");
+                           payload.setDefaultNotificationPreview(jsonObject.optInt(ShortpayloadConstant.TEXTOVERLAY));
 
                            if(payload.getTitle() !=null && !payload.getTitle().isEmpty()) {
                                Log.v(AppConstant.NOTIFICATION_MESSAGE, "YES");
                               // NotificationEventManager.receiveAds(payload);
-                               if(payload.getDefaultNotificationPreview()==0 || payload.getDefaultNotificationPreview()==1 )
-                               {
-                                   NotificationEventManager.receivedNotification(payload);
-                               }
-                               else if(payload.getDefaultNotificationPreview()==2)
-                               {
-                                   NotificationPreview.receiveCustomNotification(payload);
-                               }
-                               if(payload.getDefaultNotificationPreview()==3)
-                               {
-                                   NotificationEventManager.receiveAds(payload);
-                               }
+                               NotificationEventManager.notificationPreview(DATB.appContext,payload);
+
 
                                ShowClickAndImpressionData(payload);
                            }
@@ -1251,9 +1209,6 @@ static  String checkURL(String jsonString)
        }
 
     }
-
-
-     @RequiresApi(api = Build.VERSION_CODES.KITKAT)
      static void ShowClickAndImpressionData(Payload payload) {
        if(DATB.appContext!=null) {
            try {
@@ -1302,9 +1257,6 @@ static  String checkURL(String jsonString)
            }
        }
     }
-
-
-    @RequiresApi(api = Build.VERSION_CODES.KITKAT)
     private static void parseAgainJson(Payload payload1, JSONObject jsonObject) {
         if(DATB.appContext!=null) {
             String dataValue = "";
@@ -1382,22 +1334,8 @@ static  String checkURL(String jsonString)
 
                     }
 
-                    if(payload1.getDefaultNotificationPreview()==0 || payload1.getDefaultNotificationPreview()==1 )
-                    {
-                        NotificationEventManager.receivedNotification(payload1);
-                    }
-                    else if(payload1.getDefaultNotificationPreview()==2)
-                    {
-                        NotificationPreview.receiveCustomNotification(payload1);
-                    }
-                    if(payload1.getDefaultNotificationPreview()==3)
-                    {
-                        NotificationEventManager.receiveAds(payload1);
-                    }
-
-
-
-                   // NotificationEventManager.receiveAds(payload1);
+                    NotificationEventManager.notificationPreview(DATB.appContext,payload1);
+                    // NotificationEventManager.receiveAds(payload1);
                     Log.v(AppConstant.NOTIFICATION_MESSAGE, AppConstant.YES);
                 } else {
                     String fallBackAPI = callFallbackAPI(payload1);
@@ -1412,8 +1350,6 @@ static  String checkURL(String jsonString)
             }
         }
     }
-
-     @RequiresApi(api = Build.VERSION_CODES.KITKAT)
      static void mediationImpression(String finalData, int impNUmber) {
         if(DATB.appContext!=null) {
             try {
@@ -1465,8 +1401,6 @@ static  String checkURL(String jsonString)
             finalData="";
         }
     }
-
-
     private static void callRandomView(String rv) {
         if(!rv.isEmpty()) {
             RestClient.get(rv, new RestClient.ResponseHandler() {
@@ -1485,7 +1419,6 @@ static  String checkURL(String jsonString)
             });
         }
     }
-
     private static String getParsedValue(JSONObject jsonObject, String sourceString) {
        if(DATB.appContext!=null) {
            try {
@@ -1577,6 +1510,4 @@ static  String checkURL(String jsonString)
            return "";
 
     }
-
-
 }

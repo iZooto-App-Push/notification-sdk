@@ -42,7 +42,6 @@ import java.util.Objects;
 public class DATBMessagingService extends FirebaseMessagingService {
     private  Payload payload = null;
     private final String Name="DATBMessagingService";
-    private static Bitmap bitmap;
     @Override
     public void onMessageReceived(@NonNull RemoteMessage remoteMessage) {
         try {
@@ -64,9 +63,7 @@ public class DATBMessagingService extends FirebaseMessagingService {
 
     }
 
-
     private void sendNotification(RemoteMessage remoteMessage) {
-
         Intent intent = new Intent();
         intent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
         PendingIntent pendingIntent = PendingIntent.getActivity(this, 0 /* Request code */, intent,
@@ -98,9 +95,6 @@ public class DATBMessagingService extends FirebaseMessagingService {
 
 
    }
-
-
-    @RequiresApi(api = Build.VERSION_CODES.KITKAT)
     public   void handleNow(final Map<String, String> data) {
         Log.d(AppConstant.APP_NAME_TAG, AppConstant.NOTIFICATIONRECEIVED);
         PreferenceUtil preferenceUtil =PreferenceUtil.getInstance(this);
@@ -155,12 +149,8 @@ public class DATBMessagingService extends FirebaseMessagingService {
                                    if(impIndex.equalsIgnoreCase("1"))
                                    {
                                        NotificationEventManager.impressionNotification(RestClient.IMPRESSION_URL, cid, rid, -1,AppConstant.PUSH_FCM);
-
                                    }
-
                                 }
-
-
                            JSONObject jsonObject1=new JSONObject(data.toString());
                            AdMediation.getMediationData(this, jsonObject1,"fcm","");
                            preferenceUtil.setBooleanData(AppConstant.MEDIATION, true);

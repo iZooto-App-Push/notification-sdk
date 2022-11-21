@@ -194,7 +194,7 @@ public class NotificationActionReceiver extends BroadcastReceiver {
                         }
 
                     } catch (Exception ex) {
-                        launchApp(DATB.appContext);
+                        Util.setException(DATB.appContext,ex.toString(),AppConstant.APPName_3,"Landing URL issues"+mUrl);
                     }
                 }
             }
@@ -340,7 +340,6 @@ public class NotificationActionReceiver extends BroadcastReceiver {
             }
         }
     }
-    @RequiresApi(api = Build.VERSION_CODES.KITKAT)
     static void callMediationClicks(Context context,final String medClick, int cNUmber) {
         try {
             if(!medClick.isEmpty()) {

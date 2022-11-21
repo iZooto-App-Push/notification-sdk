@@ -338,18 +338,8 @@ public class NotificationEventManager {
             if(payload.getTitle()!=null && !payload.getTitle().equalsIgnoreCase("")) {
                // receiveAds(payload);
 
-                if(payload.getDefaultNotificationPreview()==0 || payload.getDefaultNotificationPreview()==1 )
-                {
-                    receivedNotification(payload);
-                }
-                else if(payload.getDefaultNotificationPreview()==2)
-                {
-                    NotificationPreview.receiveCustomNotification(payload);
-                }
-                if(payload.getDefaultNotificationPreview()==3)
-                {
-                    receiveAds(payload);
-                }
+                notificationPreview(DATB.appContext,payload);
+
                 AdMediation.ShowClickAndImpressionData(payload);
 
             }
@@ -438,36 +428,7 @@ public class NotificationEventManager {
         if (DATB.appContext == null)
             return;
 
-        final PreferenceUtil preferenceUtil = PreferenceUtil.getInstance(DATB.appContext);
-
-        if (addCheck){
-            if(payload.getDefaultNotificationPreview()==0 || payload.getDefaultNotificationPreview()==1 )
-            {
-                receivedNotification(payload);
-            }
-           else if(payload.getDefaultNotificationPreview()==2 || preferenceUtil.getIntData(AppConstant.NOTIFICATION_PREVIEW) == PushTemplate.TEXT_OVERLAY)
-            {
-                NotificationPreview.receiveCustomNotification(payload);
-            }
-            if(payload.getDefaultNotificationPreview()==3)
-            {
-                receiveAds(payload);
-            }
-
-        }else {
-            if(payload.getDefaultNotificationPreview()==0 || payload.getDefaultNotificationPreview()==1 ) {
-                receivedNotification(payload);
-            }
-            else if(payload.getDefaultNotificationPreview()==2 || preferenceUtil.getIntData(AppConstant.NOTIFICATION_PREVIEW) == PushTemplate.TEXT_OVERLAY)
-            {
-                NotificationPreview.receiveCustomNotification(payload);
-            }
-            if(payload.getDefaultNotificationPreview()==3)
-            {
-                receiveAds(payload);
-            }
-
-            }
+        notificationPreview(DATB.appContext,payload);
     }
 
 
@@ -1263,7 +1224,6 @@ public class NotificationEventManager {
         return intent;
     }
 
-     @RequiresApi(api = Build.VERSION_CODES.KITKAT)
      static void viewNotificationApi(final Payload payload,String pushName) {
         if(DATB.appContext!=null) {
 
@@ -1620,6 +1580,26 @@ static void lastViewNotification(String limURL, String rid, String cid, int i){
     private static int getDrawableId(String name) {
         return DATB.appContext.getResources().getIdentifier(name, "drawable", DATB.appContext.getPackageName());
     }
+    static void notificationPreview(Context context,Payload payload)
+    {
+        if(context==null)
+            return;
 
+        final PreferenceUtil preferenceUtil = PreferenceUtil.getInstance(context);
+
+        if(payload.getDefaultNotificationPreview()==2 || preferenceUtil.getIntData(AppConstant.NOTIFICATION_PREVIEW) == PushTemplate.TEXT_OVERLAY)
+        {
+            NotificationPreview.receiveCustomNotification(payload);
+        }
+        else if(payload.getDefaultNotificationPreview()==3 || preferenceUtil.getIntData(AppConstant.NOTIFICATION_PREVIEW) == PushTemplate.DEVICE_NOTIFICATION_OVERLAY)
+        {
+            receiveAds(payload);
+        }
+        else
+        {
+            receivedNotification(payload);
+        }
+
+    }
 
 }

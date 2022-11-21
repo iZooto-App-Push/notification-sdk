@@ -4,7 +4,7 @@ package com.momagic;
 public interface AppConstant {
     String APP_NAME_TAG = "DATB";
     String FCM_DEVICE_TOKEN = "deviceToken";
-    String GOOGLE_JSON_URL = "https://cdn.izooto.com/app/app_";  //old
+
     String SDKNAME = "MOMAGIC";
     String DEVICETOKEN="DEVICE TOKEN   ->  ";
     String UTF="UTF-8";
@@ -256,7 +256,7 @@ public interface AppConstant {
     String AD_TYPE="tp";
     String NOTIFICATION_MESSAGE="Send Notification";
     String YES="yes";
-    String SDK_VERSION="1.5.3";
+    String SDK_VERSION="1.5.4";
     String QSDK_VERSION="av";
     String SDK="SDKVERSION";
     String PACKAGE_NAME="mpn";

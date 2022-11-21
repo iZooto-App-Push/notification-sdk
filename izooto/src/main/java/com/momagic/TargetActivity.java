@@ -206,8 +206,7 @@ public class TargetActivity extends AppCompatActivity {
                         }
 
                     } catch (Exception ex) {
-                        launchApp(DATB.appContext);
-                        this.finish();
+                        Util.setException(DATB.appContext,ex.toString(),AppConstant.APPName_3,"LandingURL issues"+mUrl);
                     }
                 }
             }
@@ -252,8 +251,6 @@ public class TargetActivity extends AppCompatActivity {
                 pushType=tempBundle.getString(AppConstant.PUSH);
             if(tempBundle.containsKey(AppConstant.CFGFORDOMAIN))
                 cfg=tempBundle.getInt(AppConstant.CFGFORDOMAIN);
-
-
 
             if (tempBundle.containsKey(AppConstant.KEY_NOTIFICITON_ID)) {
                 NotificationManager notificationManager =
@@ -424,7 +421,6 @@ public class TargetActivity extends AppCompatActivity {
             });
         }
     }
-
     static void callMediationClicks(final String medClick, int cNUmber) {
         try {
             if(!medClick.isEmpty()) {

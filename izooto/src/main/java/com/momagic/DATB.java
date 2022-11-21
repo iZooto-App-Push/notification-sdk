@@ -41,7 +41,6 @@ public class DATB {
     private static String senderId;
     public static String mAppId;
     public static Builder mBuilder;
-    public static int icon;
     private static Payload payload;
     public static boolean mUnsubscribeWhenNotificationsAreDisabled;
     protected static Listener mListener;
@@ -93,7 +92,7 @@ public class DATB {
                     Lg.i(AppConstant.APP_NAME_TAG, mAppId + "");
 
 
-                    RestClient.get(AppConstant.GOOGLE_JSON_URL + mAppId + ".dat", new RestClient.ResponseHandler() {
+                    RestClient.get(RestClient.GOOGLE_JSON_URL + mAppId + ".dat", new RestClient.ResponseHandler() {
                         @Override
                         void onFailure(int statusCode, String response, Throwable throwable) {
                             super.onFailure(statusCode, response, throwable);
@@ -140,25 +139,19 @@ public class DATB {
                             } else {
                                 DebugFileManager.createExternalStoragePublic(context, "Account id is not sync properly on panel", "[Log.e]-->");
                                 Log.e(AppConstant.APP_NAME_TAG, "Account id is not sync properly on panel");
-
                             }
                         }
                     });
-
                 }
             } else {
                 Lg.e(AppConstant.APP_NAME_TAG, AppConstant.MESSAGE);
                 DebugFileManager.createExternalStoragePublic(context, AppConstant.MESSAGE, "[Log.e]-->");
-
             }
-
-
         } catch (Throwable t) {
             DebugFileManager.createExternalStoragePublic(context, t.toString(), "[Log.e]-->initBuilder");
             Util.setException(appContext, t.toString(), AppConstant.APP_NAME_TAG, "initBuilder");
         }
     }
-
     private static void init(final Context context, String apiKey, String appId) {
         if (context != null) {
 
@@ -195,7 +188,6 @@ public class DATB {
         }
 
     }
-
     private static void trackAdvertisingId() {
         final PreferenceUtil preferenceUtil = PreferenceUtil.getInstance(appContext);
         AdvertisingIdClient.getAdvertisingId(appContext, new AdvertisingIdClient.Listener() {
