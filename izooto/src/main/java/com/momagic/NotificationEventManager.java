@@ -1281,57 +1281,6 @@ public class NotificationEventManager {
             phone = AppConstant.NO;
         return phone;
     }
-     static int getBadgeIcon(String setBadgeIcon){
-             int bIicon;
-           try{
-            if (DATB.icon != 0) {
-                bIicon = DATB.icon;
-            } else {
-                if(setBadgeIcon!=null && !setBadgeIcon.isEmpty()) {
-                    if (setBadgeIcon.equalsIgnoreCase(AppConstant.DEFAULT_ICON)) {
-                        bIicon = R.drawable.ic_notifications_black_24dp;
-                    } else {
-
-                        if (isInt(setBadgeIcon)) {
-                            bIicon = DATB.appContext.getApplicationInfo().icon;
-                        } else {
-                            int checkExistence = DATB.appContext.getResources().getIdentifier(setBadgeIcon, "drawable", DATB.appContext.getPackageName());
-                            if (checkExistence != 0) {  // the resource exists...
-                                bIicon = checkExistence;
-
-                            } else {  // checkExistence == 0  // the resource does NOT exist!!
-                                int checkExistenceMipmap = DATB.appContext.getResources().getIdentifier(
-                                        setBadgeIcon, "mipmap", DATB.appContext.getPackageName());
-                                if (checkExistenceMipmap != 0) {  // the resource exists...
-                                    bIicon = checkExistenceMipmap;
-
-                                } else {
-
-                                    bIicon = R.drawable.ic_notifications_black_24dp;
-                                }
-
-                            }
-
-                        }
-
-                    }
-                }
-                else
-                {
-                    return R.drawable.ic_notifications_black_24dp;
-                }
-            }
-
-            }
-           catch (Exception ex)
-           {
-               return R.drawable.ic_notifications_black_24dp;
-
-           }
-
-
-        return bIicon;
-    }
      static int getBadgeColor(String setColor){
         int iconColor;
        if(setColor!=null && !setColor.isEmpty()) {
