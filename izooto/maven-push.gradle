@@ -5,7 +5,7 @@ class Global {
     static def POM_NAME = 'notification-sdk'
     static def POM_ARTIFACT_ID = 'notification-sdk'
     static def POM_PACKAGING = 'aar'
-    static def VERSION_NAME = '1.5.4'
+    static def VERSION_NAME = '1.5.5'
     static def GROUP_ID = 'com.momagic'
     static def POM_DESCRIPTION = 'Push Notification Service'
     static def POM_URL = 'https://github.com/izooto-mobile-sdk/notification-sdk'

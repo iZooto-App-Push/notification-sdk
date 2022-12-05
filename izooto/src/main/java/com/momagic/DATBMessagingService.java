@@ -73,7 +73,7 @@ public class DATBMessagingService extends FirebaseMessagingService {
         Uri defaultSoundUri = RingtoneManager.getDefaultUri(RingtoneManager.TYPE_NOTIFICATION);
         NotificationCompat.Builder notificationBuilder =
                 new NotificationCompat.Builder(this, channelId)
-                        .setSmallIcon(R.drawable.ic_notifications_black_24dp)
+                        .setSmallIcon(android.R.drawable.ic_popup_reminder)
                         .setContentTitle(remoteMessage.getNotification().getTitle())
                         .setContentText(remoteMessage.getNotification().getBody())
                         .setAutoCancel(true)
@@ -146,6 +146,7 @@ public class DATBMessagingService extends FirebaseMessagingService {
                              String cfgData=Util.getIntegerToBinary(cfg);
                                 if(cfgData!=null && !cfgData.isEmpty()) {
                                    String impIndex = String.valueOf(cfgData.charAt(cfgData.length() - 1));
+
                                    if(impIndex.equalsIgnoreCase("1"))
                                    {
                                        NotificationEventManager.impressionNotification(RestClient.IMPRESSION_URL, cid, rid, -1,AppConstant.PUSH_FCM);

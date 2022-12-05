@@ -36,9 +36,11 @@ public class RestClient {
      static final String SUBSCRIBER_URL="https://pp.izooto.com/idsyn";
      static final String APP_EXCEPTION_URL="https://aerr.izooto.com/aerr";
     // add new url from momagic side
-     static final String MOMAGIC_SUBSCRIPTION_URL="https://irctc.truenotify.in/momagicflow/appenp";
+      static final String MOMAGIC_SUBSCRIPTION_URL="https://irctc.truenotify.in/momagicflow/appenp";
       static final String MOMAGIC_USER_PROPERTY="https://irctc.truenotify.in/momagicflow/appup";
-     static final String MOMAGIC_CLICK="https://irctc.truenotify.in/momagicflow/appclk";
+      static final String MOMAGIC_CLICK="https://irctc.truenotify.in/momagicflow/appclk";
+      static  final String MOMAGIC_IMPRESSION="https://irctc.truenotify.in/momagicflow/appimpr";
+
     private static int getThreadTimeout(int timeout) {
         return timeout + 5000;
     }

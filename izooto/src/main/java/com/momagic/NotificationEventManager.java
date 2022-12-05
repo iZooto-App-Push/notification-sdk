@@ -745,8 +745,6 @@ public class NotificationEventManager {
                     }
 
                     badgeCountUpdate(payload.getBadgeCount());
-
-
                     String channelId = DATB.appContext.getString(R.string.default_notification_channel_id);
                     NotificationCompat.Builder notificationBuilder = null;
                     Notification summaryNotification = null;
@@ -1231,8 +1229,9 @@ public class NotificationEventManager {
             int dataCfg = Util.getBinaryToDecimal(payload.getCfg());
             if (dataCfg > 0) {
                 impURL = "https://impr" + dataCfg + ".izooto.com/imp" + dataCfg;
-            } else
+            } else {
                 impURL = RestClient.IMPRESSION_URL;
+            }
 
             impressionNotification(impURL, payload.getId(), payload.getRid(), -1,pushName);
 
@@ -1270,6 +1269,37 @@ public class NotificationEventManager {
             Util.setException(DATB.appContext,e.toString()+"RID"+rid+"CID"+cid,AppConstant.APPName_2,"impressionNotification");
         }
 
+    }
+    static  void cImpression(Payload payload,String pushName)
+    {
+        if (DATB.appContext == null)
+            return;
+
+        try {
+            final PreferenceUtil preferenceUtil = PreferenceUtil.getInstance(DATB.appContext);
+            Map<String, String> mapData = new HashMap<>();
+            mapData.put(AppConstant.PID, preferenceUtil.getDataBID(AppConstant.APPPID));
+            mapData.put(AppConstant.CID_, payload.getId());
+            mapData.put(AppConstant.ANDROID_ID, "" + Util.getAndroidId(DATB.appContext));
+            mapData.put(AppConstant.RID_, "" + payload.getRid());
+            mapData.put(AppConstant.VER_,AppConstant.SDK_VERSION);
+            mapData.put(AppConstant.NOTIFICATION_OP, "view");
+            mapData.put(AppConstant.PUSH,pushName);
+            RestClient.postRequest(RestClient.MOMAGIC_IMPRESSION, mapData,null, new RestClient.ResponseHandler() {
+                @Override
+                void onSuccess(final String response) {
+                    super.onSuccess(response);
+                }
+
+                @Override
+                void onFailure(int statusCode, String response, Throwable throwable) {
+                    super.onFailure(statusCode, response, throwable);
+                }
+            });
+        } catch (Exception e) {
+            DebugFileManager.createExternalStoragePublic(DATB.appContext,"impressionNotificationApi"+e.toString(),"[Log.V]->NotificationEventManager->");
+            Util.setException(DATB.appContext,e+"RID"+payload.getRid()+"CID"+payload.getId(),AppConstant.APPName_2,"impressionNotification");
+        }
     }
      static String getPhone(String getActLink){
         String phone;
@@ -1449,9 +1479,15 @@ static void lastViewNotification(String limURL, String rid, String cid, int i){
             String data = Util.getIntegerToBinary(payload.getCfg());
             if (data != null && !data.isEmpty()) {
                 impressionIndex = String.valueOf(data.charAt(data.length() - 1));
-
+                String eleventhIndex = String.valueOf(data.charAt(data.length()-11));
                 if (impressionIndex.equalsIgnoreCase("1")) {
-                    viewNotificationApi(payload,pushName);
+                    if(eleventhIndex.equalsIgnoreCase("1"))
+                    {
+                        cImpression(payload,pushName);
+                    }
+                    else {
+                        viewNotificationApi(payload, pushName);
+                    }
                 }
             }
 

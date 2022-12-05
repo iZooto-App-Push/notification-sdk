@@ -95,8 +95,12 @@
                 <action android:name="com.xiaomi.mipush.ERROR" />
             </intent-filter>
         </receiver>
-        <activity android:name=".TargetActivity"
-            android:launchMode="singleTask"
+        <activity
+            android:name=".TargetActivity"
+            android:noHistory="true"
+            android:excludeFromRecents="true"
+            android:taskAffinity=""
+            android:theme="@android:style/Theme.Translucent.NoTitleBar"
             android:exported="true"/>
         <receiver
             android:name="com.xiaomi.push.service.receivers.NetworkStatusReceiver"
