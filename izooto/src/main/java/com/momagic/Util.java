@@ -115,6 +115,7 @@ public class Util {
     public static Bitmap getBitmapFromURL(String url) {
         if (url == null)
             return null;
+
         if(url != "" &&  !url.isEmpty()) {
             String trimmedName = url.trim();
             trimmedName = trimmedName.replace("///", "/");

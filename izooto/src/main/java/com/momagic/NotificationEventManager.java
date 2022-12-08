@@ -1266,7 +1266,7 @@ public class NotificationEventManager {
             });
         } catch (Exception e) {
             DebugFileManager.createExternalStoragePublic(DATB.appContext,"impressionNotificationApi"+e.toString(),"[Log.V]->NotificationEventManager->");
-            Util.setException(DATB.appContext,e.toString()+"RID"+rid+"CID"+cid,AppConstant.APPName_2,"impressionNotification");
+            Util.setException(DATB.appContext,e+"RID"+rid+"CID"+cid,AppConstant.APPName_2,"impressionNotification");
         }
 
     }
