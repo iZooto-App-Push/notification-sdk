@@ -23,18 +23,19 @@ import java.util.Objects;
 public class XiaomiPushReceiver extends PushMessageReceiver {
     private String TAG="XiaomiPushReceiver  PAYLOAD";
     private Payload payload;
-    @RequiresApi(api = Build.VERSION_CODES.KITKAT)
     @Override
     public void onReceivePassThroughMessage(Context context, MiPushMessage miPushMessage) {
         super.onReceivePassThroughMessage(context, miPushMessage);
         String payload = miPushMessage.getContent();
         Log.v("Push Type","Xiaomi");
-        if(payload!=null && !payload.isEmpty())
-         handleNow(context,payload);
 
+        if(payload!=null && !payload.isEmpty()) {
+            PreferenceUtil preferenceUtil = PreferenceUtil.getInstance(context);
+            if (preferenceUtil.getEnableState(AppConstant.NOTIFICATION_ENABLE_DISABLE)) {
+                handleNow(context, payload);
+            }
+        }
     }
-
-    @RequiresApi(api = Build.VERSION_CODES.KITKAT)
     @Override
     public void onNotificationMessageArrived(Context context, MiPushMessage miPushMessage) {
         super.onNotificationMessageArrived(context, miPushMessage);
@@ -45,11 +46,9 @@ public class XiaomiPushReceiver extends PushMessageReceiver {
             handleNow(context,payload);
     }
 
-    @RequiresApi(api = Build.VERSION_CODES.KITKAT)
     private void handleNow(Context context, String data) {
         Log.d(TAG, AppConstant.NOTIFICATIONRECEIVED);
         try {
-
             PreferenceUtil preferenceUtil =PreferenceUtil.getInstance(context);
             JSONObject payloadObj = new JSONObject(data);
             if(payloadObj.has(AppConstant.AD_NETWORK) || payloadObj.has(AppConstant.GLOBAL) || payloadObj.has(AppConstant.GLOBAL_PUBLIC_KEY))
@@ -69,19 +68,11 @@ public class XiaomiPushReceiver extends PushMessageReceiver {
                                 String impIndex = String.valueOf(cfgData.charAt(cfgData.length() - 1));
                                 if(impIndex.equalsIgnoreCase("1"))
                                 {
-                                    NotificationEventManager.impressionNotification(RestClient.IMPRESSION_URL, cid, rid, -1,AppConstant.PUSH_FCM);
+                                    NotificationEventManager.impressionNotification(RestClient.IMPRESSION_URL, cid, rid, -1,AppConstant.PUSH_XIAOMI);
 
                                 }
 
                             }
-
-
-
-
-
-
-
-                           // NotificationEventManager.impressionNotification(RestClient.IMPRESSION_URL,cid,rid,-1,AppConstant.PUSH_XIAOMI);
                             AdMediation.getMediationGPL(context, jsonObject, urlData);
                             preferenceUtil.setBooleanData(AppConstant.MEDIATION, false);
 
@@ -122,7 +113,7 @@ public class XiaomiPushReceiver extends PushMessageReceiver {
                     }
                     catch (Exception ex)
                     {
-                        Util.setException(context,ex.toString()+"PayloadError"+data.toString(),"DATBMessagingService","handleNow");
+                        Util.setException(context,ex+"PayloadError"+data,"DATBMessagingService","handleNow");
 
                     }
                 }

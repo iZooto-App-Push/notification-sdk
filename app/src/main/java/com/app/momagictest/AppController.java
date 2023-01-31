@@ -22,6 +22,7 @@ public class AppController extends Application implements TokenReceivedListener,
         DATB.initialize(this)
                 .setNotificationReceiveListener(this)
                 .build();
+        DATB.promptForPushNotifications();
     }
     @Override
     public void onTokenReceived(String token) {

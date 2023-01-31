@@ -34,6 +34,7 @@ import org.json.JSONException;
 import org.json.JSONObject;
 import org.json.JSONTokener;
 import java.io.UnsupportedEncodingException;
+import java.math.BigInteger;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -478,7 +479,6 @@ public class NotificationEventManager {
                 lockScreenVisibility = setLockScreenVisibility(payload.getLockScreenVisibility());
 
                 intent = notificationClick(payload, payload.getLink(),payload.getAct1link(),payload.getAct2link(),AppConstant.NO,clickIndex,lastView_Click,100,0);
-               // Uri defaultSoundUri = RingtoneManager.getDefaultUri(RingtoneManager.TYPE_NOTIFICATION);
 
                 PendingIntent pendingIntent=null;
                 if(Build.VERSION.SDK_INT>=Build.VERSION_CODES.S) {
@@ -498,11 +498,13 @@ public class NotificationEventManager {
                         .setContentTitle(payload.getTitle())
                         .setContentText(payload.getMessage())
                         .setContentIntent(pendingIntent)
-                        //.setStyle(new NotificationCompat.BigTextStyle().bigText(payload.getMessage()))
-                       // .setDefaults(NotificationCompat.DEFAULT_LIGHTS | NotificationCompat.DEFAULT_SOUND).setVibrate(new long[]{1000, 1000})
-                       // .setSound(defaultSoundUri)
                         .setVisibility(lockScreenVisibility)
                         .setAutoCancel(true);
+                try {
+                    BigInteger accentColor = Util.getAccentColor();
+                    if (accentColor != null)
+                        notificationBuilder.setColor(accentColor.intValue());
+                } catch (Throwable t) {}
                 if (uri != null) {
                     notificationBuilder.setSound(uri);
                 } else {
@@ -862,6 +864,12 @@ public class NotificationEventManager {
                             .setCustomContentView(collapsedView)
                             .setCustomBigContentView(expandedView)
                             .setAutoCancel(true);
+
+                    try {
+                        BigInteger accentColor = Util.getAccentColor();
+                        if (accentColor != null)
+                            notificationBuilder.setColor(accentColor.intValue());
+                    } catch (Throwable t) {}
                     if (uri != null) {
                         notificationBuilder.setSound(uri);
                     } else {
@@ -1113,9 +1121,6 @@ public class NotificationEventManager {
         {
             return url;
         }
-
-
-
     }
 
      static int priorityForImportance(int priority) {
@@ -1136,7 +1141,6 @@ public class NotificationEventManager {
         return NotificationCompat.VISIBILITY_PUBLIC;
 
     }
-
      static void badgeCountUpdate(int count){
         final PreferenceUtil preferenceUtil = PreferenceUtil.getInstance(DATB.appContext);
         try {
@@ -1153,9 +1157,6 @@ public class NotificationEventManager {
             e.printStackTrace();
         }
     }
-
-
-
     static Intent notificationClick(Payload payload, String getLink ,String getLink1, String getLink2, String phone, String finalClickIndex, String lastClick, int notificationId, int button){
         String link = getLink;
         String link1 = getLink1;

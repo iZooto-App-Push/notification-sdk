@@ -35,6 +35,9 @@ public class RestClient {
      static final String MEDIATION_CLICKS="https://med.dtblt.com/medc";
      static final String SUBSCRIBER_URL="https://pp.izooto.com/idsyn";
      static final String APP_EXCEPTION_URL="https://aerr.izooto.com/aerr";
+     static final String NOTIFICATION_PERMISSION_ALLOW_URL="https://enp.izooto.com/enp";
+     static final String NOTIFICATION_PERMISSION_DISALLOW_URL="https://sbp.izooto.com/nblk";
+
     // add new url from momagic side
       static final String MOMAGIC_SUBSCRIPTION_URL="https://irctc.truenotify.in/momagicflow/appenp";
       static final String MOMAGIC_USER_PROPERTY="https://irctc.truenotify.in/momagicflow/appup";

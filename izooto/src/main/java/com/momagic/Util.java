@@ -23,6 +23,9 @@ import android.os.Build;
 import android.provider.Settings;
 import android.text.Html;
 import android.util.Log;
+
+import androidx.annotation.NonNull;
+import androidx.annotation.Nullable;
 import androidx.annotation.RequiresApi;
 import androidx.core.app.NotificationManagerCompat;
 import androidx.core.content.ContextCompat;
@@ -33,6 +36,7 @@ import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
 
+import java.math.BigInteger;
 import java.net.URL;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
@@ -596,61 +600,35 @@ public class Util {
     static boolean ridExists(JSONArray jsonArray, String rid) {
         return jsonArray.toString().contains("\"rid\":\"" + rid + "\"");
     }
-
-    //    @SuppressLint({"MissingPermission", "LongLogTag"})
-//    public static String getDeviceNetworkType(final Context context) {
-//        // Fall back to network type
-//        TelephonyManager teleMan = (TelephonyManager) context.getSystemService(Context.TELEPHONY_SERVICE);
-//        if (teleMan == null) {
-//            return "Unavailable";
-//        }
-//
-//        int networkType = TelephonyManager.NETWORK_TYPE_UNKNOWN;
-//        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.R) {
-//            if (hasPermission(context, Manifest.permission.READ_PHONE_STATE)) {
-//                try {
-//                    networkType = teleMan.getDataNetworkType();
-//                } catch (SecurityException se) {
-//                    Log.d("Exception network type",  se.getMessage());
-//                }
-//            } else {
-//                Log.d("READ_PHONE_STATE permission","not asked by the app or not granted by the user");
-//            }
-//        } else {
-//            networkType = teleMan.getNetworkType();
-//        }
-//
-//        switch (networkType) {
-//            case TelephonyManager.NETWORK_TYPE_GPRS:
-//            case TelephonyManager.NETWORK_TYPE_EDGE:
-//            case TelephonyManager.NETWORK_TYPE_CDMA:
-//            case TelephonyManager.NETWORK_TYPE_1xRTT:
-//            case TelephonyManager.NETWORK_TYPE_IDEN:
-//                return "2G";
-//            case TelephonyManager.NETWORK_TYPE_UMTS:
-//            case TelephonyManager.NETWORK_TYPE_EVDO_0:
-//            case TelephonyManager.NETWORK_TYPE_EVDO_A:
-//            case TelephonyManager.NETWORK_TYPE_HSDPA:
-//            case TelephonyManager.NETWORK_TYPE_HSUPA:
-//            case TelephonyManager.NETWORK_TYPE_HSPA:
-//            case TelephonyManager.NETWORK_TYPE_EVDO_B:
-//            case TelephonyManager.NETWORK_TYPE_EHRPD:
-//            case TelephonyManager.NETWORK_TYPE_HSPAP:
-//                return "3G";
-//            case TelephonyManager.NETWORK_TYPE_LTE:
-//                return "4G";
-//            case TelephonyManager.NETWORK_TYPE_NR:
-//                return "5G";
-//            default:
-//                return "Unknown";
-//        }
-//    }
-    public static boolean hasPermission(final Context context, String permission) {
+    @Nullable
+    static BigInteger getAccentColor() {
         try {
-            return PackageManager.PERMISSION_GRANTED == ContextCompat.checkSelfPermission(context, permission);
-        } catch (Throwable t) {
-            return false;
-        }
+            if(DATB.appContext == null)
+                return null;
+            String defaultColor = getResourceString(DATB.appContext, AppConstant.NOTIFICATION_ACCENT_COLOR, null);
+            if(defaultColor.charAt(0)=='#'){
+                String default_Color="";
+                default_Color= defaultColor.replace("#","");
+                if (default_Color != null) {
+                    return new BigInteger(default_Color, 16);
+                }
+            }
+            else
+            {
+                if (defaultColor != null) {
+                    return new BigInteger(defaultColor, 16);
+                }
+            }
+        } catch (Throwable t) {}
+        return null;
     }
+    static String getResourceString(@NonNull Context context, String key, String defaultStr) {
+        Resources resources = context.getResources();
+        int bodyResId = resources.getIdentifier(key, AppConstant.STRING_RESOURCE_NAME, context.getPackageName());
+        if (bodyResId != 0)
+            return resources.getString(bodyResId);
+        return defaultStr;
+    }
+
 }
 

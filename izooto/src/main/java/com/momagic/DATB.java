@@ -4,6 +4,7 @@ import android.annotation.SuppressLint;
 import android.app.Activity;
 import android.app.Application;
 import android.content.Context;
+import android.content.Intent;
 import android.content.pm.ApplicationInfo;
 import android.content.pm.PackageManager;
 import android.os.Build;
@@ -304,7 +305,7 @@ public class DATB {
                         mapData.put(AppConstant.OS, "" + AppConstant.SDKOS);
                         mapData.put(AppConstant.ALLOWED_, "" + AppConstant.ALLOWED);
                         mapData.put(AppConstant.ANDROID_ID, "" + Util.getAndroidId(appContext));
-                        mapData.put(AppConstant.CHECKSDKVERSION, "" + AppConstant.SDK_VERSION);
+                        mapData.put(AppConstant.CHECKSDKVERSION, "" +  Util.getAppVersion(appContext));
                         mapData.put(AppConstant.LANGUAGE, "" + Util.getDeviceLanguage());
                         mapData.put(AppConstant.QSDK_VERSION, "" + AppConstant.SDK_VERSION);
                         mapData.put(AppConstant.TOKEN, "" + preferenceUtil.getStringData(AppConstant.FCM_DEVICE_TOKEN));
@@ -1034,6 +1035,7 @@ public class DATB {
         }
 
         final PreferenceUtil preferenceUtil = PreferenceUtil.getInstance(appContext);
+        preferenceUtil.setBooleanData(AppConstant.NOTIFICATION_ENABLE_DISABLE, enable);
 
         try {
             int value = 2;
@@ -1649,5 +1651,20 @@ public class DATB {
     public static void shareFile(Context context, String name, String emailID) {
 
         DebugFileManager.shareDebuginfo(context, name, emailID);
+    }
+    public static void promptForPushNotifications() {
+        if(DATB.appContext!=null) {
+            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
+                try {
+
+                    Intent intent = new Intent(DATB.appContext, NotificationPermission.class);
+                    intent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
+                    DATB.appContext.startActivity(intent);
+                } catch (Exception e) {
+                    e.printStackTrace();
+                }
+            }
+        }
+
     }
 }

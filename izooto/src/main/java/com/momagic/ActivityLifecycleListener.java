@@ -23,15 +23,17 @@ public class ActivityLifecycleListener implements Application.ActivityLifecycleC
     }
     @Override
     public void onActivityCreated(@NonNull Activity activity, @Nullable Bundle savedInstanceState) {
+        DATB.curActivity =activity;
     }
 
     @Override
     public void onActivityStarted(@NonNull Activity activity) {
-
+        DATB.curActivity =activity;
     }
 
     @Override
     public void onActivityResumed(@NonNull Activity activity) {
+        DATB.curActivity =activity;
         DATB.onActivityResumed(activity);
 
     }

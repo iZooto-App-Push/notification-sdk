@@ -24,10 +24,10 @@
     <content url="file://$MODULE_DIR$/../../../izooto/build/generated/ap_generated_sources/debugUnitTest/out" />
     <content url="file://$MODULE_DIR$/../../../izooto/src/test" />
     <content url="file://$MODULE_DIR$/../../../izooto/src/testDebug" />
-    <orderEntry type="jdk" jdkName="Android API 32 Platform" jdkType="Android SDK" />
+    <orderEntry type="jdk" jdkName="Android API 33 Platform" jdkType="Android SDK" />
     <orderEntry type="sourceFolder" forTests="false" />
     <orderEntry type="module" module-name="sdk.izooto.main" scope="TEST" />
-    <orderEntry type="library" scope="TEST" name="Gradle: ./izooto/libs/MiPush_SDK_Client_4_8_6-G.jar" level="project" />
+    <orderEntry type="library" scope="TEST" name="Gradle: ./izooto/libs/MiPush_SDK_Client_5_1_1-G.jar" level="project" />
     <orderEntry type="library" scope="TEST" name="Gradle: org.testng:testng:7.3.0" level="project" />
     <orderEntry type="library" scope="TEST" name="Gradle: com.beust:jcommander:1.78" level="project" />
     <orderEntry type="library" scope="TEST" name="Gradle: org.apache.ant:ant:1.10.3" level="project" />
