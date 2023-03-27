@@ -1669,33 +1669,44 @@ public class DATB {
 
     }
 
+    /** navigate to Notification settings */
+
     public static  void navigateToSettings(Activity activity)
     {
         try {
-
-            Intent settingsIntent = null;
-            if (android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.O) {
-                settingsIntent = new Intent(Settings.ACTION_APP_NOTIFICATION_SETTINGS)
+            if(Build.VERSION.SDK_INT >= Build.VERSION_CODES.O){
+                Intent settingsIntent = new Intent(Settings.ACTION_APP_NOTIFICATION_SETTINGS)
                         .addFlags(Intent.FLAG_ACTIVITY_NEW_TASK)
                         .putExtra(Settings.EXTRA_APP_PACKAGE, Util.getPackageName(activity));
+                activity.startActivity(settingsIntent);
             }
-            activity.startActivity(settingsIntent);
+            else {
+                Log.e(AppConstant.APP_NAME_TAG,"Method require API level 26 or Above");
+            }
         }catch (Exception ex)
         {
             Log.e("Exception ex",ex.toString());
         }
     }
-    public static  void setNotificationChannelName(String channelName)
-    {
-        if(DATB.appContext!=null) {
-            if (channelName != null && channelName != "") {
-                PreferenceUtil preferenceUtil = PreferenceUtil.getInstance(DATB.appContext);
-                preferenceUtil.setStringData(AppConstant.iZ_STORE_CHANNEL_NAME, channelName);
-            } else {
-                PreferenceUtil preferenceUtil = PreferenceUtil.getInstance(DATB.appContext);
+    /**     setNotificationChannelName      */
+    public static void setNotificationChannelName(String channelName) {
+        if(DATB.appContext!= null) {
+            PreferenceUtil preferenceUtil = PreferenceUtil.getInstance(DATB.appContext);
+            if (channelName != null && !channelName.isEmpty()){
+                if(channelName.charAt(0)!= ' '){
+                    if(channelName.length()<=30){
+                        preferenceUtil.setStringData(AppConstant.iZ_STORE_CHANNEL_NAME, channelName);
+                    }
+                    else{
+                        preferenceUtil.setStringData(AppConstant.iZ_STORE_CHANNEL_NAME, Util.getApplicationName(DATB.appContext) + " Notification");
+                    }
+                }else{
+                    Log.e(AppConstant.APP_NAME_TAG,"Channel Name not allowed with whitespace at first index");
+                    preferenceUtil.setStringData(AppConstant.iZ_STORE_CHANNEL_NAME, Util.getApplicationName(DATB.appContext) + " Notification");
+                }
+            }else {
                 preferenceUtil.setStringData(AppConstant.iZ_STORE_CHANNEL_NAME, Util.getApplicationName(DATB.appContext) + " Notification");
             }
         }
-
     }
 }

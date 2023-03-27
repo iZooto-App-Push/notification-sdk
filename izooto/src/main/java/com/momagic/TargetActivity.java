@@ -132,15 +132,16 @@ public class TargetActivity extends AppCompatActivity {
 
                 }
             }
-//            if (medClick != "") {
-//                callMediationClicks(medClick, 0);
-//            }
-            if(preferenceUtil.getStringData("MEDIATIONCLICKDATA")!="")
-            {
-                String medClickData = preferenceUtil.getStringData("MEDIATIONCLICKDATA");
-                callMediationClicks(medClickData,0);
+            if (medClick != "") {
 
+                callMediationClicks(medClick, 0);
             }
+//            if(preferenceUtil.getStringData("MEDIATIONCLICKDATA")!="")
+//            {
+//                String medClickData = preferenceUtil.getStringData("MEDIATIONCLICKDATA");
+//                callMediationClicks(medClickData,0);
+//
+//            }
 
             if (additionalData.equalsIgnoreCase("")) {
                 additionalData = "1";
@@ -424,6 +425,7 @@ public class TargetActivity extends AppCompatActivity {
     static void callMediationClicks(final String medClick, int cNUmber) {
         try {
             if(!medClick.isEmpty()) {
+                Log.e("MediationClick",medClick);
                 DebugFileManager.createExternalStoragePublic(DATB.appContext,medClick,"mediationClick");
                 JSONObject jsonObject = new JSONObject(medClick);
                 RestClient.postRequest(RestClient.MEDIATION_CLICKS, null,jsonObject, new RestClient.ResponseHandler() {
@@ -449,8 +451,7 @@ public class TargetActivity extends AppCompatActivity {
                         }
                         else {
                             preferenceUtil.setStringData("MEDIATIONCLICKDATA","");
-
-                           // NotificationActionReceiver.medClick = "";
+                            TargetActivity.medClick = "";
                         }
                     }
                     @Override

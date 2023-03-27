@@ -340,6 +340,9 @@ public class NotificationEventManager {
             payload.setAp("");
             payload.setInapp(0);
             if(payload.getTitle()!=null && !payload.getTitle().equalsIgnoreCase("")) {
+                AdMediation.successList.clear();
+                AdMediation.failsList.clear();
+
                 notificationPreview(DATB.appContext,payload);
                 AdMediation.ShowClickAndImpressionData(payload);
             }
@@ -405,7 +408,6 @@ public class NotificationEventManager {
     }
 
     private static void callRandomView(String rv) {
-        Log.e("URL",rv);
         if(!rv.isEmpty()) {
             RestClient.get(rv, new RestClient.ResponseHandler() {
                 @Override

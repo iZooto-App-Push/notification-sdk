@@ -18,9 +18,9 @@ public class AdMediation {
     private static final List<Payload> payloadList = new ArrayList<>();
     private static final List<Payload> adPayload = new ArrayList<>();
     private static final List<Payload> passiveList = new ArrayList<>();
-    private static final List<JSONObject> failsList = new ArrayList<>();
+     static final List<JSONObject> failsList = new ArrayList<>();
     public static List<String> clicksData = new ArrayList<>();
-    private static final List<JSONObject> successList=new ArrayList<>();
+     static final List<JSONObject> successList=new ArrayList<>();
     static List<String> storeList=new ArrayList<>();
     static  int counterIndex = 0;
 
@@ -1270,6 +1270,7 @@ public class AdMediation {
                 String dataValue = finalData.toString().replaceAll("\\\\", " ");
                 mediationImpression(dataValue,0);
                 NotificationActionReceiver.medClick = dataValue;
+                TargetActivity.medClick = dataValue;
             } catch (Exception ex) {
                 PreferenceUtil preferenceUtil=PreferenceUtil.getInstance(DATB.appContext);
                 String data2=preferenceUtil.getStringData("iz_AdMediation_EXCEPTION_AdType_14");
@@ -1296,10 +1297,12 @@ public class AdMediation {
                         super.onSuccess(response);
                         PreferenceUtil preferenceUtil=PreferenceUtil.getInstance(DATB.appContext);
                         if (!preferenceUtil.getStringData(AppConstant.STORE_MEDIATION_RECORDS).isEmpty() && impNUmber >= 0) {
+
                             try {
                                 JSONArray jsonArrayOffline = new JSONArray(preferenceUtil.getStringData(AppConstant.STORE_MEDIATION_RECORDS));
                                 jsonArrayOffline.remove(impNUmber);
                                 preferenceUtil.setStringData(AppConstant.STORE_MEDIATION_RECORDS, null);
+
                             }
                             catch (Exception ex)
                             {
@@ -1307,6 +1310,7 @@ public class AdMediation {
                             }
 
                         }
+
                     }
 
                     @Override
