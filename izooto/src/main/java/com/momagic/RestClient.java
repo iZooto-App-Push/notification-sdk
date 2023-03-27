@@ -161,9 +161,12 @@ public class RestClient {
                 if (httpResponse == HttpURLConnection.HTTP_OK) {
                     DebugFileManager.createExternalStoragePublic(DATB.appContext,"->"+url,"[Log.V]->URL");
                     if(data!=null) {
+                        Log.e("Response",data+url);
                         DebugFileManager.createExternalStoragePublic(DATB.appContext, "->" + data, "[Log.V]->URL");
                     }
                     if(jsonBody!=null) {
+                        Log.e("Response",jsonBody+url);
+
                         DebugFileManager.createExternalStoragePublic(DATB.appContext, "->" + jsonBody.toString(), "[Log.V]->URL");
                     }
                     if (url.equals(AppConstant.CDN + DATB.mAppId + AppConstant.DAT))

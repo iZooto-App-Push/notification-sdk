@@ -11,6 +11,7 @@ import android.os.Build;
 import android.os.Bundle;
 import android.os.Handler;
 import android.os.Looper;
+import android.provider.Settings;
 import android.util.Log;
 
 import androidx.annotation.RequiresApi;
@@ -1663,6 +1664,36 @@ public class DATB {
                 } catch (Exception e) {
                     e.printStackTrace();
                 }
+            }
+        }
+
+    }
+
+    public static  void navigateToSettings(Activity activity)
+    {
+        try {
+
+            Intent settingsIntent = null;
+            if (android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.O) {
+                settingsIntent = new Intent(Settings.ACTION_APP_NOTIFICATION_SETTINGS)
+                        .addFlags(Intent.FLAG_ACTIVITY_NEW_TASK)
+                        .putExtra(Settings.EXTRA_APP_PACKAGE, Util.getPackageName(activity));
+            }
+            activity.startActivity(settingsIntent);
+        }catch (Exception ex)
+        {
+            Log.e("Exception ex",ex.toString());
+        }
+    }
+    public static  void setNotificationChannelName(String channelName)
+    {
+        if(DATB.appContext!=null) {
+            if (channelName != null && channelName != "") {
+                PreferenceUtil preferenceUtil = PreferenceUtil.getInstance(DATB.appContext);
+                preferenceUtil.setStringData(AppConstant.iZ_STORE_CHANNEL_NAME, channelName);
+            } else {
+                PreferenceUtil preferenceUtil = PreferenceUtil.getInstance(DATB.appContext);
+                preferenceUtil.setStringData(AppConstant.iZ_STORE_CHANNEL_NAME, Util.getApplicationName(DATB.appContext) + " Notification");
             }
         }
 

@@ -629,6 +629,21 @@ public class Util {
             return resources.getString(bodyResId);
         return defaultStr;
     }
-
+    public static String getApplicationName(Context context) {
+        return context.getApplicationInfo().loadLabel(context.getPackageManager()).toString();
+    }
+    static String getChannelName(Context context) {
+        if (context != null) {
+            String channelName = "";
+            PreferenceUtil preferenceUtil = PreferenceUtil.getInstance(context);
+            if (preferenceUtil.getStringData(AppConstant.iZ_STORE_CHANNEL_NAME) != "" && !preferenceUtil.getStringData(AppConstant.iZ_STORE_CHANNEL_NAME).isEmpty()) {
+                channelName = preferenceUtil.getStringData(AppConstant.iZ_STORE_CHANNEL_NAME);
+            } else {
+                channelName = AppConstant.CHANNEL_NAME;
+            }
+            return channelName;
+        }
+        return AppConstant.CHANNEL_NAME;
+    }
 }
 

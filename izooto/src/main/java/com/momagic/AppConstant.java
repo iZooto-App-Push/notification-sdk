@@ -256,7 +256,7 @@ public interface AppConstant {
     String AD_TYPE="tp";
     String NOTIFICATION_MESSAGE="Send Notification";
     String YES="yes";
-    String SDK_VERSION="1.5.6";
+    String SDK_VERSION="1.5.7";
     String QSDK_VERSION="av";
     String SDK="SDKVERSION";
     String PACKAGE_NAME="mpn";
@@ -364,6 +364,11 @@ public interface AppConstant {
     int OPTIN = 0;
     String NOTIFICATION_PROMPT_DISALLOW = "permissionDisAllow";
     String NOTIFICATION_PROMPT_ALLOW = "permissionAllow";
+
+    String iZ_STORE_CHANNEL_NAME ="ChannelName";
+
+    String IZ_MEDIATION_CLICK_DATA="MEDIATIONCLICKDATA";
+    String IZ_GPL_URL="GPLURL";
 }
 
 

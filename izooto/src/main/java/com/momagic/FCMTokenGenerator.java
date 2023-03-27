@@ -70,11 +70,6 @@ public void getToken(final Context context, final String senderId, final String 
                         });
 
             } catch (Exception e) {
-                if(!preferenceUtil.getBoolean("FCMEXCEPTION"))
-                {
-                    preferenceUtil.setBooleanData("FCMEXCEPTION",true);
-                    Util.setException(context,e.getMessage()+senderId,"FCMGenerator","getToken");
-                }
                 if (callback != null)
                     callback.failure(e.getMessage());
             }

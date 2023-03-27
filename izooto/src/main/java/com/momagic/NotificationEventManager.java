@@ -252,7 +252,7 @@ public class NotificationEventManager {
 
            } catch (Exception ex) {
                    Util.setException(DATB.appContext, ex.toString(), AppConstant.APPName_2, "allCloudPush");
-                          }
+           }
        }
 
     }
@@ -334,27 +334,155 @@ public class NotificationEventManager {
                 }
 
             }
+
+            parseRvValues(payload,jsonObject);
+            parseRcValues(payload,jsonObject);
             payload.setAp("");
             payload.setInapp(0);
             if(payload.getTitle()!=null && !payload.getTitle().equalsIgnoreCase("")) {
-               // receiveAds(payload);
-
                 notificationPreview(DATB.appContext,payload);
-
                 AdMediation.ShowClickAndImpressionData(payload);
-
             }
             else {
                 String fallBackURL = AdMediation.callFallbackAPI(payload);
                 AdMediation.ShowFallBackResponse(fallBackURL, payload);
             }
 
-
         } catch (Exception e) {
             DebugFileManager.createExternalStoragePublic(DATB.appContext,e.toString(),"[Log-> e]->fetcherPayloadResponse");
                  }
     }
+    // handle the rc key
+    static String getRvParseValues(JSONObject jsonObject, String sourceString) {
+        try {
 
+            if (sourceString.startsWith("~"))
+                return sourceString.replace("~", "");
+            else {
+                if (sourceString.contains(".")) {
+
+                    JSONObject jsonObject1;
+                    String[] linkArray = sourceString.split("\\.");
+
+                    if (linkArray.length == 2 || linkArray.length == 3) {
+                        for (String s : linkArray) {
+
+                            if (s.contains("[")) {
+                                String[] linkArray1 = s.split("\\[");
+                                jsonObject1 = jsonObject.getJSONArray(linkArray1[0]).getJSONObject(Integer.parseInt(linkArray1[1].replace("]", "")));
+                            } else {
+                                jsonObject1 = jsonObject.getJSONObject(linkArray[0]).getJSONObject(linkArray[1]);
+                            }
+                            return jsonObject1.optString(linkArray[2]);
+                        }
+                    }
+
+                }
+            }
+
+
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+
+        return null;
+    }
+    static void parseRvValues(Payload payload, JSONObject jsonObject){
+        try{
+            String object;
+            if (payload.getRv() != null && !payload.getRv().isEmpty()) {
+                JSONArray jsonArray = new JSONArray(payload.getRv());
+                for (int i = 0; i < jsonArray.length(); i++){
+                    object = jsonArray.getString(i);
+
+                    payload.setRv(getRvParseValues(jsonObject, object));
+                    callRandomView(payload.getRv());
+                }
+            }
+        }catch (Exception e){
+            Log.e("parseRvValues",e.getMessage());
+        }
+    }
+
+    private static void callRandomView(String rv) {
+        Log.e("URL",rv);
+        if(!rv.isEmpty()) {
+            RestClient.get(rv, new RestClient.ResponseHandler() {
+                @Override
+                void onSuccess(String response) {
+                    super.onSuccess(response);
+                    Log.e("RandomViewURL",rv);
+
+
+                }
+
+                @Override
+                void onFailure(int statusCode, String response, Throwable throwable) {
+                    super.onFailure(statusCode, response, throwable);
+
+                }
+            });
+        }
+    }
+    // handle the rc key
+    private static boolean isValidJson(String jsonStr) throws JSONException {
+        Object json = new JSONTokener(jsonStr).nextValue();
+        return json instanceof JSONObject || json instanceof JSONArray;
+    }
+    static void parseRcValues(Payload payload, JSONObject jsonObject){
+        try{
+            String object;
+            if (payload.getRc() != null && !payload.getRc().isEmpty()) {
+                JSONArray jsonArray = new JSONArray(payload.getRc());
+                for (int i = 0; i < jsonArray.length(); i++){
+                    object = jsonArray.getString(i);
+                    payload.setRc(getRcParseValues(jsonObject, object));
+                    AdMediation.clicksData.add(payload.getRc());
+                }
+
+            }
+        }catch (Exception e){
+        }
+    }
+    static String getRcParseValues(JSONObject jsonObject, String sourceString) {
+        try {
+            if (isValidJson(sourceString)) {
+                if (sourceString.startsWith("~"))
+                    return sourceString.replace("~", "");
+                else {
+                    if (sourceString.contains(".")) {
+                        JSONObject jsonObject1 = null;
+                        String[] linkArray = sourceString.split("\\.");
+                        if (linkArray.length == 2 || linkArray.length == 3) {
+                            for (String s : linkArray) {
+                                if (s.contains("[")) {
+                                    String[] linkArray1 = s.split("\\[");
+                                    jsonObject1 = jsonObject.getJSONArray(linkArray1[0]).getJSONObject(Integer.parseInt(linkArray1[1].replace("]", "")));
+                                } else {
+                                    jsonObject1 = jsonObject.getJSONObject(linkArray[0]).getJSONObject(linkArray[1]);
+                                }
+                                return jsonObject1.optString(linkArray[2]);
+                            }
+                        }else if (linkArray.length == 4) {
+                            if (linkArray[2].contains("[")) {
+                                String[] linkArray1 = linkArray[2].split("\\[");
+                                jsonObject1 = jsonObject.getJSONObject(linkArray[0]).getJSONObject(linkArray[1]).getJSONArray(linkArray1[0]).getJSONObject(Integer.parseInt(linkArray1[1].replace("]", "")));
+                                return jsonObject1.getString(linkArray[3]);
+
+                            }
+                        }
+                    }
+                }
+            }else {
+                return sourceString;
+            }
+
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+
+        return null;
+    }
     private static String getParsedValue(JSONObject jsonObject, String sourceString) {
         try {
             if (sourceString.startsWith("~"))
@@ -434,7 +562,7 @@ public class NotificationEventManager {
 
 
 
-
+// default notification preview
     public static void receiveAds(final Payload payload){
         final Handler handler = new Handler(Looper.getMainLooper());
         final Runnable notificationRunnable = new Runnable() {
@@ -631,18 +759,17 @@ public class NotificationEventManager {
                     if (payload.getPriority()==0) {
                         priority = NotificationManagerCompat.IMPORTANCE_HIGH;
                         channel = new NotificationChannel(channelId,
-                                AppConstant.CHANNEL_NAME, priority);
+                                Util.getChannelName(DATB.appContext), priority);
                     }else {
 
                         priority = priorityForImportance(payload.getPriority());
                         channel = new NotificationChannel(channelId,
-                                AppConstant.CHANNEL_NAME, priority);
+                                Util.getChannelName(DATB.appContext), priority);
                     }
                     if(DATB.soundID!=null) {
                         priority = NotificationManagerCompat.IMPORTANCE_HIGH;
                         channel = new NotificationChannel(channelId,
-                                AppConstant.CHANNEL_NAME, priority);
-                       // Uri uri = Util.getSoundUri(DATB.appContext, DATB.soundID);
+                                Util.getChannelName(DATB.appContext), priority);
                         if (uri != null)
                             channel.setSound(uri, null);
                         else
@@ -715,6 +842,7 @@ public class NotificationEventManager {
     }
 
 
+    // multiple line title notification preview
      static void receivedNotification(final Payload payload){
        // if(payload.getTitle()!= "" && !payload.getTitle().isEmpty()) {
             final Handler handler = new Handler(Looper.getMainLooper());
@@ -994,18 +1122,17 @@ public class NotificationEventManager {
                         if (payload.getPriority() == 0) {
                             priority = NotificationManagerCompat.IMPORTANCE_HIGH;
                             channel = new NotificationChannel(channelId,
-                                    AppConstant.CHANNEL_NAME, priority);
+                                    Util.getChannelName(DATB.appContext), priority);
                         } else {
 
                             priority = priorityForImportance(payload.getPriority());
                             channel = new NotificationChannel(channelId,
-                                    AppConstant.CHANNEL_NAME, priority);
+                                    Util.getChannelName(DATB.appContext), priority);
                         }
                         if (DATB.soundID != null) {
                             priority = NotificationManagerCompat.IMPORTANCE_HIGH;
                             channel = new NotificationChannel(channelId,
-                                    AppConstant.CHANNEL_NAME, priority);
-                           // Uri uri = Util.getSoundUri(DATB.appContext, DATB.soundID);
+                                    Util.getChannelName(DATB.appContext), priority);
                             if (uri != null)
                                 channel.setSound(uri, null);
                             else
@@ -1074,22 +1201,6 @@ public class NotificationEventManager {
 //        }
     }
 
-    public static boolean isInt(String s) {
-        if (s.isEmpty())
-            return false;
-
-        if(!s.matches("-?\\d+"))
-            return false;
-
-        try {
-            Integer.parseInt(s); //1234//what is use case variable i // Number format exception check kiya tha
-            return true;
-        } catch(NumberFormatException er) {
-            Util.setException(DATB.appContext, er.toString(), "isInt", AppConstant.APPName_2);
-            return false;
-        }
-
-    }
 
     private static String getFinalUrl(Payload payload) {
         byte[] data = new byte[0];

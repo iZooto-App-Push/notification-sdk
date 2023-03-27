@@ -272,24 +272,24 @@ public class NotificationPreview {
                             if (payload.getPriority() == 0) {
                                 priority = NotificationManagerCompat.IMPORTANCE_HIGH;
                                 channel = new NotificationChannel(channelId,
-                                        AppConstant.CHANNEL_NAME, priority);
+                                        Util.getChannelName(DATB.appContext), priority);
+
                             } else {
 
                                 priority = NotificationEventManager.priorityForImportance(payload.getPriority());
                                 channel = new NotificationChannel(channelId,
-                                        AppConstant.CHANNEL_NAME, priority);
+                                        Util.getChannelName(DATB.appContext), priority);
                             }
 
 
                             if (DATB.soundID != null) {
                                 priority = NotificationManagerCompat.IMPORTANCE_HIGH;
                                 channel = new NotificationChannel(channelId,
-                                        AppConstant.CHANNEL_NAME, priority);
+                                        Util.getChannelName(DATB.appContext), priority);
                                 AudioAttributes audioAttributes = new AudioAttributes.Builder()
                                         .setContentType(AudioAttributes.CONTENT_TYPE_SONIFICATION)
                                         .setUsage(AudioAttributes.USAGE_ALARM)
                                         .build();
-                               // Uri uri = Util.getSoundUri(DATB.appContext, DATB.soundID);
                                 if (uri != null)
                                     channel.setSound(uri, audioAttributes);
                                 else
@@ -349,7 +349,6 @@ public class NotificationPreview {
 
                         handler.post(notificationRunnable);
                     } catch (Exception e) {
-                        Lg.e("Error", e.getMessage());
                         e.printStackTrace();
                         handler.post(notificationRunnable);
                     }
