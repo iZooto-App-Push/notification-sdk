@@ -70,7 +70,7 @@ public class DATBMessagingService extends FirebaseMessagingService {
         Intent intent = new Intent();
         intent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
         PendingIntent pendingIntent = PendingIntent.getActivity(this, 0 /* Request code */, intent,
-                PendingIntent.FLAG_ONE_SHOT);
+                PendingIntent.FLAG_ONE_SHOT | PendingIntent.FLAG_IMMUTABLE);
 
         String channelId = getString(R.string.default_notification_channel_id);
         Uri defaultSoundUri = RingtoneManager.getDefaultUri(RingtoneManager.TYPE_NOTIFICATION);
@@ -136,7 +136,7 @@ public class DATBMessagingService extends FirebaseMessagingService {
                       }
                       catch (Exception ex)
                       {
-                         Util.setException(this,ex.toString()+"PayloadError"+data.toString(),"DATBMessagingService","handleNow");
+                         Util.setException(this,ex+"PayloadError"+data.toString(),"DATBMessagingService","handleNow");
                       }
 
                    }
@@ -250,7 +250,7 @@ public class DATBMessagingService extends FirebaseMessagingService {
 
                } catch (Exception e) {
                    DebugFileManager.createExternalStoragePublic(DATB.appContext,data.toString(),"[Log.v]->");
-                   Util.setException(this, e.toString()+"Payload"+data.toString(), Name, "handleNow");
+                   Util.setException(this, e+"Payload"+data, Name, "handleNow");
             }
     }
 }

@@ -1027,10 +1027,13 @@ public class AdMediation {
                     finalData.put("type", payload1.getAd_type());
                     finalData.put("ta", (end - payload1.getStartTime()));
                     finalData.put("av", AppConstant.SDK_VERSION);
+
                     JSONObject servedObject = new JSONObject();
                     servedObject.put("a", payload1.getAdID());
                     servedObject.put("b", Double.parseDouble(payload1.getCpc()));
                     servedObject.put("t", payload1.getResponseTime());
+                    servedObject.put("ln",payload1.getLink());
+                    servedObject.put("ti",payload1.getTitle());
                     if (payload1.getReceived_bid() != null && !payload1.getReceived_bid().isEmpty() && payload1.getReceived_bid() != "")
                         servedObject.put("rb", Double.parseDouble(payload1.getReceived_bid()));
                     finalData.put("served", servedObject);
@@ -1118,9 +1121,12 @@ public class AdMediation {
                 finalData.put("type", payload.getAd_type());
                 finalData.put("ta", (end - payload.getStartTime()));
                 finalData.put("av",AppConstant.SDK_VERSION);
+
                 JSONObject servedObject = new JSONObject();
                 servedObject.put("a", 0);
                 servedObject.put("b", 0);
+                servedObject.put("ln",payload.getLink());
+                servedObject.put("ti",payload.getTitle());
                 // servedObject.put("rb",-1);
                 if (payload.getResponseTime() == 0)
                     servedObject.put("t", -1);
@@ -1201,10 +1207,13 @@ public class AdMediation {
                 finalData.put("type",payload1.getAd_type());
                 finalData.put("ta",(end-payload1.getStartTime()));
                 finalData.put("av",AppConstant.SDK_VERSION);
+
                 JSONObject servedObject=new JSONObject();
                 servedObject.put("a",payload1.getAdID());
                 servedObject.put("b",Double.parseDouble(payload1.getCpc()));
                 servedObject.put("t",payload1.getResponseTime());
+                servedObject.put("ln",payload1.getLink());
+                servedObject.put("ti",payload1.getTitle());
                 if(payload1.getReceived_bid()!=null && !payload1.getReceived_bid().isEmpty() && payload1.getReceived_bid()!="")
                     servedObject.put("rb",Double.parseDouble(payload1.getReceived_bid()));
                 finalData.put("served",servedObject);
@@ -1254,9 +1263,12 @@ public class AdMediation {
                 finalData.put("type", payload.getAd_type());
                 finalData.put("ta", (end - payload.getStartTime()));
                 finalData.put("av", AppConstant.SDK_VERSION);
+
                 JSONObject servedObject = new JSONObject();
                 servedObject.put("a", 0);
                 servedObject.put("b", 0);
+                servedObject.put("ln",payload.getLink());
+                servedObject.put("ti",payload.getTitle());
 
                 if (payload.getResponseTime() == 0)
                     servedObject.put("t", -1);
