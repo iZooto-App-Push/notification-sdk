@@ -131,12 +131,18 @@ public class DATBMessagingService extends FirebaseMessagingService {
                          }
                          else
                          {
-                             NotificationEventManager.handleNotificationError("Payload Error",data.toString(),"MessagingSevices","HandleNow");
+                             NotificationEventManager.handleNotificationError("Payload Error",data.toString(),"MessagingServices","handleNow");
                          }
                       }
                       catch (Exception ex)
                       {
-                         Util.setException(this,ex+"PayloadError"+data.toString(),"DATBMessagingService","handleNow");
+                        if(!preferenceUtil.getBoolean("IsException")) {
+                            preferenceUtil.setBooleanData("IsException",true);
+                            Util.setException(this, ex + "PayloadError" + data, "DATBMessagingService", "handleNow");
+                        }
+                          DebugFileManager.createExternalStoragePublic(this,data.toString(),"[Log.v]->");
+
+
                       }
 
                    }
@@ -161,7 +167,7 @@ public class DATBMessagingService extends FirebaseMessagingService {
                        }
                        catch (Exception ex)
                        {
-                           Util.setException(this,ex.toString()+"PayloadError"+data.toString(),"DATBMessagingService","handleNow");
+                           DebugFileManager.createExternalStoragePublic(this,data.toString(),"[Log.v]->");
 
                        }
                    }
@@ -250,7 +256,6 @@ public class DATBMessagingService extends FirebaseMessagingService {
 
                } catch (Exception e) {
                    DebugFileManager.createExternalStoragePublic(DATB.appContext,data.toString(),"[Log.v]->");
-                   Util.setException(this, e+"Payload"+data, Name, "handleNow");
             }
     }
 }

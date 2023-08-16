@@ -20,7 +20,7 @@ import java.util.concurrent.Executors;
 
 public class RestClient {
 
-     static final String BASE_URL = "https://aevents.izooto.com/app.php";
+     static final String BASE_URL = "https://aevents.izooto.com/app";
      static final int GET_TIMEOUT = 60000;
     static String GOOGLE_JSON_URL = "https://cdn.izooto.com/app/app_";  //old
      static final String EVENT_URL="https://et.izooto.com/evt";
