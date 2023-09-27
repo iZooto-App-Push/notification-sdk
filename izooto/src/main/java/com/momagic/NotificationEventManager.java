@@ -558,7 +558,6 @@ public class NotificationEventManager {
     private static void showNotification(final Payload payload) {
         if (DATB.appContext == null)
             return;
-
         notificationPreview(DATB.appContext,payload);
     }
 
@@ -1689,6 +1688,7 @@ static void lastViewNotification(String limURL, String rid, String cid, int i){
         if(payload.getDefaultNotificationPreview()==2 || preferenceUtil.getIntData(AppConstant.NOTIFICATION_PREVIEW) == PushTemplate.TEXT_OVERLAY)
         {
             NotificationPreview.receiveCustomNotification(payload);
+
         }
         else if(payload.getDefaultNotificationPreview()==3 || preferenceUtil.getIntData(AppConstant.NOTIFICATION_PREVIEW) == PushTemplate.DEVICE_NOTIFICATION_OVERLAY)
         {

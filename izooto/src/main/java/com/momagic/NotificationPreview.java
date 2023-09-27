@@ -14,7 +14,10 @@ import android.net.Uri;
 import android.os.Build;
 import android.os.Handler;
 import android.os.Looper;
+import android.os.SystemClock;
 import android.util.Base64;
+import android.util.Log;
+import android.view.Gravity;
 import android.view.View;
 import android.widget.RemoteViews;
 
@@ -24,12 +27,23 @@ import androidx.core.app.NotificationManagerCompat;
 
 import java.io.UnsupportedEncodingException;
 import java.math.BigInteger;
+import java.util.Objects;
 import java.util.Random;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
 public class NotificationPreview {
     private static Bitmap notificationIcon, notificationBanner;
     private static  int badgeColor;
     private static int priority,lockScreenVisibility;
+    static int OBTAINED_VALUES;
+    static int FCDTSM = 9;
+    static long MILLIS = 1000;
+    static long TOTAL_MILLIS;
+    static long EQUALS_TIMES;
+    static NotificationManager notificationManager;
+    static int notificationId;
+    static int mColor = 0x33000000;
 
     static void receiveCustomNotification(final Payload payload){
         if(DATB.appContext !=null) {
@@ -94,14 +108,37 @@ public class NotificationPreview {
                         /*---------------------------collapsed view----------------------- */
                         RemoteViews collapsedView = new RemoteViews(DATB.appContext.getPackageName(), R.layout.layout_custom_notification);
                         collapsedView.setTextViewText(R.id.tv_message, "" + payload.getTitle());
-                        if(Build.VERSION.SDK_INT>=Build.VERSION_CODES.S)
-                        {
-                            collapsedView.setViewVisibility(R.id.iv_large_icon,View.GONE);
-
-                        }
-                        else {
-                            collapsedView.setTextViewText(R.id.tv_display_time, "" + Util.getTimeWithoutDate());
-
+//                        if(Build.VERSION.SDK_INT>=Build.VERSION_CODES.S)
+//                        {
+//                            collapsedView.setViewVisibility(R.id.iv_large_icon,View.GONE);
+//
+//                        }
+//                        else {
+//                            collapsedView.setTextViewText(R.id.tv_display_time, "" + Util.getTimeWithoutDate());
+//
+//                            if (notificationIcon != null)
+//                                collapsedView.setImageViewBitmap(R.id.iv_large_icon, notificationIcon);
+//                            else {
+//                                if (DATB.appContext.getApplicationInfo().icon != 0)
+//                                    collapsedView.setImageViewResource(R.id.iv_large_icon, DATB.appContext.getApplicationInfo().icon);
+//                            }
+//                        }
+                        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.S) {
+                            collapsedView.setViewVisibility(R.id.iv_large_icon, View.GONE);
+                            collapsedView.setViewVisibility(R.id.rlc2, View.GONE);
+                        } else {
+                            collapsedView.setViewVisibility(R.id.rlc2, View.VISIBLE);
+                            collapsedView.setTextViewText(R.id.tv_display_time, "" + Util.getTimeWithoutDate().toLowerCase());
+                            collapsedView.setViewPadding(R.id.rlp, 20, 20, 20, 0);
+                            collapsedView.setViewPadding(R.id.llp, 20, 0, 20, 0);
+                            if (Util.notificationMode()){
+                                collapsedView.setViewPadding(R.id.tv_message_temp, 0, 0, 0, 0);
+                                collapsedView.setViewPadding(R.id.tv_display_time, 0, 0, 0, 0);
+                            }else {
+                                collapsedView.setViewPadding(R.id.tv_message_temp, 8, 0, 0, 0);
+                                collapsedView.setViewPadding(R.id.ll_timer_notification_for_below, 8, 0, 0, 0);
+                                collapsedView.setViewPadding(R.id.tv_display_time, 8, 0, 0, 0);
+                            }
                             if (notificationIcon != null)
                                 collapsedView.setImageViewBitmap(R.id.iv_large_icon, notificationIcon);
                             else {
@@ -114,10 +151,13 @@ public class NotificationPreview {
                         /*---------------------------expanded view----------------------- */
                         RemoteViews expandedView = new RemoteViews(DATB.appContext.getPackageName(), R.layout.layout_custom_notification_expand);
                         expandedView.setTextViewText(R.id.tv_notification_title, "" + payload.getTitle());
-                        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.S) {
-                            if ((payload.getAct1name() == null || payload.getAct1name().isEmpty()) && (payload.getAct2name() == null || payload.getAct2name().isEmpty())) {
-                                expandedView.setViewVisibility(R.id.iz_tv_layout, View.GONE);
-                            }
+//                        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.S) {
+//                            if ((payload.getAct1name() == null || payload.getAct1name().isEmpty()) && (payload.getAct2name() == null || payload.getAct2name().isEmpty())) {
+//                                expandedView.setViewVisibility(R.id.iz_tv_layout, View.GONE);
+//                            }
+//                        }
+                        if (payload.getAct1name().isEmpty() && payload.getAct2name().isEmpty()) {
+                            expandedView.setViewVisibility(R.id.ll_button, View.GONE);
                         }
 
 
@@ -151,6 +191,11 @@ public class NotificationPreview {
                             }
                         }
                         // Diplay time
+//                        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.S){
+//                            expandedView.setViewVisibility(R.id.tv_display_time, View.GONE);
+//                        }else {
+//                            expandedView.setTextViewText(R.id.tv_display_time, "" + Util.getTimeWithoutDate());
+//                        }
                         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.S){
                             expandedView.setViewVisibility(R.id.tv_display_time, View.GONE);
                         }else {
@@ -164,12 +209,145 @@ public class NotificationPreview {
                                 .setContentTitle(payload.getTitle())
                                 .setContentText(payload.getMessage())
                                 .setContentIntent(pendingIntent)
-                               // .setDefaults(NotificationCompat.DEFAULT_LIGHTS | NotificationCompat.DEFAULT_SOUND).setVibrate(new long[]{1000, 1000})
-                               // .setSound(defaultSoundUri)
                                 .setVisibility(lockScreenVisibility)
                                 .setCustomContentView(collapsedView)
                                 .setCustomBigContentView(expandedView)
                                 .setAutoCancel(true);
+                        /* show the timer notification functionality */
+                        if (payload.getExpiryTimerValue() != null && !payload.getExpiryTimerValue().isEmpty() && payload.getExpiryTimerValue().length() >FCDTSM) {
+                            try {
+                                if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O){
+                                    if(!Util.findDifferenceTimerValue(payload.getExpiryTimerValue()).equals("")) {
+                                        if (getPattern(payload.getExpiryTimerValue())) {
+                                            OBTAINED_VALUES = Integer.parseInt(Util.findDifferenceTimerValue(payload.getExpiryTimerValue()));
+                                            if (OBTAINED_VALUES > FCDTSM) {
+                                                TOTAL_MILLIS = OBTAINED_VALUES * MILLIS;
+                                                EQUALS_TIMES = SystemClock.elapsedRealtime() + TOTAL_MILLIS;
+                                                notificationBuilder.setTimeoutAfter(TOTAL_MILLIS);
+                                                if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.S) {
+                                                    collapsedView.setViewVisibility(R.id.ll_timer_notification_for_below, View.GONE);
+                                                    collapsedView.setViewVisibility(R.id.ll_timer_notification_, View.VISIBLE);
+                                                    collapsedView.setViewVisibility(R.id.tv_ll, View.VISIBLE);
+                                                    expandedView.setViewPadding(R.id.ll_timer_notification, 0,15,0,0);
+                                                    if (Util.notificationMode()) {
+                                                        collapsedView.setViewPadding(R.id.tv_message_temp, 10, 0, 0, 0);
+                                                        collapsedView.setInt(R.id.tv_message_temp, "setGravity", Gravity.START);
+                                                        expandedView.setInt(R.id.tv_notification_title, "setGravity", Gravity.START);
+                                                    } else {
+                                                        collapsedView.setViewPadding(R.id.tv_message_temp, 0, 0, 0, 0);
+                                                        collapsedView.setInt(R.id.tv_message_temp, "setGravity", Gravity.START);
+                                                    }
+
+
+                                                    collapsedView.setChronometerCountDown(R.id.tv_notification_timer_, true);
+                                                    collapsedView.setChronometer(R.id.tv_notification_timer_, EQUALS_TIMES, ("%tH:%tM:%tS"), true);
+
+
+                                                } else {
+                                                    collapsedView.setViewVisibility(R.id.ll_timer_notification_, View.GONE);
+                                                    collapsedView.setViewVisibility(R.id.ll_timer_notification_for_below, View.VISIBLE);
+                                                    collapsedView.setChronometerCountDown(R.id.tv_notification_timer_for_below, true);
+                                                    collapsedView.setChronometer(R.id.tv_notification_timer_for_below, EQUALS_TIMES, ("%tH:%tM:%tS"), true);
+                                                }
+
+
+                                                expandedView.setViewVisibility(R.id.ll_timer_notification, View.VISIBLE);
+                                                if(Build.VERSION.SDK_INT >= Build.VERSION_CODES.S){
+                                                    expandedView.setViewPadding(R.id.ll_timer_notification, 0,20,0,0);
+                                                }
+
+                                                expandedView.setChronometerCountDown(R.id.tv_notification_timer, true);
+                                                expandedView.setChronometer(R.id.tv_notification_timer, EQUALS_TIMES, ("%tH:%tM:%tS"), true);
+                                            }
+                                        }
+                                    }
+                                    else {
+                                        notificationBuilder.setTimeoutAfter(0);
+                                        collapsedView.setViewVisibility(R.id.ll_timer_notification_, View.GONE);
+                                        expandedView.setViewVisibility(R.id.ll_timer_notification, View.GONE);
+                                    }
+                                }else {
+                                    expandedView.setViewVisibility(R.id.ll_timer_notification, View.GONE);
+                                    collapsedView.setViewVisibility(R.id.ll_timer_notification_, View.GONE);
+                                    collapsedView.setViewVisibility(R.id.ll_timer_notification_for_below, View.GONE);
+                                }
+
+
+                            } catch (Exception e) {
+                                Log.e("Tpn", Objects.requireNonNull(e.getMessage()));
+                            }
+
+
+                        } else {
+                            notificationBuilder.setTimeoutAfter(0);
+                            collapsedView.setViewVisibility(R.id.ll_timer_notification_, View.GONE);
+                            expandedView.setViewVisibility(R.id.ll_timer_notification, View.GONE);
+                            collapsedView.setViewVisibility(R.id.ll_timer_notification_for_below, View.GONE);
+                        }
+                        // end the timer functionality
+
+                        /* override the  notification functionality */
+                        if (payload.getTag() != null && !payload.getTag().isEmpty()) {
+                            notificationId = Util.convertStringToDecimal(payload.getTag());
+                        } else {
+                            notificationId = (int) System.currentTimeMillis();
+                        }
+
+                        /* make sticky notification */
+                        if (payload.getMakeStickyNotification() != null && !payload.getMakeStickyNotification().isEmpty() && payload.getMakeStickyNotification().equals("1")){
+                            try {
+                                if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
+                                    notificationBuilder.setOngoing(true);
+                                    if (payload.getExpiryTimerValue() != null && !payload.getExpiryTimerValue().isEmpty() && payload.getExpiryTimerValue().length() > FCDTSM && OBTAINED_VALUES > FCDTSM) {
+                                        collapsedView.setViewVisibility(R.id.tv_dismissed_, View.GONE);
+                                        collapsedView.setViewVisibility(R.id.tv_close_icon, View.GONE);
+                                    } else {
+                                        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.S) {
+                                            if (Util.notificationMode()) {
+                                                collapsedView.setViewPadding(R.id.tv_message_temp, 50, 0, 0, 0);
+                                                collapsedView.setInt(R.id.tv_message_temp, "setGravity", Gravity.START);
+                                                expandedView.setInt(R.id.tv_notification_title, "setGravity", Gravity.START);
+                                            } else {
+                                                collapsedView.setViewPadding(R.id.tv_message_temp, 0, 0, 50, 0);
+                                                collapsedView.setInt(R.id.tv_message_temp, "setGravity", Gravity.START);
+                                            }
+                                            collapsedView.setViewVisibility(R.id.ll_timer_notification_, View.VISIBLE);
+                                            collapsedView.setViewVisibility(R.id.tv_close_icon, View.VISIBLE);
+                                            collapsedView.setViewVisibility(R.id.tv_ll, View.GONE);
+                                        } else {
+                                            collapsedView.setViewVisibility(R.id.ll_timer_notification_, View.GONE);
+                                            collapsedView.setViewVisibility(R.id.ll_timer_notification_for_below, View.GONE);
+                                            collapsedView.setViewVisibility(R.id.tv_dismissed_, View.VISIBLE);
+                                        }
+                                    }
+                                    expandedView.setViewVisibility(R.id.tv_dismissed, View.VISIBLE);
+                                    Intent cancelIntent = dismissedNotification(payload, notificationId,3);
+                                    if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.S) {
+                                        cancelIntent.setPackage(Util.getPackageName(DATB.appContext));
+                                        pendingIntent = PendingIntent.getBroadcast(DATB.appContext, notificationId, cancelIntent, PendingIntent.FLAG_UPDATE_CURRENT | PendingIntent.FLAG_IMMUTABLE);
+                                    } else {
+                                        pendingIntent = PendingIntent.getBroadcast(DATB.appContext, notificationId, cancelIntent, PendingIntent.FLAG_UPDATE_CURRENT | PendingIntent.FLAG_IMMUTABLE);
+                                    }
+                                    expandedView.setOnClickPendingIntent(R.id.tv_dismissed, pendingIntent);
+                                    collapsedView.setOnClickPendingIntent(R.id.tv_dismissed_, pendingIntent);
+                                    collapsedView.setOnClickPendingIntent(R.id.tv_close_icon, pendingIntent);
+                                }else {
+                                    expandedView.setViewVisibility(R.id.tv_dismissed, View.GONE);
+                                    collapsedView.setViewVisibility(R.id.tv_dismissed_, View.GONE);
+                                    collapsedView.setViewVisibility(R.id.tv_close_icon, View.GONE);
+                                    notificationBuilder.setOngoing(false);
+                                }
+                            }catch (Exception e){
+                                Log.e("pv",e.getMessage());
+                            }
+
+
+                        }else {
+                            expandedView.setViewVisibility(R.id.tv_dismissed, View.GONE);
+                            collapsedView.setViewVisibility(R.id.tv_dismissed_, View.GONE);
+                            collapsedView.setViewVisibility(R.id.tv_close_icon, View.GONE);
+                            notificationBuilder.setOngoing(false);
+                        }
                         try {
                             BigInteger accentColor = Util.getAccentColor();
                             if (accentColor != null)
@@ -203,11 +381,10 @@ public class NotificationPreview {
 
                         NotificationManager notificationManager =
                                 (NotificationManager) DATB.appContext.getSystemService(Context.NOTIFICATION_SERVICE);
-                        int notificaitionId;
-                        if (payload.getTag() != null && !payload.getTag().isEmpty())
-                            notificaitionId = Util.convertStringToDecimal(payload.getTag());
-                        else
-                            notificaitionId = (int) System.currentTimeMillis();
+//                        if (payload.getTag() != null && !payload.getTag().isEmpty())
+//                            notificationId = Util.convertStringToDecimal(payload.getTag());
+//                        else
+//                            notificationId = (int) System.currentTimeMillis();
 
                         if (payload.getAct1name() != null && !payload.getAct1name().isEmpty()) {
                             expandedView.setViewVisibility(R.id.tv_btn1, View.VISIBLE);
@@ -219,7 +396,7 @@ public class NotificationPreview {
                             }
                             expandedView.setTextViewText(R.id.tv_btn1, "" + button1.replace("~",""));
                             String phone = NotificationEventManager.getPhone(payload.getAct1link());
-                            Intent btn1 = cnotificationClick(payload, payload.getAct1link(), payload.getLink(), payload.getAct2link(), phone, clickIndex, lastclickIndex, notificaitionId, 1);
+                            Intent btn1 = cnotificationClick(payload, payload.getAct1link(), payload.getLink(), payload.getAct2link(), phone, clickIndex, lastclickIndex, notificationId, 1);
                             if(Build.VERSION.SDK_INT>=Build.VERSION_CODES.S) {
                                 btn1.setPackage(Util.getPackageName(DATB.appContext));
 
@@ -247,7 +424,7 @@ public class NotificationPreview {
                             }
                             expandedView.setTextViewText(R.id.tv_btn2, "" + button2.replace("~",""));
                             String phone = NotificationEventManager.getPhone(payload.getAct2link());
-                            Intent btn2 = NotificationEventManager.notificationClick(payload, payload.getAct2link(), payload.getLink(), payload.getAct1link(), phone, clickIndex, lastclickIndex, notificaitionId, 2);
+                            Intent btn2 = NotificationEventManager.notificationClick(payload, payload.getAct2link(), payload.getLink(), payload.getAct1link(), phone, clickIndex, lastclickIndex, notificationId, 2);
 
                             if(Build.VERSION.SDK_INT>=Build.VERSION_CODES.S) {
                                 btn2.setPackage(Util.getPackageName(DATB.appContext));
@@ -305,11 +482,12 @@ public class NotificationPreview {
                             int notifyId = Util.convertStringToDecimal(payload.getTag());
                             notificationManager.notify(notifyId, notificationBuilder.build());
                         }else
-                            notificationManager.notify(notificaitionId, notificationBuilder.build());
+                            notificationManager.notify(notificationId, notificationBuilder.build());
 
                         if (lastViewIndex.equalsIgnoreCase("1") || lastSeventhIndex.equalsIgnoreCase("1")) {
                             NotificationEventManager.lastViewNotificationApi(payload, lastViewIndex, lastSeventhIndex, lastNinthIndex);
                         }
+
 
                         DATB.notificationView(payload);
 
@@ -467,8 +645,55 @@ public class NotificationPreview {
         }
         return android.R.drawable.ic_popup_reminder;
     }
+    static Intent dismissedNotification(Payload payload ,int notificationId, int button){
+        Intent intent = null;
+        if(Build.VERSION.SDK_INT >= Build.VERSION_CODES.S) {
+            if(button == 3){
 
+                intent = new Intent(DATB.appContext, NotificationDismissedReceiver.class);
+            }
+            else {
+                intent = new Intent(DATB.appContext, TargetActivity.class);
+            }
+        }
+        else {
+            if(button == 3){
+                intent = new Intent(DATB.appContext, NotificationDismissedReceiver.class);
+            }else {
+                intent = new Intent(DATB.appContext, NotificationActionReceiver.class);
+            }
+        }
+        intent.putExtra(AppConstant.KEY_WEB_URL, "link");
+        intent.putExtra(AppConstant.KEY_NOTIFICITON_ID, notificationId);
+        intent.putExtra(AppConstant.KEY_IN_APP, payload.getInapp());
+        intent.putExtra(AppConstant.KEY_IN_CID, payload.getId());
+        intent.putExtra(AppConstant.KEY_IN_RID, payload.getRid());
+        intent.putExtra(AppConstant.KEY_IN_BUTOON, button);
+        intent.putExtra(AppConstant.KEY_IN_ADDITIONALDATA, payload.getAp());
+        intent.putExtra(AppConstant.KEY_IN_PHONE, "phone");
+        intent.putExtra(AppConstant.KEY_IN_ACT1ID, payload.getAct1ID());
+        intent.putExtra(AppConstant.KEY_IN_ACT2ID, payload.getAct2ID());
+        intent.putExtra(AppConstant.LANDINGURL, "link");
+        intent.putExtra(AppConstant.ACT1TITLE, payload.getAct1name());
+        intent.putExtra(AppConstant.ACT2TITLE, payload.getAct2name());
+        intent.putExtra(AppConstant.ACT1URL, "link1");
+        intent.putExtra(AppConstant.ACT2URL, "link2");
+        intent.putExtra(AppConstant.CLICKINDEX, "finalClickIndex");
+        intent.putExtra(AppConstant.LASTCLICKINDEX, "lastClick");
+        intent.putExtra(AppConstant.PUSH,payload.getPush_type());
+        intent.putExtra(AppConstant.CFGFORDOMAIN, payload.getCfg());
+
+        return intent;
+    }
     private static int getDrawableId(String name) {
         return DATB.appContext.getResources().getIdentifier(name, "drawable", DATB.appContext.getPackageName());
+    }
+    static boolean getPattern(String patterns) {
+        if (patterns.length() > FCDTSM) {
+            Pattern length = Pattern.compile(AppConstant.FORMAT);
+            Matcher totalNumber = length.matcher(patterns);
+            return totalNumber.find();
+        } else
+            return false;
     }
 }

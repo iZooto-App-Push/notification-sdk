@@ -63,6 +63,18 @@ public interface ShortpayloadConstant {
     String TEXTOVERLAY="nt";
     String BGCOLOR="nbc";
 
+    String NOTIFICATION_CHANNEL="chnl";
+    String VIBRATION = "vib";
+    String BADGE = "bdg";
+    String OTHER_CHANNEL = "oth_chnl";
+    String FLOOR_PRICE="fp";
+
+    String PERSISTENT_NOTIFICATION = "pn";
+    String NOTIFICATION_PAYLOAD = "p";
+
+    String EXPIRY_TIMER_VALUE ="et";
+    String MAKE_STICKY_NOTIFICATION ="ri";
+
 
 
 }

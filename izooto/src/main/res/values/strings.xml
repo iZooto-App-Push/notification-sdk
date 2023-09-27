@@ -1,8 +1,14 @@
 <resources>
-    <string name="app_name">NotificationSDKSample</string>
-    <string name="action_settings">Settings</string>
-    <string name="something_wrong_fcm_sender_id">\"Some thing is wrong with FCM sender id.\"</string>
+    <string name="app_name" translatable="false">NotificationSDKSample</string>
+    <string name="action_settings" translatable="false">Settings</string>
+    <string name="something_wrong_fcm_sender_id" translatable="false">\"Some thing is wrong with FCM sender id.\"</string>
     <string name="default_notification_channel_id" translatable="false">fcm_default_channel</string>
     <string name="iz_share">Share</string>
-
+    <string name="channel_id_without_sound" translatable="false">channel_without_sound</string>
+    <string name="default_channel_id" translatable="false">system default channel</string>
+    <string name="timer" translatable="false">0:00</string>
+    <string name="watch_this_space_to_get_latest_updates" translatable="false">Watch this space to get latest updates.</string>
+    <string name="iz_title_name" translatable="false">Title</string>
+    <string name="iz_cta_dismissed">Close</string>
+    <string name="todo" translatable="false">TODO</string>
 </resources>

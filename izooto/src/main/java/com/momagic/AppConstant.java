@@ -256,7 +256,7 @@ public interface AppConstant {
     String AD_TYPE="tp";
     String NOTIFICATION_MESSAGE="Send Notification";
     String YES="yes";
-    String SDK_VERSION="1.5.9";
+    String SDK_VERSION="2.0.1";
     String QSDK_VERSION="av";
     String SDK="SDKVERSION";
     String PACKAGE_NAME="mpn";
@@ -369,6 +369,33 @@ public interface AppConstant {
 
     String IZ_MEDIATION_CLICK_DATA="MEDIATIONCLICKDATA";
     String IZ_GPL_URL="GPLURL";
+
+
+    String SILENT_CHANNEL="Silent Push Notification";
+    String DEFAULT_CHANNEL="Default Channel";
+    String NOTIFICATION_SOUND_NAME="IZ_SOUND_NAME";
+    String IZ_DEFAULT_WEB_VIEW = "defaultWebView";
+    String IZ_NOTIFICATION_DATA = "notificationData";
+
+    String IZ_TITLE_INFO = "title";
+    String IZ_MESSAGE_INFO = "message";
+    String IZ_BANNER_INFO = "banner_image";
+    String IZ_LANDING_URL_INFO = "landing_url";
+    String IZ_TIME_STAMP_INFO = "time_stamp";
+    String IZ_NO_MORE_DATA ="No more data";
+    String IZ_ERROR_MESSAGE = "iZooto is not initialised properly, Please verify again.";
+    String IZ_NOTIFICATION_FETCH_EXCEPTION="fetchNotificationData";
+    String IZ_PAYLOAD_ERROR ="Payload Error";
+    String IZ_AD_MEDIATION_CLASS = "AdMediation";
+    String IZ_DEBUG_FILE_NAME ="pid.debug";
+    String IZ_DEBUG_EXCEPTION ="Exception";
+
+    String IZ_MISSING_GOOGLE_JSON_SERVICES_FILE ="missing google-service.json file";
+
+
+    String FORMAT = "[0-9]";
+    String IZ_DATE_TIME_FORMAT = "dd:MM:yyyy hh:mm:ss";
+
 }
 
 

@@ -173,6 +173,7 @@ public class DATBMessagingService extends FirebaseMessagingService {
                    }
                 }
                 else {
+
                     preferenceUtil.setBooleanData(AppConstant.MEDIATION, false);
                     JSONObject payloadObj = new JSONObject(data);
                     if (payloadObj.optLong(ShortpayloadConstant.CREATEDON) > PreferenceUtil.getInstance(this).getLongValue(AppConstant.DEVICE_REGISTRATION_TIMESTAMP)) {
@@ -228,7 +229,8 @@ public class DATBMessagingService extends FirebaseMessagingService {
                         payload.setFallBackPath(payloadObj.optString(ShortpayloadConstant.FAll_BACK_PATH));
                         payload.setDefaultNotificationPreview(payloadObj.optInt(ShortpayloadConstant.TEXTOVERLAY));
                         payload.setNotification_bg_color(payloadObj.optString(ShortpayloadConstant.BGCOLOR));
-
+                        payload.setExpiryTimerValue(payloadObj.optString(ShortpayloadConstant.EXPIRY_TIMER_VALUE));
+                        payload.setMakeStickyNotification(payloadObj.optString(ShortpayloadConstant.MAKE_STICKY_NOTIFICATION));
                     } else {
                         String updateDaily=NotificationEventManager.getDailyTime(this);
                         if (!updateDaily.equalsIgnoreCase(Util.getTime())) {

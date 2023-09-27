@@ -95,6 +95,9 @@ public class Payload {
     private int defaultNotificationPreview;
     private String notification_bg_color;
 
+    private String expiryTimerValue;
+    private String makeStickyNotification;
+
     //////////////////////////////////////////////
 
     private int cfg;
@@ -640,5 +643,21 @@ public class Payload {
 
     public void setNotification_bg_color(String notification_bg_color) {
         this.notification_bg_color = notification_bg_color;
+    }
+
+    public String getExpiryTimerValue() {
+        return expiryTimerValue;
+    }
+
+    public void setExpiryTimerValue(String expiryTimerValue) {
+        this.expiryTimerValue = expiryTimerValue;
+    }
+
+    public String getMakeStickyNotification() {
+        return makeStickyNotification;
+    }
+
+    public void setMakeStickyNotification(String makeStickyNotification) {
+        this.makeStickyNotification = makeStickyNotification;
     }
 }
