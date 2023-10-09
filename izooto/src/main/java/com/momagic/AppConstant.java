@@ -392,9 +392,21 @@ public interface AppConstant {
 
     String IZ_MISSING_GOOGLE_JSON_SERVICES_FILE ="missing google-service.json file";
 
+    String TP_TYPE="type";
+    String TYPE_TP="tp";
+    String TYPE_P="p";
+    String TYPE_O="o";
+    String P_OP="op";
+    String DISMISSED="dismiss";
 
     String FORMAT = "[0-9]";
     String IZ_DATE_TIME_FORMAT = "dd:MM:yyyy hh:mm:ss";
+    String IZ_LISTENER_ERROR = "Notification dismiss listener is not working";
+    String IZ_LISTENER_KEY = "nDismiss";
+    String IZ_TIMER_MESSAGE = "getTimerValue";
+    String IZ_TIMER_VALUE_MESSAGE = "Timer values exceed on maximum seconds or minimum seconds";
+
+
 
 }
 

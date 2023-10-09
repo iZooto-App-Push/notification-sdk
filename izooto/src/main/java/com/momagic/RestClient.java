@@ -22,7 +22,7 @@ public class RestClient {
 
      static final String BASE_URL = "https://aevents.izooto.com/app";
      static final int GET_TIMEOUT = 60000;
-    static String GOOGLE_JSON_URL = "https://cdn.izooto.com/app/app_";  //old
+     static String GOOGLE_JSON_URL = "https://cdn.izooto.com/app/app_";  //old
      static final String EVENT_URL="https://et.izooto.com/evt";
      static final String PROPERTIES_URL="https://prp.izooto.com/prp";
      static final String IMPRESSION_URL="https://impr.izooto.com/imp";
@@ -37,6 +37,9 @@ public class RestClient {
      static final String APP_EXCEPTION_URL="https://aerr.izooto.com/aerr";
      static final String NOTIFICATION_PERMISSION_ALLOW_URL="https://enp.izooto.com/enp";
      static final String NOTIFICATION_PERMISSION_DISALLOW_URL="https://sbp.izooto.com/nblk";
+
+     static final String PERSISTENT_NOTIFICATION_DISMISS_URL = "https://dsp.izooto.com/dsp";
+
 
     // add new url from momagic side
       static final String MOMAGIC_SUBSCRIPTION_URL="https://irctc.truenotify.in/momagicflow/appenp";
