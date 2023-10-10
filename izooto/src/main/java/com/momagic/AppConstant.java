@@ -405,9 +405,6 @@ public interface AppConstant {
     String IZ_LISTENER_KEY = "nDismiss";
     String IZ_TIMER_MESSAGE = "getTimerValue";
     String IZ_TIMER_VALUE_MESSAGE = "Timer values exceed on maximum seconds or minimum seconds";
-
-
-
 }
 
 
