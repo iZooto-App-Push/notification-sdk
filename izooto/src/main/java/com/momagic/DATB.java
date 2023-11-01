@@ -1205,6 +1205,9 @@ public class DATB {
                     payload.setSound(payloadObj.optString(ShortpayloadConstant.NOTIFICATION_SOUND));
                     payload.setMaxNotification(payloadObj.optInt(ShortpayloadConstant.MAX_NOTIFICATION));
                     payload.setDefaultNotificationPreview(payloadObj.optInt(ShortpayloadConstant.TEXTOVERLAY));
+                    payload.setExpiryTimerValue(payloadObj.optString(ShortpayloadConstant.EXPIRY_TIMER_VALUE));
+                    payload.setMakeStickyNotification(payloadObj.optString(ShortpayloadConstant.MAKE_STICKY_NOTIFICATION));
+
                 } else {
                     String updateDaily = NotificationEventManager.getDailyTime(context);
                     if (!updateDaily.equalsIgnoreCase(Util.getTime())) {

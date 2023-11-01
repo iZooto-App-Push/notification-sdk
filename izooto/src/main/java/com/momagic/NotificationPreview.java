@@ -286,7 +286,7 @@ public class NotificationPreview {
                         if (payload.getMakeStickyNotification() != null && !payload.getMakeStickyNotification().isEmpty() && payload.getMakeStickyNotification().equals("1")){
                             try {
                                 if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
-                                    notificationBuilder.setOngoing(true);
+                                    notificationBuilder.setOngoing(Util.enableSticky(payload));
                                     if (payload.getExpiryTimerValue() != null && !payload.getExpiryTimerValue().isEmpty() && payload.getExpiryTimerValue().length() > FCDTSM && OBTAINED_VALUES > FCDTSM) {
                                         collapsedView.setViewVisibility(R.id.tv_dismissed_, View.GONE);
                                         collapsedView.setViewVisibility(R.id.tv_close_icon, View.GONE);

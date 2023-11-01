@@ -688,5 +688,11 @@ public class Util {
     private static long MinutesToMillisecondsConverter(int minutes) {
         return (minutes * 60 * 1000L);
     }
+
+    // notifications sticky support
+    static boolean enableSticky(Payload payload){
+        return payload.getMakeStickyNotification() != null &&
+                !payload.getMakeStickyNotification().isEmpty() && payload.getMakeStickyNotification().equals("1");
+    }
 }
 

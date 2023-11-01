@@ -16,7 +16,7 @@ import androidx.appcompat.app.AppCompatActivity;
 public class DATBWebViewActivity extends AppCompatActivity {
 
     private WebView mWebView;
-    private ProgressBar mProgressBar;
+   // private ProgressBar mProgressBar;
     private String mUrl;
 
     public static void startActivity(Context context, String url) {
@@ -47,7 +47,7 @@ public class DATBWebViewActivity extends AppCompatActivity {
     private void initUI() {
         getBundleData();
         mWebView = findViewById(R.id.webView);
-        mProgressBar = findViewById(R.id.circular_progress_bar);
+       // mProgressBar = findViewById(R.id.circular_progress_bar);
         WebSettings settings = mWebView.getSettings();
         settings.setLoadWithOverviewMode(true);
         settings.setJavaScriptEnabled(false);
@@ -56,7 +56,6 @@ public class DATBWebViewActivity extends AppCompatActivity {
         settings.setAllowFileAccess(false);
         settings.setAllowFileAccessFromFileURLs(false);
         settings.setAllowUniversalAccessFromFileURLs(false);
-
         settings.setLoadsImagesAutomatically(true);
         mWebView.setWebChromeClient(new WebChromeClient());
         mWebView.setVerticalScrollBarEnabled(false);
@@ -88,13 +87,13 @@ public class DATBWebViewActivity extends AppCompatActivity {
         @Override
         public void onPageStarted(WebView view, String url, Bitmap favicon) {
             super.onPageStarted(view, url, favicon);
-            mProgressBar.setVisibility(View.VISIBLE);
+           // mProgressBar.setVisibility(View.VISIBLE);
 
         }
 
         @Override
         public void onPageFinished(WebView view, String url) {
-            mProgressBar.setVisibility(View.GONE);
+           // mProgressBar.setVisibility(View.GONE);
             super.onPageFinished(view, url);
 
 

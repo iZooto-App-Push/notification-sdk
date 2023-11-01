@@ -627,6 +627,7 @@ public class NotificationEventManager {
                         .setContentTitle(payload.getTitle())
                         .setContentText(payload.getMessage())
                         .setContentIntent(pendingIntent)
+                        .setOngoing(Util.enableSticky(payload)) /*    Notification sticky   */
                         .setVisibility(lockScreenVisibility)
                         .setAutoCancel(true);
                 try {
@@ -661,6 +662,8 @@ public class NotificationEventManager {
                                         .setContentText(payload.getMessage())
                                         .setSmallIcon(getDefaultSmallIconId())
                                         .setColor(badgeColor)
+                                        .setOngoing(Util.enableSticky(payload)) /*    Notification sticky   */
+
                                         .setStyle(new NotificationCompat.InboxStyle()
                                                 .addLine(payload.getMessage())
                                                 .setBigContentTitle(payload.getGroupMessage()))
@@ -754,6 +757,31 @@ public class NotificationEventManager {
                                     pendingIntent).build();
                     notificationBuilder.addAction(action2);
                 }
+                try {
+                    PreferenceUtil preferenceUtil = PreferenceUtil.getInstance(DATB.appContext);
+                    if (payload.getMakeStickyNotification() != null && !payload.getMakeStickyNotification().isEmpty() && payload.getMakeStickyNotification().equals("1")) {
+                        preferenceUtil.setStringData(AppConstant.TP_TYPE, AppConstant.TYPE_P);
+                        Intent btn3 = NotificationPreview.dismissedNotification(payload, notificationId, 3);
+                        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.S) {
+                            btn3.setPackage(Util.getPackageName(DATB.appContext));
+                            pendingIntent = PendingIntent.getBroadcast(DATB.appContext, notificationId, btn3, PendingIntent.FLAG_UPDATE_CURRENT | PendingIntent.FLAG_IMMUTABLE);
+
+                        } else {
+                            pendingIntent = PendingIntent.getBroadcast(DATB.appContext, notificationId, btn3, PendingIntent.FLAG_UPDATE_CURRENT | PendingIntent.FLAG_IMMUTABLE);
+
+                        }
+
+                        NotificationCompat.Action action3 =
+                                new NotificationCompat.Action.Builder(
+                                        0, DATB.appContext.getResources().getString(R.string.iz_cta_dismissed),
+                                        pendingIntent).build();
+                        notificationBuilder.addAction(action3);
+                    }
+                }catch (Exception e){
+                    // Handle the exceptions here
+                }
+
+
                 assert notificationManager != null;
                 if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
                     NotificationChannel channel;
@@ -986,8 +1014,7 @@ public class NotificationEventManager {
                             .setContentTitle(payload.getTitle())
                             .setContentText(payload.getMessage())
                             .setContentIntent(pendingIntent)
-                           // .setDefaults(NotificationCompat.DEFAULT_LIGHTS | NotificationCompat.DEFAULT_SOUND).setVibrate(new long[]{1000, 1000})
-                          //  .setSound(defaultSoundUri)
+                            .setOngoing(Util.enableSticky(payload)) /*    Notification sticky   */
                             .setVisibility(lockScreenVisibility)
                             .setStyle(new NotificationCompat.DecoratedCustomViewStyle())
                             .setCustomContentView(collapsedView)
@@ -1038,6 +1065,7 @@ public class NotificationEventManager {
                                                 .setContentText(Util.makeBoldString(payload.getTitle()))
                                                 .setSmallIcon(getDefaultSmallIconId())
                                                 .setColor(badgeColor)
+                                                .setOngoing(Util.enableSticky(payload)) /*    Notification sticky   */
                                                 .setStyle(new NotificationCompat.InboxStyle()
                                                         .addLine(Util.makeBlackString(payload.getTitle()))
                                                         .setBigContentTitle(payload.getGroupMessage()))
@@ -1117,6 +1145,31 @@ public class NotificationEventManager {
                                         pendingIntent).build();
                         notificationBuilder.addAction(action2);
                     }
+                    try {
+                        PreferenceUtil preferenceUtil = PreferenceUtil.getInstance(DATB.appContext);
+                        if (payload.getMakeStickyNotification() != null && !payload.getMakeStickyNotification().isEmpty() && payload.getMakeStickyNotification().equals("1")) {
+                            preferenceUtil.setStringData(AppConstant.TP_TYPE, AppConstant.TYPE_P);
+                            Intent cancelIntent = NotificationPreview.dismissedNotification(payload, notificationID, 3);
+                            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.S) {
+                                cancelIntent.setPackage(Util.getPackageName(DATB.appContext));
+                                pendingIntent = PendingIntent.getBroadcast(DATB.appContext, notificationID, cancelIntent, PendingIntent.FLAG_UPDATE_CURRENT | PendingIntent.FLAG_IMMUTABLE);
+                            } else {
+                                pendingIntent = PendingIntent.getBroadcast(DATB.appContext, notificationID, cancelIntent, PendingIntent.FLAG_UPDATE_CURRENT | PendingIntent.FLAG_IMMUTABLE);
+                            }
+                            NotificationCompat.Action action3 =
+                                    new NotificationCompat.Action.Builder(
+                                            R.drawable.transparent_image, DATB.appContext.getResources().getString(R.string.iz_cta_dismissed),
+                                            pendingIntent).build();
+                            notificationBuilder.addAction(action3);
+
+                        }
+                    }catch (Exception e){
+                        // Handle the exceptions here
+                    }
+
+
+
+
                     assert notificationManager != null;
                     if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
                         NotificationChannel channel;

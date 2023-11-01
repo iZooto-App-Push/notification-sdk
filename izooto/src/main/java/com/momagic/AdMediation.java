@@ -124,6 +124,9 @@ public class AdMediation {
                             payload.setCreated_Time(jsonObject.optString(ShortpayloadConstant.CREATEDON));
                             payload.setPush_type(pushType);
                             payload.setDefaultNotificationPreview(jsonObject.optInt(ShortpayloadConstant.TEXTOVERLAY));
+                            payload.setMakeStickyNotification(jsonObject.optString(ShortpayloadConstant.MAKE_STICKY_NOTIFICATION));  // Add sticky value
+
+
                             if (payload.getPassive_flag().equalsIgnoreCase("1") && jsonObject.optString(AppConstant.AD_TYPE).equalsIgnoreCase("6")) {
                                 passiveList.add(payload);
                             } else {

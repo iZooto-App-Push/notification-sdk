@@ -36,6 +36,7 @@
             android:name="com.momagic.DATBWebViewActivity"
             android:screenOrientation="portrait"
             android:exported="false"
+            tools:ignore="Instantiatable"
             android:launchMode="singleTask" />
         <meta-data android:name="android.webkit.WebView.EnableSafeBrowsing"
             android:value="true" />

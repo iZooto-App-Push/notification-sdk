@@ -163,8 +163,9 @@ public class NotificationActionReceiver extends BroadcastReceiver {
                 if (inApp == 1 && phoneNumber.equalsIgnoreCase(AppConstant.NO) && landingURL!="" && !landingURL.isEmpty()) {
                     if (DATB.mBuilder != null && DATB.mBuilder.mWebViewListener != null) {
                         DATB.notificationInAppAction(mUrl);
-                    } else
+                    } else {
                         DATBWebViewActivity.startActivity(context, mUrl);
+                    }
                 } else {
                     try {
                         if (phoneNumber.equalsIgnoreCase(AppConstant.NO)) {
