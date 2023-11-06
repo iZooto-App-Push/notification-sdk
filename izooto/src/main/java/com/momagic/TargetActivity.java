@@ -26,11 +26,11 @@ public class TargetActivity extends AppCompatActivity {
     private String cid;
     private int btnCount;
     private String api_url;
-    private String additionalData;
+    private static String additionalData;
     private String phoneNumber;
     private String act1ID;
     private String act2ID;
-    private String landingURL;
+    private static String landingURL;
     private String act2URL;
     private String act1URL;
     private String btn1Title;
@@ -136,20 +136,12 @@ public class TargetActivity extends AppCompatActivity {
 
                 callMediationClicks(medClick, 0);
             }
-//            if(preferenceUtil.getStringData("MEDIATIONCLICKDATA")!="")
-//            {
-//                String medClickData = preferenceUtil.getStringData("MEDIATIONCLICKDATA");
-//                callMediationClicks(medClickData,0);
-//
-//            }
-
             if (additionalData.equalsIgnoreCase("")) {
                 additionalData = "1";
             }
 
 
             if (!additionalData.equalsIgnoreCase("1") && inApp >= 0) {
-
                 HashMap<String, String> hashMap = new HashMap<>();
                 hashMap.put(AppConstant.BUTTON_ID_1, act1ID);
                 hashMap.put(AppConstant.BUTTON_TITLE_1, btn1Title);
@@ -274,6 +266,8 @@ public class TargetActivity extends AppCompatActivity {
             mapData.put(AppConstant.RID_,"" + rid);
             mapData.put(AppConstant.PUSH, pushType);
             mapData.put("op","click");
+            mapData.put(AppConstant.IZ_LANDING_URL, landingURL);
+            mapData.put(AppConstant.IZ_DEEPLINK_URL, additionalData);
             if (btnCount != 0)
                 mapData.put("btn","" + btnCount);
             DebugFileManager.createExternalStoragePublic(DATB.appContext,mapData.toString(),"clickData");

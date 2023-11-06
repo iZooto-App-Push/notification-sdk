@@ -256,7 +256,7 @@ public interface AppConstant {
     String AD_TYPE="tp";
     String NOTIFICATION_MESSAGE="Send Notification";
     String YES="yes";
-    String SDK_VERSION="2.0.2";
+    String SDK_VERSION="2.0.3";
     String QSDK_VERSION="av";
     String SDK="SDKVERSION";
     String PACKAGE_NAME="mpn";
@@ -405,6 +405,11 @@ public interface AppConstant {
     String IZ_LISTENER_KEY = "nDismiss";
     String IZ_TIMER_MESSAGE = "getTimerValue";
     String IZ_TIMER_VALUE_MESSAGE = "Timer values exceed on maximum seconds or minimum seconds";
+    String IZ_LANDING_URL = "ln";
+    String IZ_DEEPLINK_URL = "ap";
+
+
+
 }
 
 
