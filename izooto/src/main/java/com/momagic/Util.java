@@ -143,7 +143,6 @@ public class Util {
                 }
             } else {
                 DebugFileManager.createExternalStoragePublic(DATB.appContext, url, "[Log-> e]->getBitmapFromURL");
-                Util.setException(DATB.appContext, "Image URL" + url, "Util", "getBitmapFromURL");
                 return null;
             }
         }

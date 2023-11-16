@@ -209,7 +209,7 @@ public interface AppConstant {
     String BADGE_COUNT = "badgeCount";
     String ADVERTISEMENT_ID = "advertisementID";
     String ISINSTALL="isInstall";
-    String CHANNEL_NAME="IRCTC Updates and Notifications";
+    String CHANNEL_NAME="Updates and Notifications";
     String DIALOG_DISMISS="Dismiss";
     String DIALOG_OK="Take me there";
     String URL_FWD="&frwd";
@@ -256,7 +256,7 @@ public interface AppConstant {
     String AD_TYPE="tp";
     String NOTIFICATION_MESSAGE="Send Notification";
     String YES="yes";
-    String SDK_VERSION="2.0.3";
+    String SDK_VERSION="2.0.4";
     String QSDK_VERSION="av";
     String SDK="SDKVERSION";
     String PACKAGE_NAME="mpn";
