@@ -89,7 +89,7 @@ public class DATB {
                     preferenceUtil.setStringData(AppConstant.ENCRYPTED_PID, mAppId);
                 }
                 if (mAppId == "") {
-                    Lg.e(AppConstant.APP_NAME_TAG, AppConstant.MISSINGID);
+                    Lg.e(AppConstant.APP_NAME_TAG, AppConstant.MISSING_ID);
                 } else {
                     Lg.i(AppConstant.APP_NAME_TAG, mAppId + "");
 
@@ -106,7 +106,7 @@ public class DATB {
                             if (!response.isEmpty() && response.length() > 20 && response != null) {
                                 try {
                                     final PreferenceUtil preferenceUtil = PreferenceUtil.getInstance(appContext);
-                                    JSONObject jsonObject = new JSONObject(Objects.requireNonNull(Util.decrypt(AppConstant.SECRETKEY, response)));
+                                    JSONObject jsonObject = new JSONObject(Objects.requireNonNull(Util.decrypt(AppConstant.SECRET_KEY, response)));
                                     senderId = jsonObject.getString(AppConstant.SENDERID);
                                     String appId = jsonObject.getString(AppConstant.APPID);
                                     String apiKey = jsonObject.getString(AppConstant.APIKEY);
@@ -166,7 +166,7 @@ public class DATB {
                         Util util = new Util();
                         final PreferenceUtil preferenceUtil = PreferenceUtil.getInstance(appContext);
                         if (util.isInitializationValid()) {
-                            Lg.i(AppConstant.APP_NAME_TAG, AppConstant.DEVICETOKEN + preferenceUtil.getStringData(AppConstant.FCM_DEVICE_TOKEN));
+                            Lg.i(AppConstant.APP_NAME_TAG, AppConstant.DEVICE_TOKEN + preferenceUtil.getStringData(AppConstant.FCM_DEVICE_TOKEN));
                             registerToken();
                             ActivityLifecycleListener.registerActivity((Application) appContext);
                             setCurActivity(context);
@@ -297,16 +297,16 @@ public class DATB {
                         if (!preferenceUtil.getStringData(AppConstant.XiaomiToken).isEmpty())
                             preferenceUtil.setBooleanData(AppConstant.IS_UPDATED_XIAOMI_TOKEN, true);
                         Map<String, String> mapData = new HashMap<>();
-                        mapData.put(AppConstant.ADDURL, "" + AppConstant.STYPE);
+                        mapData.put(AppConstant.ADD_URL, "" + AppConstant.STYPE);
                         mapData.put(AppConstant.PID, preferenceUtil.getDataBID(AppConstant.APPPID));
                         mapData.put(AppConstant.BTYPE_, "" + AppConstant.BTYPE);
                         mapData.put(AppConstant.DTYPE_, "" + AppConstant.DTYPE);
                         mapData.put(AppConstant.TIMEZONE, "" + System.currentTimeMillis());
-                        mapData.put(AppConstant.APPVERSION, "" + Util.getAppVersion(appContext));
+                        mapData.put(AppConstant.APP_VERSION, "" + Util.getAppVersion(appContext));
                         mapData.put(AppConstant.OS, "" + AppConstant.SDKOS);
                         mapData.put(AppConstant.ALLOWED_, "" + AppConstant.ALLOWED);
                         mapData.put(AppConstant.ANDROID_ID, "" + Util.getAndroidId(appContext));
-                        mapData.put(AppConstant.CHECKSDKVERSION, "" +  Util.getAppVersion(appContext));
+                        mapData.put(AppConstant.CHECK_SDK_VERSION, "" +  Util.getAppVersion(appContext));
                         mapData.put(AppConstant.LANGUAGE, "" + Util.getDeviceLanguage());
                         mapData.put(AppConstant.QSDK_VERSION, "" + AppConstant.SDK_VERSION);
                         mapData.put(AppConstant.TOKEN, "" + preferenceUtil.getStringData(AppConstant.FCM_DEVICE_TOKEN));
@@ -315,8 +315,8 @@ public class DATB {
                         mapData.put(AppConstant.PACKAGE_NAME, "" + appContext.getPackageName());
                         mapData.put(AppConstant.SDKTYPE, "" + SDKDEF);
                         mapData.put(AppConstant.KEY_HMS, "" + preferenceUtil.getStringData(AppConstant.HMS_TOKEN));
-                        mapData.put(AppConstant.ANDROIDVERSION, "" + Build.VERSION.RELEASE);
-                        mapData.put(AppConstant.DEVICENAME, "" + Util.getDeviceName());
+                        mapData.put(AppConstant.ANDROID_VERSION, "" + Build.VERSION.RELEASE);
+                        mapData.put(AppConstant.DEVICE_NAME, "" + Util.getDeviceName());
                         RestClient.postRequest(RestClient.MOMAGIC_SUBSCRIPTION_URL, mapData, null, new RestClient.ResponseHandler() {
                             @Override
                             void onSuccess(final String response) {
@@ -450,16 +450,16 @@ public class DATB {
                             try {
 
                                 Map<String, String> mapData = new HashMap<>();
-                                mapData.put(AppConstant.ADDURL, "" + AppConstant.STYPE);
+                                mapData.put(AppConstant.ADD_URL, "" + AppConstant.STYPE);
                                 mapData.put(AppConstant.PID, preferenceUtil.getDataBID(AppConstant.APPPID));
                                 mapData.put(AppConstant.BTYPE_, "" + AppConstant.BTYPE);
                                 mapData.put(AppConstant.DTYPE_, "" + AppConstant.DTYPE);
                                 mapData.put(AppConstant.TIMEZONE, "" + System.currentTimeMillis());
-                                mapData.put(AppConstant.APPVERSION, "" + Util.getAppVersion(appContext));
+                                mapData.put(AppConstant.APP_VERSION, "" + Util.getAppVersion(appContext));
                                 mapData.put(AppConstant.OS, "" + AppConstant.SDKOS);
                                 mapData.put(AppConstant.ALLOWED_, "" + AppConstant.ALLOWED);
                                 mapData.put(AppConstant.ANDROID_ID, "" + Util.getAndroidId(appContext));
-                                mapData.put(AppConstant.CHECKSDKVERSION, "" + AppConstant.SDK_VERSION);
+                                mapData.put(AppConstant.CHECK_SDK_VERSION, "" + AppConstant.SDK_VERSION);
                                 mapData.put(AppConstant.LANGUAGE, "" + Util.getDeviceLanguage());
                                 mapData.put(AppConstant.QSDK_VERSION, "" + AppConstant.SDK_VERSION);
                                 mapData.put(AppConstant.TOKEN, "" + preferenceUtil.getStringData(AppConstant.FCM_DEVICE_TOKEN));
@@ -468,8 +468,8 @@ public class DATB {
                                 mapData.put(AppConstant.PACKAGE_NAME, "" + appContext.getPackageName());
                                 mapData.put(AppConstant.SDKTYPE, "" + SDKDEF);
                                 mapData.put(AppConstant.KEY_HMS, "" + preferenceUtil.getStringData(AppConstant.HMS_TOKEN));
-                                mapData.put(AppConstant.ANDROIDVERSION, "" + Build.VERSION.RELEASE);
-                                mapData.put(AppConstant.DEVICENAME, "" + Util.getDeviceName());
+                                mapData.put(AppConstant.ANDROID_VERSION, "" + Build.VERSION.RELEASE);
+                                mapData.put(AppConstant.DEVICE_NAME, "" + Util.getDeviceName());
                                 DebugFileManager.createExternalStoragePublic(DATB.appContext, mapData.toString(), "RegisterToken");
 
                             } catch (Exception exception) {
@@ -669,7 +669,7 @@ public class DATB {
                         mapData.put(AppConstant.ANDROID_ID, "" + Util.getAndroidId(context));
                         mapData.put(AppConstant.BTYPE_, "" + AppConstant.BTYPE);
                         mapData.put(AppConstant.DTYPE_, "" + AppConstant.DTYPE);
-                        mapData.put(AppConstant.APPVERSION, "" + AppConstant.SDK_VERSION);
+                        mapData.put(AppConstant.APP_VERSION, "" + AppConstant.SDK_VERSION);
                         mapData.put(AppConstant.PTE_, "" + AppConstant.PTE);
                         mapData.put(AppConstant.OS, "" + AppConstant.SDKOS);
                         mapData.put(AppConstant.PT_, "" + AppConstant.PT);
@@ -1052,7 +1052,7 @@ public class DATB {
                         mapData.put(AppConstant.ANDROID_ID, "" + Util.getAndroidId(appContext));
                         mapData.put(AppConstant.BTYPE_, "" + AppConstant.BTYPE);
                         mapData.put(AppConstant.DTYPE_, "" + AppConstant.DTYPE);
-                        mapData.put(AppConstant.APPVERSION, "" + AppConstant.SDK_VERSION);
+                        mapData.put(AppConstant.APP_VERSION, "" + AppConstant.SDK_VERSION);
                         mapData.put(AppConstant.PTE_, "" + AppConstant.PTE);
                         mapData.put(AppConstant.OS, "" + AppConstant.SDKOS);
                         mapData.put(AppConstant.PT_, "" + AppConstant.PT);
@@ -1114,7 +1114,7 @@ public class DATB {
 
     @RequiresApi(api = Build.VERSION_CODES.KITKAT)
     public static void handleNotification(Context context, final Map<String, String> data) {
-        Log.d(AppConstant.APP_NAME_TAG, AppConstant.NOTIFICATIONRECEIVED);
+        Log.d(AppConstant.APP_NAME_TAG, AppConstant.NOTIFICATION_RECEIVED);
         try {
             final PreferenceUtil preferenceUtil = PreferenceUtil.getInstance(context);
 

@@ -1371,7 +1371,7 @@ public class NotificationEventManager {
         intent.putExtra(AppConstant.KEY_IN_APP, payload.getInapp());
         intent.putExtra(AppConstant.KEY_IN_CID, payload.getId());
         intent.putExtra(AppConstant.KEY_IN_RID, payload.getRid());
-        intent.putExtra(AppConstant.KEY_IN_BUTOON, button);
+        intent.putExtra(AppConstant.KEY_IN_BUTTON, button);
         intent.putExtra(AppConstant.KEY_IN_ADDITIONALDATA, payload.getAp());
         intent.putExtra(AppConstant.KEY_IN_PHONE, phone);
         intent.putExtra(AppConstant.KEY_IN_ACT1ID, payload.getAct1ID());
@@ -1385,6 +1385,8 @@ public class NotificationEventManager {
         intent.putExtra(AppConstant.LASTCLICKINDEX, lastClick);
         intent.putExtra(AppConstant.PUSH,payload.getPush_type());
         intent.putExtra(AppConstant.CFGFORDOMAIN, payload.getCfg());
+        intent.putExtra(AppConstant.IZ_NOTIFICATION_TITLE_KEY_NAME,payload.getTitle());
+
         return intent;
     }
 

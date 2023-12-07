@@ -47,7 +47,7 @@ public class XiaomiPushReceiver extends PushMessageReceiver {
     }
 
     private void handleNow(Context context, String data) {
-        Log.d(TAG, AppConstant.NOTIFICATIONRECEIVED);
+        Log.d(TAG, AppConstant.NOTIFICATION_RECEIVED);
         try {
             PreferenceUtil preferenceUtil =PreferenceUtil.getInstance(context);
             JSONObject payloadObj = new JSONObject(data);
@@ -240,16 +240,16 @@ public class XiaomiPushReceiver extends PushMessageReceiver {
                 if (!preferenceUtil.getStringData(AppConstant.HMS_TOKEN).isEmpty())
                     preferenceUtil.setBooleanData(AppConstant.IS_UPDATED_HMS_TOKEN, true);
                 Map<String,String> mapData= new HashMap<>();
-                mapData.put(AppConstant.ADDURL, "" + AppConstant.STYPE);
+                mapData.put(AppConstant.ADD_URL, "" + AppConstant.STYPE);
                 mapData.put(AppConstant.PID, preferenceUtil.getDataBID(AppConstant.APPPID));
                 mapData.put(AppConstant.BTYPE_,"" + AppConstant.BTYPE);
                 mapData.put(AppConstant.DTYPE_,"" + AppConstant.DTYPE);
                 mapData.put(AppConstant.TIMEZONE,"" + System.currentTimeMillis());
-                mapData.put(AppConstant.APPVERSION,"" + Util.getAppVersion(context));
+                mapData.put(AppConstant.APP_VERSION,"" + Util.getAppVersion(context));
                 mapData.put(AppConstant.OS,"" + AppConstant.SDKOS);
                 mapData.put(AppConstant.ALLOWED_,"" + AppConstant.ALLOWED);
                 mapData.put(AppConstant.ANDROID_ID,"" + Util.getAndroidId(context));
-                mapData.put(AppConstant.CHECKSDKVERSION,"" + AppConstant.SDK_VERSION);
+                mapData.put(AppConstant.CHECK_SDK_VERSION,"" + AppConstant.SDK_VERSION);
                 mapData.put(AppConstant.LANGUAGE,"" + Util.getDeviceLanguage());
                 mapData.put(AppConstant.QSDK_VERSION ,"" + AppConstant.SDK_VERSION);
                 mapData.put(AppConstant.TOKEN,"" + preferenceUtil.getStringData(AppConstant.FCM_DEVICE_TOKEN));
@@ -258,8 +258,8 @@ public class XiaomiPushReceiver extends PushMessageReceiver {
                 mapData.put(AppConstant.PACKAGE_NAME,"" + context.getPackageName());
                 mapData.put(AppConstant.SDKTYPE,"" + DATB.SDKDEF);
                 mapData.put(AppConstant.KEY_HMS,"" + preferenceUtil.getStringData(AppConstant.HMS_TOKEN));
-                mapData.put(AppConstant.ANDROIDVERSION,"" + Build.VERSION.RELEASE);
-                mapData.put(AppConstant.DEVICENAME,"" + Util.getDeviceName());
+                mapData.put(AppConstant.ANDROID_VERSION,"" + Build.VERSION.RELEASE);
+                mapData.put(AppConstant.DEVICE_NAME,"" + Util.getDeviceName());
                 if (!preferenceUtil.getStringData(AppConstant.HMS_TOKEN).isEmpty() && !preferenceUtil.getStringData(AppConstant.FCM_DEVICE_TOKEN).isEmpty() && !preferenceUtil.getStringData(AppConstant.XiaomiToken).isEmpty()) {
                     preferenceUtil.setIntData(AppConstant.CLOUD_PUSH, 3);
                 } else if (!preferenceUtil.getStringData(AppConstant.FCM_DEVICE_TOKEN).isEmpty() && !preferenceUtil.getStringData(AppConstant.XiaomiToken).isEmpty()) {

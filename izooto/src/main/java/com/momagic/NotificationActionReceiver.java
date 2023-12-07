@@ -47,7 +47,7 @@ public class NotificationActionReceiver extends BroadcastReceiver {
     private String pushType;
     private int cfg;
     String GLOBAL_ACTION_DISMISS_NOTIFICATION_SHADE = "15";
-
+    private  static  String notificationTitle;
     @SuppressLint("MissingPermission")
     @Override
     public void onReceive(Context context, Intent intent) {
@@ -55,7 +55,7 @@ public class NotificationActionReceiver extends BroadcastReceiver {
             Intent it = new Intent(GLOBAL_ACTION_DISMISS_NOTIFICATION_SHADE);
             context.sendBroadcast(it);
             getBundleData(context, intent);
-            mUrl.replace(AppConstant.BROWSERKEYID, PreferenceUtil.getInstance(context).getStringData(AppConstant.FCM_DEVICE_TOKEN));
+            mUrl.replace(AppConstant.BROWSER_KEY_ID, PreferenceUtil.getInstance(context).getStringData(AppConstant.FCM_DEVICE_TOKEN));
             getBundleData(context, intent);
             try {
                 final PreferenceUtil preferenceUtil = PreferenceUtil.getInstance(context);
@@ -300,8 +300,8 @@ public class NotificationActionReceiver extends BroadcastReceiver {
                         rid = tempBundle.getString(AppConstant.KEY_IN_RID);
                     if (tempBundle.containsKey(AppConstant.KEY_IN_CID))
                         cid = tempBundle.getString(AppConstant.KEY_IN_CID);
-                    if (tempBundle.containsKey(AppConstant.KEY_IN_BUTOON))
-                        btnCount = tempBundle.getInt(AppConstant.KEY_IN_BUTOON);
+                    if (tempBundle.containsKey(AppConstant.KEY_IN_BUTTON))
+                        btnCount = tempBundle.getInt(AppConstant.KEY_IN_BUTTON);
                     if (tempBundle.containsKey(AppConstant.KEY_IN_ADDITIONALDATA))
                         additionalData = tempBundle.getString(AppConstant.KEY_IN_ADDITIONALDATA);
                     if (tempBundle.containsKey(AppConstant.KEY_IN_PHONE))
@@ -328,6 +328,8 @@ public class NotificationActionReceiver extends BroadcastReceiver {
                         pushType = tempBundle.getString(AppConstant.PUSH);
                     if (tempBundle.containsKey(AppConstant.CFGFORDOMAIN))
                         cfg = tempBundle.getInt(AppConstant.CFGFORDOMAIN);
+                    if(tempBundle.containsKey(AppConstant.IZ_NOTIFICATION_TITLE_KEY_NAME))
+                        notificationTitle=tempBundle.getString(AppConstant.IZ_NOTIFICATION_TITLE_KEY_NAME);
                     if (tempBundle.containsKey(AppConstant.KEY_NOTIFICITON_ID)) {
                         NotificationManager notificationManager =
                                 (NotificationManager) context.getSystemService(Context.NOTIFICATION_SERVICE);
@@ -421,6 +423,7 @@ public class NotificationActionReceiver extends BroadcastReceiver {
             mapData.put("op","click");
             mapData.put(AppConstant.IZ_LANDING_URL, landingURL);
             mapData.put(AppConstant.IZ_DEEPLINK_URL, additionalData);
+            mapData.put(AppConstant.IZ_NOTIFICATION_TITLE_KEY_NAME,notificationTitle);
             if (btnCount != 0)
                 mapData.put("btn","" + btnCount);
             DebugFileManager.createExternalStoragePublic(DATB.appContext,mapData.toString(),"clickData");
@@ -438,6 +441,7 @@ public class NotificationActionReceiver extends BroadcastReceiver {
                             preferenceUtil.setStringData(AppConstant.IZ_NOTIFICATION_CLICK_OFFLINE, null);
                         }
                     } catch (Exception e) {
+
                         Util.setException(DATB.appContext,e.toString(),AppConstant.APPName_3,"notificationClickAPI");
                     }
 

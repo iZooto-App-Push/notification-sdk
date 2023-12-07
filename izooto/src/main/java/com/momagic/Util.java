@@ -433,8 +433,8 @@ public class Util {
                 mapData.put(AppConstant.EXCEPTION_, "" + exception);
                 mapData.put(AppConstant.METHOD_NAME, "" + methodName);
                 mapData.put(AppConstant.ClASS_NAME, "" + className);
-                mapData.put(AppConstant.ANDROIDVERSION, "" + Build.VERSION.RELEASE);
-                mapData.put(AppConstant.DEVICENAME, "" + Util.getDeviceName());
+                mapData.put(AppConstant.ANDROID_VERSION, "" + Build.VERSION.RELEASE);
+                mapData.put(AppConstant.DEVICE_NAME, "" + Util.getDeviceName());
                 mapData.put(AppConstant.SDK,AppConstant.SDK_VERSION);
 
                 RestClient.postRequest(RestClient.APP_EXCEPTION_URL, mapData, null, new RestClient.ResponseHandler() {

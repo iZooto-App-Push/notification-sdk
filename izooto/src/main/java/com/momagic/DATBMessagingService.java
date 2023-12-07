@@ -60,7 +60,7 @@ public class DATBMessagingService extends FirebaseMessagingService {
         }
         catch (Exception ex)
         {
-            Log.e(AppConstant.FIREBASEEXCEPTION,ex.toString());
+            Log.e(AppConstant.FIREBASE_EXCEPTION,ex.toString());
         }
 
 
@@ -99,7 +99,7 @@ public class DATBMessagingService extends FirebaseMessagingService {
 
    }
     public   void handleNow(final Map<String, String> data) {
-        Log.d(AppConstant.APP_NAME_TAG, AppConstant.NOTIFICATIONRECEIVED);
+        Log.d(AppConstant.APP_NAME_TAG, AppConstant.NOTIFICATION_RECEIVED);
         PreferenceUtil preferenceUtil =PreferenceUtil.getInstance(this);
                try {
                 if(data.get(AppConstant.AD_NETWORK) !=null || data.get(AppConstant.GLOBAL)!=null || data.get(AppConstant.GLOBAL_PUBLIC_KEY)!=null)

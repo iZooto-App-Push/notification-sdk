@@ -1,47 +1,26 @@
 package com.momagic;
 
-import android.annotation.SuppressLint;
 import android.content.Context;
 import android.content.Intent;
 import android.net.Uri;
 import android.os.Build;
 import android.os.Environment;
 import android.util.Log;
-import android.widget.Toast;
-
 import androidx.annotation.RequiresApi;
 import androidx.core.content.FileProvider;
-
-import org.json.JSONObject;
-
-import java.io.BufferedWriter;
 import java.io.File;
 import java.io.FileWriter;
-import java.io.IOException;
-import java.util.UUID;
 
 public class DebugFileManager {
-    static boolean hasPermission() {
-        return true;
 
-    }
 
-    static void createTempFolder(String folderName) {
 
-    }
 
-    static void addFileTempFolder(String folderName, File fileName, String jsonData) {
-
-    }
-
-    static boolean isFileExitNot(String folderName, File fileName) {
-        return true;
-    }
 
     @RequiresApi(api = Build.VERSION_CODES.KITKAT)
     static void createExternalStoragePublic(Context context, String data, String requestName) {
         try {
-            File outputDirectory = CheckDirectory_ExitsORNot(AppConstant.DIRECTORYNAME);
+            File outputDirectory = CheckDirectory_ExitsORNot(AppConstant.DIRECTORY_NAME);
 
             GenerateTimeStampAppData(context, outputDirectory, "pid.debug", data, requestName);
 
@@ -58,7 +37,7 @@ public class DebugFileManager {
                 String externalStorageState = Environment.getExternalStorageState();
                 if (externalStorageState.equals(Environment.MEDIA_MOUNTED)) {
 
-                    File fileDirectory = Environment.getExternalStoragePublicDirectory(AppConstant.DIRECTORYNAME);
+                    File fileDirectory = Environment.getExternalStoragePublicDirectory(AppConstant.DIRECTORY_NAME);
                     if (fileDirectory.exists() && fileDirectory.isDirectory()) {
                         // File outputDirectory = new File(fileDirectory, Util.getPackageName(DATB.appContext));
 
@@ -85,7 +64,7 @@ public class DebugFileManager {
                 String externalStorageState = Environment.getExternalStorageState();
                 if (externalStorageState.equals(Environment.MEDIA_MOUNTED)) {
 
-                    File fileDirectory = Environment.getExternalStoragePublicDirectory(AppConstant.DIRECTORYNAME);
+                    File fileDirectory = Environment.getExternalStoragePublicDirectory(AppConstant.DIRECTORY_NAME);
                     if (fileDirectory.exists() && fileDirectory.isDirectory()) {
                         if (!fileDirectory.isDirectory()) {
                         }
@@ -107,7 +86,7 @@ public class DebugFileManager {
                         fileDirectory.delete();
                     }
 
-                    File fileDirectory1 = Environment.getExternalStoragePublicDirectory(AppConstant.DIRECTORYNAME);
+                    File fileDirectory1 = Environment.getExternalStoragePublicDirectory(AppConstant.DIRECTORY_NAME);
                     fileDirectory1.delete();
                     // File outputDirectory = new File(fileDirectory, Util.getPackageName(DATB.appContext));
                     PreferenceUtil.getInstance(context).setBooleanData(AppConstant.FILE_EXIST, false);
@@ -174,10 +153,10 @@ public class DebugFileManager {
         String externalStorageState = Environment.getExternalStorageState();
         if (externalStorageState.equals(Environment.MEDIA_MOUNTED)) {
 
-            File fileDirectory = Environment.getExternalStoragePublicDirectory(AppConstant.DIRECTORYNAME);
+            File fileDirectory = Environment.getExternalStoragePublicDirectory(AppConstant.DIRECTORY_NAME);
             if (fileDirectory.exists() && fileDirectory.isDirectory()) {
                 if (android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.R) {
-                    String path = String.valueOf(Environment.getExternalStoragePublicDirectory(AppConstant.DIRECTORYNAME + "/pid.debug"));
+                    String path = String.valueOf(Environment.getExternalStoragePublicDirectory(AppConstant.DIRECTORY_NAME + "/pid.debug"));
                     File file = new File(path);
                     Uri uri = FileProvider.getUriForFile(context, context.getApplicationContext().getPackageName() + ".provider", file);
                     Intent emailIntent = new Intent(Intent.ACTION_SEND);
@@ -193,7 +172,7 @@ public class DebugFileManager {
                 }
                 else
                 {
-                    String path = String.valueOf(Environment.getExternalStoragePublicDirectory(AppConstant.DIRECTORYNAME + "/pid.debug"));
+                    String path = String.valueOf(Environment.getExternalStoragePublicDirectory(AppConstant.DIRECTORY_NAME + "/pid.debug"));
                     File file = new File(path);
 
                     Uri pngUri = Uri.fromFile(file);

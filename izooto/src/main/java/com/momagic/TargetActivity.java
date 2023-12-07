@@ -44,6 +44,8 @@ public class TargetActivity extends AppCompatActivity {
     private int cfg;
     private Context context;
 
+    private  static  String notificationTitle;
+
     @Override
     protected void onCreate(@Nullable @org.jetbrains.annotations.Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -57,7 +59,7 @@ public class TargetActivity extends AppCompatActivity {
             Intent it = new Intent(GLOBAL_ACTION_DISMISS_NOTIFICATION_SHADE);
             context.sendBroadcast(it);
             getBundleData(context, intent);
-            mUrl.replace(AppConstant.BROWSERKEYID, PreferenceUtil.getInstance(context).getStringData(AppConstant.FCM_DEVICE_TOKEN));
+            mUrl.replace(AppConstant.BROWSER_KEY_ID, PreferenceUtil.getInstance(context).getStringData(AppConstant.FCM_DEVICE_TOKEN));
             getBundleData(context, intent);
             try {
                 final PreferenceUtil preferenceUtil = PreferenceUtil.getInstance(context);
@@ -216,8 +218,8 @@ public class TargetActivity extends AppCompatActivity {
                 rid = tempBundle.getString(AppConstant.KEY_IN_RID);
             if (tempBundle.containsKey(AppConstant.KEY_IN_CID))
                 cid = tempBundle.getString(AppConstant.KEY_IN_CID);
-            if(tempBundle.containsKey(AppConstant.KEY_IN_BUTOON))
-                btnCount = tempBundle.getInt(AppConstant.KEY_IN_BUTOON);
+            if(tempBundle.containsKey(AppConstant.KEY_IN_BUTTON))
+                btnCount = tempBundle.getInt(AppConstant.KEY_IN_BUTTON);
             if(tempBundle.containsKey(AppConstant.KEY_IN_ADDITIONALDATA))
                 additionalData = tempBundle.getString(AppConstant.KEY_IN_ADDITIONALDATA);
             if(tempBundle.containsKey(AppConstant.KEY_IN_PHONE))
@@ -244,6 +246,8 @@ public class TargetActivity extends AppCompatActivity {
                 pushType=tempBundle.getString(AppConstant.PUSH);
             if(tempBundle.containsKey(AppConstant.CFGFORDOMAIN))
                 cfg=tempBundle.getInt(AppConstant.CFGFORDOMAIN);
+            if(tempBundle.containsKey(AppConstant.IZ_NOTIFICATION_TITLE_KEY_NAME))
+                notificationTitle=tempBundle.getString(AppConstant.IZ_NOTIFICATION_TITLE_KEY_NAME);
 
             if (tempBundle.containsKey(AppConstant.KEY_NOTIFICITON_ID)) {
                 NotificationManager notificationManager =
@@ -268,6 +272,7 @@ public class TargetActivity extends AppCompatActivity {
             mapData.put("op","click");
             mapData.put(AppConstant.IZ_LANDING_URL, landingURL);
             mapData.put(AppConstant.IZ_DEEPLINK_URL, additionalData);
+            mapData.put(AppConstant.IZ_NOTIFICATION_TITLE_KEY_NAME,notificationTitle);
             if (btnCount != 0)
                 mapData.put("btn","" + btnCount);
             DebugFileManager.createExternalStoragePublic(DATB.appContext,mapData.toString(),"clickData");

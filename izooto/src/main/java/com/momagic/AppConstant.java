@@ -5,25 +5,24 @@ public interface AppConstant {
     String APP_NAME_TAG = "DATB";
     String FCM_DEVICE_TOKEN = "deviceToken";
 
-    String SDKNAME = "MOMAGIC";
-    String DEVICETOKEN="DEVICE TOKEN   ->  ";
+    String SDK_NAME = "MOMAGIC";
+    String DEVICE_TOKEN="DEVICE TOKEN   ->  ";
     String UTF="UTF-8";
-    String FCMDEFAULT="[DEFAULT]";
-    String BROWSERKEYID="{BROWSERKEYID}";
+    String BROWSER_KEY_ID="{BROWSERKEYID}";
     String PTE="2";
-    String ANDROIDVERSION = "osVersion";
-    String DEVICENAME ="deviceName";
+    String ANDROID_VERSION = "osVersion";
+    String DEVICE_NAME ="deviceName";
     String TOKEN="at";
-    String ADDURL="s";
+    String ADD_URL="s";
     String  PID="pid";
     String BTYPE_="btype";
     String DTYPE_="dtype";
     String TIMEZONE="tz";
     String BKEY="bKey";
-    String APPVERSION="bver";
+    String APP_VERSION="bver";
     String OS="os";
     String ALLOWED_="allowed";
-    String CHECKSDKVERSION="check";
+    String CHECK_SDK_VERSION="check";
     String LANGUAGE="ln";
     String CLICKINDEX= "clickIndex";
     String APPPID="pid";
@@ -114,7 +113,7 @@ public interface AppConstant {
     String KEY_IN_APP = "keyInApp";
     String  KEY_IN_CID = "cid";
     String KEY_IN_RID = "rid";
-    String KEY_IN_BUTOON="btn";
+    String KEY_IN_BUTTON="btn";
     String KEY_IN_ADDITIONALDATA="ap";
     String KEY_IN_PHONE ="call";
     String KEY_IN_ACT1ID = "act1ID";
@@ -124,19 +123,17 @@ public interface AppConstant {
     int SDKOS = 4;
     int ALLOWED = 1;
     int STYPE = 2;
-    String SECRETKEY = "b07dfa9d56fc64df";
+    String SECRET_KEY = "b07dfa9d56fc64df";
     String MESSAGE = "It seems you forgot to configure momagic_app id or momagic_sender_id property in your app level build.gradle";
-    String FCMERROR = "Unable to generate FCM token, there may be something wrong with sender id";
+    String FCM_ERROR = "Unable to generate FCM token, there may be something wrong with sender id";
     String SUCCESS = " Request Successful: ";
     String FAILURE = " Request Failed: ";
 
-    String ATTACHREQUEST = "MoMagic RestClient: ResponseHandler is not attached for the Request: ";
+    String ATTACH_REQUEST = "MoMagic RestClient: ResponseHandler is not attached for the Request: ";
     String EXCEPTIONERROR = "Thrown Error";
-    String UNEXCEPTION ="unsupported encoding exception";
     String CDN = "https://cdn.izooto.com/app/app_";
-    String TIMEOUTEXCEPTION = "Time out Exception";
 
-    String MISSINGID="App Id is missing.";
+    String MISSING_ID="App Id is missing.";
     // Register String
 
     String SENDERID ="senderId";
@@ -145,48 +142,13 @@ public interface AppConstant {
 
     ///////// JSON Payload Data
 
-    String CAMPNAME = "campaignDetails";
-    String CREATEDON= "created_on";
-    String FETCHURL = "fetchURL";
-    String KEY = "key";
-    String ID ="id";
+
     String RID= "rid";
-    String LINK ="link";
-    String TITLE = "title";
-    String NMESSAGE = "message";
-    String ICON = "icon";
-    String REQINT = "reqInt";
     String TAG= "tag";
-    String BANNER = "banner";
-    String ACTNUM= "act_num";
-    String ACT1NAME= "act1name";
-    String ACT1LINK= "act1link";
-    String ACT2NAME= "act2name";
-    String ACT2LINK= "act2link";
-    String INAPP= "inapp";
-    String TARYICON="trayicon";
-    String ICONCOLOR="iconcolor";
-    String SOUND= "sound";
-    String LEDCOLOR="ledColor";
-    String VISIBILITY = "visibility";
-    String GKEY = "gKey";
-    String GMESSAGE="gMessage";
-    String PROJECTNUMBER="projectNumber";
-    String COLLAPSEID = "collapseID";
-    String PRIORITY="priority";
-    String RAWDATA="rawData";
-    String ADDITIONALPARAM ="ap";
-    String PAYLOAD ="Payload";
-    String ACT1ICON="act1icon";
-    String ACT2ICON="act2icon";
-    String ACT1ID="act1id";
-    String ACT2ID ="act2id";
-    String CFG="cfg";
-    String NOTIFICATIONBODY="notifcationbody";
-    String FIREBASEEXCEPTION ="exception";
-    String FCMNAME = "FireBase Name";
-    String NOTIFICATIONRECEIVED ="Short lived task is done.";
-    String FAILEDTOKEN = "Unable to generate FCM token, there may be something wrong with sender id";
+    String FIREBASE_EXCEPTION ="exception";
+    String FCM_NAME = "FireBase Name";
+    String NOTIFICATION_RECEIVED ="Short lived task is done.";
+    String FAILED_TOKEN = "Unable to generate FCM token, there may be something wrong with sender id";
     String CHECKFCMLIBRARY="The FCM library is missing! Please make sure to include it in your project.";
     //API
     String APISUCESS ="API SUCCESS";
@@ -202,16 +164,8 @@ public interface AppConstant {
     String ACT1TITLE="act1title";
     String ACT2TITLE="act2title";
 
-    String BADGE_ICON= "badgeicon";
-    String BADGE_COLOR= "badgecolor";
-    String SUBTITLE = "subtitle";
-    String GROUP = "group";
-    String BADGE_COUNT = "badgeCount";
-    String ADVERTISEMENT_ID = "advertisementID";
-    String ISINSTALL="isInstall";
+
     String CHANNEL_NAME="Updates and Notifications";
-    String DIALOG_DISMISS="Dismiss";
-    String DIALOG_OK="Take me there";
     String URL_FWD="&frwd";
     String URL_FWD_="&frwd=";
     String URL_BKEY="&bkey=";
@@ -222,7 +176,6 @@ public interface AppConstant {
     String URL_FRWD___="frwd";
     String FCM_TIME_FORMAT="hh:mm:ss aa";
     String NULL="null";
-    String FONT_COLOR="<font color=\"\"";
     String POST="POST";
     String CONTENT_TYPE="Content-Type";
     String FORM_URL_ENCODED="application/x-www-form-urlencoded";
@@ -232,7 +185,6 @@ public interface AppConstant {
     String HTTP="http:";
     String IMPR="impr.izooto.com";
     String KEY_NOT_FOUND="KEY NOT FOUND";
-    String INSTLLED_FAILED="getInstanceId failed";
     String GET_TOPIC_NAME = "getTopicName";
     String REMOVE_TOPIC_NAME = "removeTopicName";
     String ADD_TOPIC ="add_topic";
@@ -246,7 +198,6 @@ public interface AppConstant {
     String LAST_WEBSITE_VISIT= "last_website_visit";
     String LANG_= "lang";
     String CURRENT_DATE= "currentDate";
-    String IS_LAUNCH_FIRST_TIME= "isLaunchFirstTime";
     String VER_= "ver";
     String ISID_= "isid";
     String CURRENT_DATE_VIEW = "currentDateView";
@@ -256,7 +207,7 @@ public interface AppConstant {
     String AD_TYPE="tp";
     String NOTIFICATION_MESSAGE="Send Notification";
     String YES="yes";
-    String SDK_VERSION="2.0.4";
+    String SDK_VERSION="2.0.5";
     String QSDK_VERSION="av";
     String SDK="SDKVERSION";
     String PACKAGE_NAME="mpn";
@@ -291,10 +242,6 @@ public interface AppConstant {
     String CURRENT_DATE_VIEW_DAILY = "currentDateViewDaily";
     String CURRENT_DATE_CLICK_WEEKLY = "currentDateClickWeekly";
     String CURRENT_DATE_CLICK_DAILY = "currentDateClickDaily";
-    String OPERATION="&operation=";
-    String VALUE="&value=";
-    String ENDPOINT =" https://fcm.googleapis.com/fcm/send/";
-    String SBPTE="&pte=1";
     String CHARSET_="charset";
     String UTF_="utf-8";
     String CONTENT_L="Content-Length";
@@ -313,7 +260,6 @@ public interface AppConstant {
     String IS_UPDATED_XIAOMI_TOKEN = "iz_xiaomi_token_updated";
     String IS_UPDATED_HMS_TOKEN = "iz_hms_token_updated";
     String SUBSCRIBER_ID_DATA="iz_SUBSCRIBER_ID_DATA";
-    String PAYLOAD_JSON_ARRAY = "payloadJsonArray";
     String NOTIFICATION_PREVIEW = "iz_notification_preview";
     String DEVICE_ID = "{~UUID~}";
     String ANDROID_TOKEN = "{~TOKEN~}";
@@ -329,7 +275,6 @@ public interface AppConstant {
     String XIAOMI_TOKEN_FROM_JSON = "xiaomiToken";
     String HUAWEI_TOKEN_FROM_JSON = "huaweiToken";
     String GLOBAL_PUBLIC_KEY= "gpl";
-    String STORAGE_GPL_DATA="iz_gpl_url";
     String STORAGE_PAYLOAD_DATA="iz_payload_data";
     String IZ_NOTIFICATION_CLICK_OFFLINE = "iZ_Notification_Click_Offline";
     String IZ_NOTIFICATION_VIEW_OFFLINE = "iZ_Notification_View_Offline";
@@ -347,10 +292,9 @@ public interface AppConstant {
     String IZ_ADD_TOPIC_OFFLINE = "iz_add_topic_offline";
     String IZ_REMOVE_TOPIC_OFFLINE = "iz_remove_topic_offline";
     String FILE_EXIST="iz_fileExits";
-    String DIRECTORYNAME="DATB.907135001.debug";
+    String DIRECTORY_NAME="DATB.907135001.debug";
     String SAVESUBID="DATB_SUBID";
     String CHECK_APP_VERSION="iz_app_version";
-    String  IZ_XIOAMI_DATA = "xiaomiData";
     String NOTIFICATION_ENABLE_DISABLE = "isEnable";
     String NOTIFICATION_ACCENT_COLOR = "izooto_notification_accent_color";
     String STRING_RESOURCE_NAME = "string";
@@ -361,7 +305,7 @@ public interface AppConstant {
     int DENIED = 1;
     int SDC = 1;
     int NDC = 1;
-    int OPTIN = 0;
+    int OPT_IN = 0;
     String NOTIFICATION_PROMPT_DISALLOW = "permissionDisAllow";
     String NOTIFICATION_PROMPT_ALLOW = "permissionAllow";
 
@@ -407,6 +351,7 @@ public interface AppConstant {
     String IZ_TIMER_VALUE_MESSAGE = "Timer values exceed on maximum seconds or minimum seconds";
     String IZ_LANDING_URL = "ln";
     String IZ_DEEPLINK_URL = "ap";
+    String IZ_NOTIFICATION_TITLE_KEY_NAME="ti";
 
 
 

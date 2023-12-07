@@ -54,11 +54,12 @@ public void getToken(final Context context, final String senderId, final String 
                                             preferenceUtil.setStringData(AppConstant.CHECK_APP_VERSION,Util.getAppVersion(context));
                                             preferenceUtil.setStringData(AppConstant.CHECK_SDK_UPDATE,AppConstant.SDK_VERSION);
                                         }
+                                        Log.e("DeviceToken",token);
                                         preferenceUtil.setStringData(AppConstant.FCM_DEVICE_TOKEN, token);
                                         if (callback != null)
                                             callback.complete(token);
                                     } else {
-                                        callback.failure(AppConstant.FCMERROR);
+                                        callback.failure(AppConstant.FCM_ERROR);
                                     }
 
                                 } catch (Exception e) {
@@ -89,8 +90,8 @@ public void getToken(final Context context, final String senderId, final String 
                             .setApiKey(getAPI_KEY()) //Application Key
                             .setProjectId(get_Project_ID()) //Project ID
                             .build();
-            firebaseApp = FirebaseApp.initializeApp(DATB.appContext, firebaseOptions, AppConstant.SDKNAME);
-            Lg.d(AppConstant.FCMNAME, firebaseApp.getName());
+            firebaseApp = FirebaseApp.initializeApp(DATB.appContext, firebaseOptions, AppConstant.SDK_NAME);
+            Lg.d(AppConstant.FCM_NAME, firebaseApp.getName());
         } else {
             Log.w("SDK ","missing google-service.json file");
         }

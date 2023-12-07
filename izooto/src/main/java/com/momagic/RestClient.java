@@ -180,7 +180,7 @@ public class RestClient {
                     if (responseHandler != null) {
                         callResponseHandlerOnSuccess(responseHandler, json);
                     } else
-                        Lg.w(AppConstant.APP_NAME_TAG, AppConstant.ATTACHREQUEST);
+                        Lg.w(AppConstant.APP_NAME_TAG, AppConstant.ATTACH_REQUEST);
                 } else {
                     retry++;
                     delay = true;
@@ -200,7 +200,7 @@ public class RestClient {
                         if (responseHandler != null) {
                             callResponseHandlerOnFailure(responseHandler, httpResponse, json, null);
                         } else
-                            Lg.w(AppConstant.APP_NAME_TAG, AppConstant.ATTACHREQUEST);
+                            Lg.w(AppConstant.APP_NAME_TAG, AppConstant.ATTACH_REQUEST);
                     }
                 }
             } catch (Throwable t) {
@@ -214,7 +214,7 @@ public class RestClient {
                     if (responseHandler != null)
                         callResponseHandlerOnFailure(responseHandler, httpResponse, null, t);
                     else
-                        Lg.w(AppConstant.APP_NAME_TAG, AppConstant.ATTACHREQUEST);
+                        Lg.w(AppConstant.APP_NAME_TAG, AppConstant.ATTACH_REQUEST);
                 }
             } finally {
                 if (con != null)

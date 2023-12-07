@@ -69,7 +69,7 @@ public class NotificationPermission extends Activity {
                         mapData.put(AppConstant.KEY_HMS, "" + preferenceUtil.getStringData(AppConstant.HMS_TOKEN));
                         mapData.put(AppConstant.TIMEZONE, "" + System.currentTimeMillis());
                         mapData.put(AppConstant.GE_, "" + AppConstant.GE);
-                        mapData.put(AppConstant.OPTIN_, "" + AppConstant.OPTIN);
+                        mapData.put(AppConstant.OPTIN_, "" + AppConstant.OPT_IN);
                         mapData.put(AppConstant.NDC_, "" + AppConstant.NDC);
                         mapData.put(AppConstant.SDC_, "" + AppConstant.SDC);
                         mapData.put(AppConstant.ALLOWED_, "" + AppConstant.ALLOWED);
@@ -121,7 +121,7 @@ public class NotificationPermission extends Activity {
                         mapData.put(AppConstant.KEY_HMS, "" + preferenceUtil.getStringData(AppConstant.HMS_TOKEN));
                         mapData.put(AppConstant.TIMEZONE, "" + System.currentTimeMillis());
                         mapData.put(AppConstant.GE_, "" + AppConstant.GE);
-                        mapData.put(AppConstant.OPTIN_, "" + AppConstant.OPTIN);
+                        mapData.put(AppConstant.OPTIN_, "" + AppConstant.OPT_IN);
                         mapData.put(AppConstant.NDC_, "" + AppConstant.NDC);
                         mapData.put(AppConstant.SDC_, "" + AppConstant.SDC);
                         mapData.put(AppConstant.DENIED_, "" + AppConstant.DENIED);
