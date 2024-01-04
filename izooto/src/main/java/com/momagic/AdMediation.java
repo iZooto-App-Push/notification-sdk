@@ -166,7 +166,7 @@ public class AdMediation {
                 }
             } catch (Exception ex) {
                 DebugFileManager.createExternalStoragePublic(DATB.appContext,"JSONException"+ex,"[Log.e]->AdMediation");
-                Util.setException(context, ex.toString(), "AdMediation", "getJSONData"); // handle one time
+                Util.handleExceptionOnce(context, ex.toString(), "AdMediation", "getJSONData"); // handle one time
             }
         }
     }
@@ -253,11 +253,11 @@ public class AdMediation {
                                 {
                                     payload.setRid(jsonObject.optString(ShortpayloadConstant.RID));
                                 }
-                                payload.setFetchURL(jsonObject.optString(ShortpayloadConstant.FETCHURL).replace("~", ""));
-                                payload.setLink(jsonObject.optString(ShortpayloadConstant.LINK).replace("~", ""));
-                                payload.setTitle(jsonObject.optString(ShortpayloadConstant.TITLE).replace("~", ""));
-                                payload.setMessage(jsonObject.optString(ShortpayloadConstant.NMESSAGE).replace("~", ""));
-                                payload.setIcon(jsonObject.optString(ShortpayloadConstant.ICON).replace("~", ""));
+                                payload.setFetchURL(jsonObject.optString(ShortpayloadConstant.FETCHURL));
+                                payload.setLink(jsonObject.optString(ShortpayloadConstant.LINK));
+                                payload.setTitle(jsonObject.optString(ShortpayloadConstant.TITLE));
+                                payload.setMessage(jsonObject.optString(ShortpayloadConstant.NMESSAGE));
+                                payload.setIcon(jsonObject.optString(ShortpayloadConstant.ICON));
                                 if(globalPayloadObject.has(ShortpayloadConstant.REQINT))
                                 {
                                     payload.setReqInt(globalPayloadObject.optInt(ShortpayloadConstant.REQINT));
@@ -267,10 +267,10 @@ public class AdMediation {
                                 }
                                 if(globalPayloadObject.has(ShortpayloadConstant.TAG))
                                 {
-                                    payload.setTag(globalPayloadObject.optString(ShortpayloadConstant.TAG).replace("~", ""));
+                                    payload.setTag(globalPayloadObject.optString(ShortpayloadConstant.TAG));
                                 }else
                                 {
-                                    payload.setTag(jsonObject.optString(ShortpayloadConstant.TAG).replace("~", ""));
+                                    payload.setTag(jsonObject.optString(ShortpayloadConstant.TAG));
                                 }
                                 if(globalPayloadObject.has(ShortpayloadConstant.ACT1NAME))
                                 {
@@ -282,39 +282,39 @@ public class AdMediation {
                                 }
                                 if(globalPayloadObject.has(ShortpayloadConstant.ACT1LINK))
                                 {
-                                    payload.setAct1link(globalPayloadObject.optString(ShortpayloadConstant.ACT1LINK).replace("~", ""));
+                                    payload.setAct1link(globalPayloadObject.optString(ShortpayloadConstant.ACT1LINK));
                                 }
                                 else {
-                                    payload.setAct1link(jsonObject.optString(ShortpayloadConstant.ACT1LINK).replace("~", ""));
+                                    payload.setAct1link(jsonObject.optString(ShortpayloadConstant.ACT1LINK));
                                 }
-                                payload.setBanner(jsonObject.optString(ShortpayloadConstant.BANNER).replace("~", ""));
+                                payload.setBanner(jsonObject.optString(ShortpayloadConstant.BANNER));
                                 payload.setAct_num(jsonObject.optInt(ShortpayloadConstant.ACTNUM));
                                 payload.setBadgeicon(jsonObject.optString(ShortpayloadConstant.BADGE_ICON));
                                 payload.setBadgecolor(jsonObject.optString(ShortpayloadConstant.BADGE_COLOR));
-                                payload.setSubTitle(jsonObject.optString(ShortpayloadConstant.SUBTITLE).replace("~", ""));
+                                payload.setSubTitle(jsonObject.optString(ShortpayloadConstant.SUBTITLE));
                                 payload.setGroup(jsonObject.optInt(ShortpayloadConstant.GROUP));
                                 payload.setBadgeCount(jsonObject.optInt(ShortpayloadConstant.BADGE_COUNT));
                                 // Button 1
-                                payload.setAct1icon(jsonObject.optString(ShortpayloadConstant.ACT1ICON).replace("~", ""));
-                                payload.setAct1ID(jsonObject.optString(ShortpayloadConstant.ACT1ID).replace("~", ""));
+                                payload.setAct1icon(jsonObject.optString(ShortpayloadConstant.ACT1ICON));
+                                payload.setAct1ID(jsonObject.optString(ShortpayloadConstant.ACT1ID));
                                 // Button 2
                                 payload.setAct2name(jsonObject.optString(ShortpayloadConstant.ACT2NAME));
                                 payload.setAct2link(jsonObject.optString(ShortpayloadConstant.ACT2LINK));
                                 payload.setAct2icon(jsonObject.optString(ShortpayloadConstant.ACT2ICON));
                                 payload.setAct2ID(jsonObject.optString(ShortpayloadConstant.ACT2ID));
                                 payload.setInapp(jsonObject.optInt(ShortpayloadConstant.INAPP));
-                                payload.setTrayicon(jsonObject.optString(ShortpayloadConstant.TARYICON).replace("~", ""));
-                                payload.setSmallIconAccentColor(jsonObject.optString(ShortpayloadConstant.ICONCOLOR).replace("~", ""));
-                                payload.setSound(jsonObject.optString(ShortpayloadConstant.SOUND).replace("~", ""));
-                                payload.setLedColor(jsonObject.optString(ShortpayloadConstant.LEDCOLOR).replace("~", ""));
+                                payload.setTrayicon(jsonObject.optString(ShortpayloadConstant.TARYICON));
+                                payload.setSmallIconAccentColor(jsonObject.optString(ShortpayloadConstant.ICONCOLOR));
+                                payload.setSound(jsonObject.optString(ShortpayloadConstant.SOUND));
+                                payload.setLedColor(jsonObject.optString(ShortpayloadConstant.LEDCOLOR));
                                 payload.setLockScreenVisibility(jsonObject.optInt(ShortpayloadConstant.VISIBILITY));
-                                payload.setGroupKey(jsonObject.optString(ShortpayloadConstant.GKEY).replace("~", ""));
-                                payload.setGroupMessage(jsonObject.optString(ShortpayloadConstant.GMESSAGE).replace("~", ""));
-                                payload.setFromProjectNumber(jsonObject.optString(ShortpayloadConstant.PROJECTNUMBER).replace("~", ""));
-                                payload.setCollapseId(jsonObject.optString(ShortpayloadConstant.COLLAPSEID).replace("~", ""));
+                                payload.setGroupKey(jsonObject.optString(ShortpayloadConstant.GKEY));
+                                payload.setGroupMessage(jsonObject.optString(ShortpayloadConstant.GMESSAGE));
+                                payload.setFromProjectNumber(jsonObject.optString(ShortpayloadConstant.PROJECTNUMBER));
+                                payload.setCollapseId(jsonObject.optString(ShortpayloadConstant.COLLAPSEID));
                                 payload.setPriority(jsonObject.optInt(ShortpayloadConstant.PRIORITY));
-                                payload.setRawPayload(jsonObject.optString(ShortpayloadConstant.RAWDATA).replace("~", ""));
-                                payload.setAp(jsonObject.optString(ShortpayloadConstant.ADDITIONALPARAM).replace("~", ""));
+                                payload.setRawPayload(jsonObject.optString(ShortpayloadConstant.RAWDATA));
+                                payload.setAp(jsonObject.optString(ShortpayloadConstant.ADDITIONALPARAM));
                                 if(globalPayloadObject.has(ShortpayloadConstant.CFG)) {
                                     payload.setCfg(globalPayloadObject.optInt(ShortpayloadConstant.CFG));
                                 }else
@@ -323,11 +323,11 @@ public class AdMediation {
                                 }
                                 payload.setPush_type(AppConstant.PUSH_FCM);
                                 payload.setPublic_global_key(url);
-                                payload.setSound(jsonObject.optString(ShortpayloadConstant.NOTIFICATION_SOUND).replace("~", ""));
+                                payload.setSound(jsonObject.optString(ShortpayloadConstant.SOUND));
                                 payload.setMaxNotification(jsonObject.optInt(ShortpayloadConstant.MAX_NOTIFICATION));
-                                payload.setFallBackDomain(jsonObject.optString(ShortpayloadConstant.FALL_BACK_DOMAIN).replace("~", ""));
-                                payload.setFallBackSubDomain(jsonObject.optString(ShortpayloadConstant.FALLBACK_SUB_DOMAIN).replace("~", ""));
-                                payload.setFallBackPath(jsonObject.optString(ShortpayloadConstant.FAll_BACK_PATH).replace("~", ""));
+                                payload.setFallBackDomain(jsonObject.optString(ShortpayloadConstant.FALL_BACK_DOMAIN));
+                                payload.setFallBackSubDomain(jsonObject.optString(ShortpayloadConstant.FALLBACK_SUB_DOMAIN));
+                                payload.setFallBackPath(jsonObject.optString(ShortpayloadConstant.FAll_BACK_PATH));
                                 DebugFileManager.createExternalStoragePublic(DATB.appContext,response,"gpl_payload");
 
                                 if (payload.getTitle() != null && !payload.getTitle().isEmpty()) {
@@ -350,7 +350,7 @@ public class AdMediation {
                             }
                         } catch (Exception ex) {
                             DebugFileManager.createExternalStoragePublic(DATB.appContext,ex.toString(),"[Log.e]->globalPayload");
-                            Util.setException(DATB.appContext, ex.toString(), "globalPayload", "AdMediation");// handle exception one time
+                            Util.handleExceptionOnce(DATB.appContext, ex.toString(), "globalPayload", "AdMediation");// handle exception one time
                         }
                     }
 
@@ -369,7 +369,7 @@ public class AdMediation {
                         String jsonData = getObjectData.optString("PayloadData");
                         JSONObject jsonObject = new JSONObject(jsonData.replace("\n",""));
                         if (jsonObject != null) {
-                            payload.setCreated_Time(globalPayloadObject.optString(ShortpayloadConstant.CREATEDON).replace("~", ""));
+                            payload.setCreated_Time(globalPayloadObject.optString(ShortpayloadConstant.CREATEDON));
                             if(globalPayloadObject.has(ShortpayloadConstant.CREATEDON)) {
                                 payload.setCreated_Time(globalPayloadObject.optString(ShortpayloadConstant.CREATEDON));
                             }else {
@@ -394,12 +394,12 @@ public class AdMediation {
                                 payload.setRid(jsonObject.optString(ShortpayloadConstant.RID));
                             }
 
-                            payload.setFetchURL(jsonObject.optString(ShortpayloadConstant.FETCHURL).replace("~", ""));
+                            payload.setFetchURL(jsonObject.optString(ShortpayloadConstant.FETCHURL));
 
-                            payload.setLink(jsonObject.optString(ShortpayloadConstant.LINK).replace("~", ""));
-                            payload.setTitle(jsonObject.optString(ShortpayloadConstant.TITLE).replace("~", ""));
-                            payload.setMessage(jsonObject.optString(ShortpayloadConstant.NMESSAGE).replace("~", ""));
-                            payload.setIcon(jsonObject.optString(ShortpayloadConstant.ICON).replace("~", ""));
+                            payload.setLink(jsonObject.optString(ShortpayloadConstant.LINK));
+                            payload.setTitle(jsonObject.optString(ShortpayloadConstant.TITLE));
+                            payload.setMessage(jsonObject.optString(ShortpayloadConstant.NMESSAGE));
+                            payload.setIcon(jsonObject.optString(ShortpayloadConstant.ICON));
                             if(globalPayloadObject.has(ShortpayloadConstant.REQINT))
                             {
                                 payload.setReqInt(globalPayloadObject.optInt(ShortpayloadConstant.REQINT));
@@ -409,10 +409,10 @@ public class AdMediation {
                             }
                             if(globalPayloadObject.has(ShortpayloadConstant.TAG))
                             {
-                                payload.setTag(globalPayloadObject.optString(ShortpayloadConstant.TAG).replace("~", ""));
+                                payload.setTag(globalPayloadObject.optString(ShortpayloadConstant.TAG));
                             }else
                             {
-                                payload.setTag(jsonObject.optString(ShortpayloadConstant.TAG).replace("~", ""));
+                                payload.setTag(jsonObject.optString(ShortpayloadConstant.TAG));
                             }
                             if(globalPayloadObject.has(ShortpayloadConstant.ACT1NAME))
                             {
@@ -424,43 +424,43 @@ public class AdMediation {
                             }
                             if(globalPayloadObject.has(ShortpayloadConstant.ACT1LINK))
                             {
-                                payload.setAct1link(globalPayloadObject.optString(ShortpayloadConstant.ACT1LINK).replace("~", ""));
+                                payload.setAct1link(globalPayloadObject.optString(ShortpayloadConstant.ACT1LINK));
 
                             }
                             else
                             {
-                                payload.setAct1link(jsonObject.optString(ShortpayloadConstant.ACT1LINK).replace("~", ""));
+                                payload.setAct1link(jsonObject.optString(ShortpayloadConstant.ACT1LINK));
 
                             }
-                            payload.setBanner(jsonObject.optString(ShortpayloadConstant.BANNER).replace("~", ""));
+                            payload.setBanner(jsonObject.optString(ShortpayloadConstant.BANNER));
                             payload.setAct_num(jsonObject.optInt(ShortpayloadConstant.ACTNUM));
                             payload.setBadgeicon(jsonObject.optString(ShortpayloadConstant.BADGE_ICON));
                             payload.setBadgecolor(jsonObject.optString(ShortpayloadConstant.BADGE_COLOR));
-                            payload.setSubTitle(jsonObject.optString(ShortpayloadConstant.SUBTITLE).replace("~", ""));
+                            payload.setSubTitle(jsonObject.optString(ShortpayloadConstant.SUBTITLE));
                             payload.setGroup(jsonObject.optInt(ShortpayloadConstant.GROUP));
                             payload.setBadgeCount(jsonObject.optInt(ShortpayloadConstant.BADGE_COUNT));
                             // Button 1
-                            payload.setAct1icon(jsonObject.optString(ShortpayloadConstant.ACT1ICON).replace("~", ""));
-                            payload.setAct1ID(jsonObject.optString(ShortpayloadConstant.ACT1ID).replace("~", ""));
+                            payload.setAct1icon(jsonObject.optString(ShortpayloadConstant.ACT1ICON));
+                            payload.setAct1ID(jsonObject.optString(ShortpayloadConstant.ACT1ID));
                             // Button 2
-                            payload.setAct2name(jsonObject.optString(ShortpayloadConstant.ACT2NAME).replace("~", ""));
-                            payload.setAct2link(jsonObject.optString(ShortpayloadConstant.ACT2LINK).replace("~", ""));
-                            payload.setAct2icon(jsonObject.optString(ShortpayloadConstant.ACT2ICON).replace("~", ""));
-                            payload.setAct2ID(jsonObject.optString(ShortpayloadConstant.ACT2ID).replace("~", ""));
+                            payload.setAct2name(jsonObject.optString(ShortpayloadConstant.ACT2NAME));
+                            payload.setAct2link(jsonObject.optString(ShortpayloadConstant.ACT2LINK));
+                            payload.setAct2icon(jsonObject.optString(ShortpayloadConstant.ACT2ICON));
+                            payload.setAct2ID(jsonObject.optString(ShortpayloadConstant.ACT2ID));
 
                             payload.setInapp(jsonObject.optInt(ShortpayloadConstant.INAPP));
-                            payload.setTrayicon(jsonObject.optString(ShortpayloadConstant.TARYICON).replace("~", ""));
-                            payload.setSmallIconAccentColor(jsonObject.optString(ShortpayloadConstant.ICONCOLOR).replace("~", ""));
-                            payload.setSound(jsonObject.optString(ShortpayloadConstant.SOUND).replace("~", ""));
-                            payload.setLedColor(jsonObject.optString(ShortpayloadConstant.LEDCOLOR).replace("~", ""));
+                            payload.setTrayicon(jsonObject.optString(ShortpayloadConstant.TARYICON));
+                            payload.setSmallIconAccentColor(jsonObject.optString(ShortpayloadConstant.ICONCOLOR));
+                            payload.setSound(jsonObject.optString(ShortpayloadConstant.SOUND));
+                            payload.setLedColor(jsonObject.optString(ShortpayloadConstant.LEDCOLOR));
                             payload.setLockScreenVisibility(jsonObject.optInt(ShortpayloadConstant.VISIBILITY));
-                            payload.setGroupKey(jsonObject.optString(ShortpayloadConstant.GKEY).replace("~", ""));
-                            payload.setGroupMessage(jsonObject.optString(ShortpayloadConstant.GMESSAGE).replace("~", ""));
-                            payload.setFromProjectNumber(jsonObject.optString(ShortpayloadConstant.PROJECTNUMBER).replace("~", ""));
-                            payload.setCollapseId(jsonObject.optString(ShortpayloadConstant.COLLAPSEID).replace("~", ""));
+                            payload.setGroupKey(jsonObject.optString(ShortpayloadConstant.GKEY));
+                            payload.setGroupMessage(jsonObject.optString(ShortpayloadConstant.GMESSAGE));
+                            payload.setFromProjectNumber(jsonObject.optString(ShortpayloadConstant.PROJECTNUMBER));
+                            payload.setCollapseId(jsonObject.optString(ShortpayloadConstant.COLLAPSEID));
                             payload.setPriority(jsonObject.optInt(ShortpayloadConstant.PRIORITY));
-                            payload.setRawPayload(jsonObject.optString(ShortpayloadConstant.RAWDATA).replace("~", ""));
-                            payload.setAp(jsonObject.optString(ShortpayloadConstant.ADDITIONALPARAM).replace("~", ""));
+                            payload.setRawPayload(jsonObject.optString(ShortpayloadConstant.RAWDATA));
+                            payload.setAp(jsonObject.optString(ShortpayloadConstant.ADDITIONALPARAM));
                             if(globalPayloadObject.has(ShortpayloadConstant.CFG)) {
                                 payload.setCfg(globalPayloadObject.optInt(ShortpayloadConstant.CFG));
                             }else
@@ -469,11 +469,11 @@ public class AdMediation {
                             }
                             payload.setPush_type(AppConstant.PUSH_FCM);
                             payload.setPublic_global_key(url);
-                            payload.setSound(jsonObject.optString(ShortpayloadConstant.NOTIFICATION_SOUND).replace("~", ""));
+                            payload.setSound(jsonObject.optString(ShortpayloadConstant.NOTIFICATION_SOUND));
                             payload.setMaxNotification(jsonObject.optInt(ShortpayloadConstant.MAX_NOTIFICATION));
-                            payload.setFallBackDomain(jsonObject.optString(ShortpayloadConstant.FALL_BACK_DOMAIN).replace("~", ""));
-                            payload.setFallBackSubDomain(jsonObject.optString(ShortpayloadConstant.FALLBACK_SUB_DOMAIN).replace("~", ""));
-                            payload.setFallBackPath(jsonObject.optString(ShortpayloadConstant.FAll_BACK_PATH).replace("~", ""));
+                            payload.setFallBackDomain(jsonObject.optString(ShortpayloadConstant.FALL_BACK_DOMAIN));
+                            payload.setFallBackSubDomain(jsonObject.optString(ShortpayloadConstant.FALLBACK_SUB_DOMAIN));
+                            payload.setFallBackPath(jsonObject.optString(ShortpayloadConstant.FAll_BACK_PATH));
                             Log.v(AppConstant.NOTIFICATION_MESSAGE, "YES");
                             if (payload.getTitle() != null && !payload.getTitle().isEmpty()) {
                                 DATB.processNotificationReceived(DATB.appContext,payload);
@@ -1227,7 +1227,6 @@ public class AdMediation {
                 finalData.put("bids",jsonArray);
                 dataValue=finalData.toString().replaceAll("\\\\", " ");
                 mediationImpression(dataValue,0);
-                // NotificationEventManager.receiveAds(payload1);
                 NotificationEventManager.notificationPreview(DATB.appContext,payload1);
                 PreferenceUtil preferenceUtil = PreferenceUtil.getInstance(DATB.appContext);
                 if(Build.VERSION.SDK_INT>=Build.VERSION_CODES.S) {
@@ -1291,7 +1290,7 @@ public class AdMediation {
                 String data2=preferenceUtil.getStringData("iz_AdMediation_EXCEPTION_AdType_14");
                 if (!data2.equalsIgnoreCase(Util.getTime())) {
                     preferenceUtil.setStringData("iz_AdMediation_EXCEPTION_AdType_14", Util.getTime());
-                    Util.setException(DATB.appContext, "PayloadError"+ex+payload.getRid(), "AdMediation", "ShowClickAndImpressionData");
+                    Util.handleExceptionOnce(DATB.appContext, "PayloadError"+ex+payload.getRid(), "AdMediation", "ShowClickAndImpressionData");
 
                 }
             }
@@ -1404,7 +1403,7 @@ public class AdMediation {
                             else
                                 jsonObject1 = jsonObject.getJSONObject(linkArray[0]).getJSONObject(linkArray[1]).getJSONArray(linkArray1[0]).getJSONObject(Integer.parseInt(linkArray1[1].replace("]", "")));
 
-                            return jsonObject1.getString(linkArray[3]);
+                            return jsonObject1.optString(linkArray[3]);
 
                         }
 
@@ -1424,12 +1423,12 @@ public class AdMediation {
                     }
                     else
                     {
-                        jsonObject.getString(sourceString);
+                        jsonObject.optString(sourceString);
                     }
 
 
                 } else {
-                    return jsonObject.getString(sourceString);
+                    return jsonObject.optString(sourceString);
                 }
             }
         } catch (Exception e) {

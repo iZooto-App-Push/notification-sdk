@@ -98,6 +98,14 @@ public class Payload {
     private String expiryTimerValue;
     private String makeStickyNotification;
 
+
+    private String otherChannel;
+
+    // Notification Channel
+    private String  channel;
+    private String vibration;
+    private int badge;
+
     //////////////////////////////////////////////
 
     private int cfg;
@@ -659,5 +667,37 @@ public class Payload {
 
     public void setMakeStickyNotification(String makeStickyNotification) {
         this.makeStickyNotification = makeStickyNotification;
+    }
+
+    public String getOtherChannel() {
+        return otherChannel;
+    }
+
+    public void setOtherChannel(String otherChannel) {
+        this.otherChannel = otherChannel;
+    }
+
+    public String getChannel() {
+        return channel;
+    }
+
+    public void setChannel(String channel) {
+        this.channel = channel;
+    }
+
+    public String getVibration() {
+        return vibration;
+    }
+
+    public void setVibration(String vibration) {
+        this.vibration = vibration;
+    }
+
+    public int getBadge() {
+        return badge;
+    }
+
+    public void setBadge(int badge) {
+        this.badge = badge;
     }
 }

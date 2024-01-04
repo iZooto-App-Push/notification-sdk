@@ -155,8 +155,8 @@ public class Util {
 
     }
     public static String getAndroidId(Context mContext) {
-        String android_id = Settings.Secure.getString(mContext.getContentResolver(), Settings.Secure.ANDROID_ID);
-        System.out.print("android_id" + android_id);
+        @SuppressLint("HardwareIds") String android_id = Settings.Secure.getString(mContext.getContentResolver(), Settings.Secure.ANDROID_ID);
+        Log.v("android_id",android_id);
         return android_id;
     }
 
@@ -692,6 +692,37 @@ public class Util {
     static boolean enableSticky(Payload payload){
         return payload.getMakeStickyNotification() != null &&
                 !payload.getMakeStickyNotification().isEmpty() && payload.getMakeStickyNotification().equals("1");
+    }
+
+    // parse vibration pattern
+    static long[] parseVibrationPattern(Object patternObj) {
+        try {
+            JSONArray jsonVibArray;
+            if (patternObj instanceof String) {
+                jsonVibArray = new JSONArray((String) patternObj);
+            }
+            else {
+                jsonVibArray = (JSONArray) patternObj;
+            }
+            long[] longArray = new long[jsonVibArray.length()];
+            for (int i = 0; i < jsonVibArray.length(); i++) {
+                longArray[i] = jsonVibArray.optLong(i);
+            }
+            return longArray;
+        } catch (JSONException e) {
+            e.printStackTrace();
+        }
+        return null;
+    }
+
+    // To Handle Exception once
+    static void handleExceptionOnce(Context context, String exception, String className, String methodName){
+        PreferenceUtil preferenceUtil = PreferenceUtil.getInstance(context);
+        if(!preferenceUtil.getBoolean(methodName)){
+            setException(context, exception, className, methodName);
+            preferenceUtil.setBooleanData(methodName, true);
+        }
+        DebugFileManager.createExternalStoragePublic(context, exception + " " +methodName, "[Log.e]-> "+className);
     }
 }
 

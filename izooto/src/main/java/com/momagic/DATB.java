@@ -1133,8 +1133,7 @@ public class DATB {
                         }
                     } catch (Exception ex) {
                         DebugFileManager.createExternalStoragePublic(DATB.appContext, "Payload" + ex.toString() + data.toString(), "[Log.e]->Exception->");
-
-                        Util.setException(context, ex.toString() + "PayloadError" + data.toString(), "DATBMessagingService", "handleNow");
+                        Util.handleExceptionOnce(context, ex.toString() + "PayloadError" + data.toString(), "DATBMessagingService", "handleNow");
                     }
 
                 } else {
@@ -1147,7 +1146,7 @@ public class DATB {
                         AdMediation.getMediationData(context, jsonObject1, "fcm", "");
                         preferenceUtil.setBooleanData(AppConstant.MEDIATION, true);
                     } catch (Exception ex) {
-                        Util.setException(context, ex + "PayloadError" + data.toString(), "DATBMessagingService", "handleNow");
+                        Util.handleExceptionOnce(context, ex + "PayloadError" + data.toString(), "DATBMessagingService", "handleNow");
                         DebugFileManager.createExternalStoragePublic(DATB.appContext, "Payload Error" + ex + data.toString(), "[Log.e]->Exception->");
 
                     }
@@ -1189,25 +1188,33 @@ public class DATB {
                     payload.setInapp(payloadObj.optInt(ShortpayloadConstant.INAPP));
                     payload.setTrayicon(payloadObj.optString(ShortpayloadConstant.TARYICON));
                     payload.setSmallIconAccentColor(payloadObj.optString(ShortpayloadConstant.ICONCOLOR));
-                    payload.setSound(payloadObj.optString(ShortpayloadConstant.SOUND));
-                    payload.setLedColor(payloadObj.optString(ShortpayloadConstant.LEDCOLOR));
-                    payload.setLockScreenVisibility(payloadObj.optInt(ShortpayloadConstant.VISIBILITY));
                     payload.setGroupKey(payloadObj.optString(ShortpayloadConstant.GKEY));
                     payload.setGroupMessage(payloadObj.optString(ShortpayloadConstant.GMESSAGE));
                     payload.setFromProjectNumber(payloadObj.optString(ShortpayloadConstant.PROJECTNUMBER));
                     payload.setCollapseId(payloadObj.optString(ShortpayloadConstant.COLLAPSEID));
-                    payload.setPriority(payloadObj.optInt(ShortpayloadConstant.PRIORITY));
                     payload.setRawPayload(payloadObj.optString(ShortpayloadConstant.RAWDATA));
                     payload.setAp(payloadObj.optString(ShortpayloadConstant.ADDITIONALPARAM));
                     payload.setCfg(payloadObj.optInt(ShortpayloadConstant.CFG));
-                    payload.setTime_to_live(payloadObj.optString(ShortpayloadConstant.TIME_TO_LIVE));
                     payload.setPush_type(AppConstant.PUSH_FCM);
-                    payload.setSound(payloadObj.optString(ShortpayloadConstant.NOTIFICATION_SOUND));
                     payload.setMaxNotification(payloadObj.optInt(ShortpayloadConstant.MAX_NOTIFICATION));
+                    payload.setFallBackDomain(payloadObj.optString(ShortpayloadConstant.FALL_BACK_DOMAIN));
+                    payload.setFallBackSubDomain(payloadObj.optString(ShortpayloadConstant.FALLBACK_SUB_DOMAIN));
+                    payload.setFallBackPath(payloadObj.optString(ShortpayloadConstant.FAll_BACK_PATH));
                     payload.setDefaultNotificationPreview(payloadObj.optInt(ShortpayloadConstant.TEXTOVERLAY));
+                    payload.setNotification_bg_color(payloadObj.optString(ShortpayloadConstant.BGCOLOR));
                     payload.setExpiryTimerValue(payloadObj.optString(ShortpayloadConstant.EXPIRY_TIMER_VALUE));
                     payload.setMakeStickyNotification(payloadObj.optString(ShortpayloadConstant.MAKE_STICKY_NOTIFICATION));
 
+
+                    // Notification Channel .............
+                    payload.setLockScreenVisibility(payloadObj.optInt(ShortpayloadConstant.VISIBILITY));
+                    payload.setLedColor(payloadObj.optString(ShortpayloadConstant.LEDCOLOR));
+                    payload.setChannel(payloadObj.optString(ShortpayloadConstant.NOTIFICATION_CHANNEL));
+                    payload.setVibration(payloadObj.optString(ShortpayloadConstant.VIBRATION));
+                    payload.setBadge(payloadObj.optInt(ShortpayloadConstant.BADGE));
+                    payload.setOtherChannel(payloadObj.optString(ShortpayloadConstant.OTHER_CHANNEL));
+                    payload.setSound(payloadObj.optString(ShortpayloadConstant.SOUND));
+                    payload.setPriority(payloadObj.optInt(ShortpayloadConstant.PRIORITY));
                 } else {
                     String updateDaily = NotificationEventManager.getDailyTime(context);
                     if (!updateDaily.equalsIgnoreCase(Util.getTime())) {
@@ -1234,7 +1241,7 @@ public class DATB {
         } catch (Exception e) {
             DebugFileManager.createExternalStoragePublic(DATB.appContext, "Payload Error" + e + data.toString(), "[Log.e]->Exception->");
 
-            Util.setException(context, e.toString(), TAG, "handleNotification");
+            Util.handleExceptionOnce(context, e.toString(), TAG, "handleNotification");
         }
     }
 
@@ -1270,7 +1277,7 @@ public class DATB {
                 topicApi(AppConstant.ADD_TOPIC, topicList);
             }
         } else {
-            Util.setException(DATB.appContext, "Topic list should not be  blank", AppConstant.APP_NAME_TAG, "AddTag");
+            Util.handleExceptionOnce(DATB.appContext, "Topic list should not be  blank", AppConstant.APP_NAME_TAG, "AddTag");
         }
     }
 
@@ -1307,7 +1314,7 @@ public class DATB {
                 topicApi(AppConstant.REMOVE_TOPIC, topicList);
             }
         } else {
-            Util.setException(DATB.appContext, "Topic list should not be  blank", AppConstant.APP_NAME_TAG, "RemoveTag");
+            Util.handleExceptionOnce(DATB.appContext, "Topic list should not be  blank", AppConstant.APP_NAME_TAG, "RemoveTag");
 
         }
     }
@@ -1372,7 +1379,7 @@ public class DATB {
                 }
             }
         } catch (Exception e) {
-            Util.setException(appContext, e.toString(), "topicApi", AppConstant.APP_NAME_TAG);
+            Util.handleExceptionOnce(appContext, e.toString(), "topicApi", AppConstant.APP_NAME_TAG);
         }
     }
 
@@ -1399,7 +1406,7 @@ public class DATB {
             if (application_id != null)
                 return application_id;
         } catch (Exception ex) {
-            Util.setException(DATB.appContext, ex.toString(), "DATB", "getAppID");
+            Util.handleExceptionOnce(DATB.appContext, ex.toString(), "DATB", "getAppID");
             return "";
         }
         return "";
@@ -1454,7 +1461,7 @@ public class DATB {
                 } catch (Exception ex) {
                     DebugFileManager.createExternalStoragePublic(DATB.appContext, "Last Visit" + ex, "[Log.e]->LastVisit->");
 
-                    Util.setException(context, ex.toString(), TAG, "lastVisitAPI");
+                    Util.handleExceptionOnce(context, ex.toString(), TAG, "lastVisitAPI");
 
 
                 }
@@ -1489,7 +1496,7 @@ public class DATB {
         } else {
             DebugFileManager.createExternalStoragePublic(DATB.appContext, "setDefaultTemplate" + "Template id is not matched" + templateID, "[Log.V]->setDefaultTemplate->");
 
-            Util.setException(appContext, "Template id is not matched" + templateID, AppConstant.APP_NAME_TAG, "setDefaultTemplate");
+            Util.handleExceptionOnce(appContext, "Template id is not matched" + templateID, AppConstant.APP_NAME_TAG, "setDefaultTemplate");
         }
 
     }
@@ -1583,7 +1590,7 @@ public class DATB {
                                 }
                             }
                         } else {
-                            Util.setException(context, "Please put huawei token...", "initialize", AppConstant.APP_NAME_TAG);
+                            Util.handleExceptionOnce(context, "Please put huawei token...", "initialize", AppConstant.APP_NAME_TAG);
                         }
                     }
                     preferenceUtil.setBooleanData(AppConstant.CAN_GENERATE_FCM_TOKEN, true);
@@ -1594,7 +1601,7 @@ public class DATB {
                                 preferenceUtil.setStringData(AppConstant.FCM_DEVICE_TOKEN, fcmToken);
                             }
                         } else {
-                            Util.setException(context, "Please put fcm token...", "initialize", AppConstant.APP_NAME_TAG);
+                            Util.handleExceptionOnce(context, "Please put fcm token...", "initialize", AppConstant.APP_NAME_TAG);
                         }
                     }
 
@@ -1607,7 +1614,7 @@ public class DATB {
                                 preferenceUtil.setStringData(AppConstant.XiaomiToken, xiaomiToken);
                             }
                         } else {
-                            Util.setException(context, "Please put xiaomi token...", "initialize", AppConstant.APP_NAME_TAG);
+                            Util.handleExceptionOnce(context, "Please put xiaomi token...", "initialize", AppConstant.APP_NAME_TAG);
                         }
                     }
                     return new DATB.Builder(context);
@@ -1622,7 +1629,7 @@ public class DATB {
             }
 
         } catch (Exception e) {
-            Util.setException(context, e.toString(), "initialize", AppConstant.APP_NAME_TAG);
+            Util.handleExceptionOnce(context, e.toString(), "initialize", AppConstant.APP_NAME_TAG);
             e.printStackTrace();
         }
         return null;

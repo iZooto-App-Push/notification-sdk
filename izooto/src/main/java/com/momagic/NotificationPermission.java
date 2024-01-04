@@ -144,7 +144,7 @@ public class NotificationPermission extends Activity {
 
             } catch (Exception ex) {
                 if (context != null) {
-                    Util.setException(context, ex.toString(), AppConstant.APP_NAME_TAG, "permissionDisallow");
+                    Util.handleExceptionOnce(context, ex.toString(), AppConstant.APP_NAME_TAG, "permissionDisallow");
                     DebugFileManager.createExternalStoragePublic(context, "permissionDisallow" + ex, "[Log.e]->Exception->");
                 }
             }

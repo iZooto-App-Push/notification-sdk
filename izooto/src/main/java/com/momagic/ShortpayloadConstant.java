@@ -1,7 +1,6 @@
 package com.momagic;
 
 public interface ShortpayloadConstant {
-    String CAMPNAME = "cd";
     String CREATEDON= "ct";
     String FETCHURL = "fu";
     String KEY = "k";
@@ -27,14 +26,10 @@ public interface ShortpayloadConstant {
     String INAPP= "ia";
     String TARYICON="ti"; //tray icon
     String ICONCOLOR="ic";// icon color
-    String SOUND= "su";//sound
-    String LEDCOLOR="lc"; // led color
-    String VISIBILITY = "vi"; //visibilty
     String GKEY = "gk";
     String GMESSAGE="gm";
     String PROJECTNUMBER="pn";// project nUmber
     String COLLAPSEID = "ci";// collapseID
-    String PRIORITY="pi";
     String RAWDATA="rawData";
     String ADDITIONALPARAM ="ap";
     String PAYLOAD ="Payload";
@@ -58,22 +53,24 @@ public interface ShortpayloadConstant {
     String TIME_OUT="to";
     String AD_TIME_OUT="to";
     String TIME_TO_LIVE="tl";
-    String NOTIFICATION_SOUND="su";
+    String NOTIFICATION_SOUND="s";
     String MAX_NOTIFICATION="mn";
     String TEXTOVERLAY="nt";
     String BGCOLOR="nbc";
-
-    String NOTIFICATION_CHANNEL="chnl";
-    String VIBRATION = "vib";
-    String BADGE = "bdg";
-    String OTHER_CHANNEL = "oth_chnl";
-    String FLOOR_PRICE="fp";
-
-    String PERSISTENT_NOTIFICATION = "pn";
-    String NOTIFICATION_PAYLOAD = "p";
-
     String EXPIRY_TIMER_VALUE ="et";
     String MAKE_STICKY_NOTIFICATION ="ri";
+
+    // ....... Notification Channel feature ....... // updated channel Payload
+
+    String NOTIFICATION_CHANNEL="c";
+    String OTHER_CHANNEL = "oth_chnl";
+    String VIBRATION = "vb";
+    String BADGE = "bdg";
+    String PRIORITY="p";
+    String SOUND= "s";//sound
+    String LEDCOLOR="lc"; // led color
+    String VISIBILITY = "v"; // visibility
+
 
 
 

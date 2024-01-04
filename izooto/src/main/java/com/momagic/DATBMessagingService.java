@@ -210,19 +210,14 @@ public class DATBMessagingService extends FirebaseMessagingService {
                         payload.setInapp(payloadObj.optInt(ShortpayloadConstant.INAPP));
                         payload.setTrayicon(payloadObj.optString(ShortpayloadConstant.TARYICON));
                         payload.setSmallIconAccentColor(payloadObj.optString(ShortpayloadConstant.ICONCOLOR));
-                        payload.setSound(payloadObj.optString(ShortpayloadConstant.SOUND));
-                        payload.setLedColor(payloadObj.optString(ShortpayloadConstant.LEDCOLOR));
-                        payload.setLockScreenVisibility(payloadObj.optInt(ShortpayloadConstant.VISIBILITY));
                         payload.setGroupKey(payloadObj.optString(ShortpayloadConstant.GKEY));
                         payload.setGroupMessage(payloadObj.optString(ShortpayloadConstant.GMESSAGE));
                         payload.setFromProjectNumber(payloadObj.optString(ShortpayloadConstant.PROJECTNUMBER));
                         payload.setCollapseId(payloadObj.optString(ShortpayloadConstant.COLLAPSEID));
-                        payload.setPriority(payloadObj.optInt(ShortpayloadConstant.PRIORITY));
                         payload.setRawPayload(payloadObj.optString(ShortpayloadConstant.RAWDATA));
                         payload.setAp(payloadObj.optString(ShortpayloadConstant.ADDITIONALPARAM));
                         payload.setCfg(payloadObj.optInt(ShortpayloadConstant.CFG));
                         payload.setPush_type(AppConstant.PUSH_FCM);
-                        payload.setSound(payloadObj.optString(ShortpayloadConstant.NOTIFICATION_SOUND));
                         payload.setMaxNotification(payloadObj.optInt(ShortpayloadConstant.MAX_NOTIFICATION));
                         payload.setFallBackDomain(payloadObj.optString(ShortpayloadConstant.FALL_BACK_DOMAIN));
                         payload.setFallBackSubDomain(payloadObj.optString(ShortpayloadConstant.FALLBACK_SUB_DOMAIN));
@@ -231,6 +226,19 @@ public class DATBMessagingService extends FirebaseMessagingService {
                         payload.setNotification_bg_color(payloadObj.optString(ShortpayloadConstant.BGCOLOR));
                         payload.setExpiryTimerValue(payloadObj.optString(ShortpayloadConstant.EXPIRY_TIMER_VALUE));
                         payload.setMakeStickyNotification(payloadObj.optString(ShortpayloadConstant.MAKE_STICKY_NOTIFICATION));
+
+
+                        // Notification Channel .............
+                        payload.setLockScreenVisibility(payloadObj.optInt(ShortpayloadConstant.VISIBILITY));
+                        payload.setLedColor(payloadObj.optString(ShortpayloadConstant.LEDCOLOR));
+                        payload.setChannel(payloadObj.optString(ShortpayloadConstant.NOTIFICATION_CHANNEL));
+                        payload.setVibration(payloadObj.optString(ShortpayloadConstant.VIBRATION));
+                        payload.setBadge(payloadObj.optInt(ShortpayloadConstant.BADGE));
+                        payload.setOtherChannel(payloadObj.optString(ShortpayloadConstant.OTHER_CHANNEL));
+                        payload.setSound(payloadObj.optString(ShortpayloadConstant.SOUND));
+                        payload.setPriority(payloadObj.optInt(ShortpayloadConstant.PRIORITY));
+
+
                     } else {
                         String updateDaily=NotificationEventManager.getDailyTime(this);
                         if (!updateDaily.equalsIgnoreCase(Util.getTime())) {

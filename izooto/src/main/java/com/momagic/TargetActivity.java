@@ -201,7 +201,7 @@ public class TargetActivity extends AppCompatActivity {
                         }
 
                     } catch (Exception ex) {
-                        Util.setException(DATB.appContext,ex.toString(),AppConstant.APPName_3,"LandingURL issues"+mUrl);
+                        Util.handleExceptionOnce(DATB.appContext,ex.toString(),AppConstant.APPName_3,"LandingURL issues"+mUrl);
                     }
                 }
             }
@@ -290,7 +290,7 @@ public class TargetActivity extends AppCompatActivity {
                             preferenceUtil.setStringData(AppConstant.IZ_NOTIFICATION_CLICK_OFFLINE, null);
                         }
                     } catch (Exception e) {
-                        Util.setException(DATB.appContext,e.toString(),AppConstant.APPName_3,"notificationClickAPI");
+                        Util.handleExceptionOnce(DATB.appContext,e.toString(),AppConstant.APPName_3,"notificationClickAPI");
                     }
 
                 }
@@ -307,7 +307,7 @@ public class TargetActivity extends AppCompatActivity {
                             Util.trackClickOffline(context, clkURL, AppConstant.IZ_NOTIFICATION_CLICK_OFFLINE, rid, cid, btnCount);
                         }
                     } catch (Exception e) {
-                        Util.setException(DATB.appContext,e.toString(),AppConstant.APPName_3,"notificationClickAPI->onFailure");
+                        Util.handleExceptionOnce(DATB.appContext,e.toString(),AppConstant.APPName_3,"notificationClickAPI->onFailure");
                     }
                 }
             });
@@ -324,7 +324,7 @@ public class TargetActivity extends AppCompatActivity {
                         } else
                             Util.trackClickOffline(context, clkURL, AppConstant.IZ_NOTIFICATION_CLICK_OFFLINE, rid, cid, btnCount);
                     } catch (Exception e) {
-                        Util.setException(DATB.appContext,e.toString(),AppConstant.APPName_3,"notificationClickAPI");
+                        Util.handleExceptionOnce(DATB.appContext,e.toString(),AppConstant.APPName_3,"notificationClickAPI");
                     }
                 }
 
@@ -339,14 +339,14 @@ public class TargetActivity extends AppCompatActivity {
 
                         }
                     } catch (Exception e) {
-                        Util.setException(DATB.appContext,e.toString(),AppConstant.APPName_3,"notificationClickAPI");
+                        Util.handleExceptionOnce(DATB.appContext,e.toString(),AppConstant.APPName_3,"notificationClickAPI");
                     }
                 }
             });
 
 
         } catch (Exception e) {
-            Util.setException(context, e.toString(), "notificationClickAPI", "NotificationActionReceiver");
+            Util.handleExceptionOnce(context, e.toString(), "notificationClickAPI", "NotificationActionReceiver");
         }
     }
     static void lastClickAPI(Context context, String lciURL, String rid, int i){
@@ -401,7 +401,7 @@ public class TargetActivity extends AppCompatActivity {
                 }
             });
         } catch (Exception e) {
-            Util.setException(context, e.toString(), "lastClickAPI", "NotificationActionReceiver");
+            Util.handleExceptionOnce(context, e.toString(), "lastClickAPI", "NotificationActionReceiver");
         }
 
     }
@@ -424,7 +424,6 @@ public class TargetActivity extends AppCompatActivity {
     static void callMediationClicks(final String medClick, int cNUmber) {
         try {
             if(!medClick.isEmpty()) {
-                Log.e("MediationClick",medClick);
                 DebugFileManager.createExternalStoragePublic(DATB.appContext,medClick,"mediationClick");
                 JSONObject jsonObject = new JSONObject(medClick);
                 RestClient.postRequest(RestClient.MEDIATION_CLICKS, null,jsonObject, new RestClient.ResponseHandler() {
@@ -494,7 +493,7 @@ public class TargetActivity extends AppCompatActivity {
                 context.startActivity(intentAppLaunch);
             }
         } catch (PackageManager.NameNotFoundException e) {
-            Util.setException(context,e.toString(),AppConstant.APPName_3,"launch App");
+            Util.handleExceptionOnce(context,e.toString(),AppConstant.APPName_3,"launch App");
 
         }
     }

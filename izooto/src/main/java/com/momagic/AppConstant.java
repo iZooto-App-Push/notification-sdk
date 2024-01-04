@@ -4,7 +4,6 @@ package com.momagic;
 public interface AppConstant {
     String APP_NAME_TAG = "DATB";
     String FCM_DEVICE_TOKEN = "deviceToken";
-
     String SDK_NAME = "MOMAGIC";
     String DEVICE_TOKEN="DEVICE TOKEN   ->  ";
     String UTF="UTF-8";
@@ -95,17 +94,9 @@ public interface AppConstant {
     String BUTTON_TITLE_2 ="button2Title";
     String BUTTON_URL_2 ="button2URL";
     String ACTION_TYPE ="actionType";
-    String NOTIFICATION_ ="Notification";
-    String INAPPALERT ="InAppAlert";
-    String DEFAULT_ICON ="default";
     int GE = 1;
 
-
     String DATAB_APP_ID = "momagic_app_id";
-
-    String ACTION_BTN_ONE = "actionBtnOne";
-    String ACTION_BTN_TWO = "actionBtnTwo";
-    int NOTIFICAITON_REQ_CODE = 101;
     String KEY_WEB_URL = "WEB_URL";
     String KEY_NOTIFICITON_ID = "keyNotificationId";
     String IS_TOKEN_UPDATED = "isTokenUpdated";
@@ -207,7 +198,7 @@ public interface AppConstant {
     String AD_TYPE="tp";
     String NOTIFICATION_MESSAGE="Send Notification";
     String YES="yes";
-    String SDK_VERSION="2.0.5";
+    String SDK_VERSION="2.1.0";
     String QSDK_VERSION="av";
     String SDK="SDKVERSION";
     String PACKAGE_NAME="mpn";
@@ -353,6 +344,18 @@ public interface AppConstant {
     String IZ_DEEPLINK_URL = "ap";
     String IZ_NOTIFICATION_TITLE_KEY_NAME="ti";
 
+    /*...........NotificationChannel............*/
+    String NOTIFICATION_CHANNEL_ID = "i";
+    String NOTIFICATION_CHANNEL_NAME = "n";
+    String NOTIFICATION_CHANNEL_GROUP_ID = "gi";
+    String NOTIFICATION_CHANNEL_GROUP_NAME = "gn";
+    String NOTIFICATION_CHANNEL_DESCRIPTION = "d";
+    String NOTIFICATION_CHANNEL_BYPASSDND = "chnl_bdnd";
+    String NOTIFICATION_CHANNEL_DELETE_ID = "delchnl_id";
+    String NOTIFICATION_CHANNEL_DELETE_GROUP_ID = "delgrp_id";
+    String CUSTOM_CHANNEL_CURRENT_DATE= "customChannelCurrentDate";
+    String IZ_LIMIT_EXCEED_MSG = "Limit exceed; cannot create more channels";
+    String IZ_NOTIFICATION_CHANNEL = "Notification Channel";
 
 
 }

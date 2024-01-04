@@ -69,7 +69,7 @@ public class NotificationDismissedReceiver extends BroadcastReceiver {
             } catch (Exception e) {
                 if (!preferenceUtil.getBoolean(AppConstant.DISMISSED)){
                     preferenceUtil.setBooleanData(AppConstant.DISMISSED,true);
-                    Util.setException(context, e.toString(), TAG, AppConstant.IZ_LISTENER_ERROR);
+                    Util.handleExceptionOnce(context, e.toString(), TAG, AppConstant.IZ_LISTENER_ERROR);
                 }
                 DebugFileManager.createExternalStoragePublic(context, TAG + e, "[Log.e]->Exception->");
             }

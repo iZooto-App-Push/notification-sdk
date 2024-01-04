@@ -44,9 +44,8 @@ import java.util.TreeMap;
 
 public class NotificationEventManager {
     public static Bitmap notificationIcon, notificationBanner;//,act1Icon,act2Icon;
-    private static int icon;
     private static  int badgeColor;
-    private static int priority,lockScreenVisibility;
+    private static int priority;
     private static boolean addCheck;
     private static String lastView_Click="0";
     private static boolean isCheck;
@@ -469,7 +468,7 @@ public class NotificationEventManager {
                             if (linkArray[2].contains("[")) {
                                 String[] linkArray1 = linkArray[2].split("\\[");
                                 jsonObject1 = jsonObject.getJSONObject(linkArray[0]).getJSONObject(linkArray[1]).getJSONArray(linkArray1[0]).getJSONObject(Integer.parseInt(linkArray1[1].replace("]", "")));
-                                return jsonObject1.getString(linkArray[3]);
+                                return jsonObject1.optString(linkArray[3]);
 
                             }
                         }
@@ -522,7 +521,7 @@ public class NotificationEventManager {
                             else
                                 jsonObject1 = jsonObject.getJSONObject(linkArray[0]).getJSONObject(linkArray[1]).getJSONArray(linkArray1[0]).getJSONObject(Integer.parseInt(linkArray1[1].replace("]", "")));
 
-                            return jsonObject1.getString(linkArray[3]);
+                            return jsonObject1.optString(linkArray[3]);
 
                         }
 
@@ -542,12 +541,12 @@ public class NotificationEventManager {
                     }
                     else
                     {
-                        jsonObject.getString(sourceString);
+                        jsonObject.optString(sourceString);
                     }
 
 
                 } else
-                    return jsonObject.getString(sourceString);
+                    return jsonObject.optString(sourceString);
             }
         } catch (Exception e) {
             DebugFileManager.createExternalStoragePublic(DATB.appContext,e.toString(),"[Log-> e]->fetcherPayloadResponse");
@@ -598,14 +597,21 @@ public class NotificationEventManager {
                 badgeCountUpdate(payload.getBadgeCount());
 
 
-                String channelId = DATB.appContext.getString(R.string.default_notification_channel_id);
+                PreferenceUtil preferenceUtil = PreferenceUtil.getInstance(DATB.appContext);
+
+                // create channel and get channelId
+                NotificationManager notificationManager =
+                        (NotificationManager) DATB.appContext.getSystemService(Context.NOTIFICATION_SERVICE);
+                String channelId = DATBNotificationChannelHandler.createNotificationChannel(DATB.appContext, notificationManager, payload);
+
+
+
                 NotificationCompat.Builder notificationBuilder = null;
                 Notification summaryNotification = null;
                 int SUMMARY_ID = 0;
                 Intent intent = null;
 
                 badgeColor = getBadgeColor(payload.getBadgecolor());
-                lockScreenVisibility = setLockScreenVisibility(payload.getLockScreenVisibility());
 
                 intent = notificationClick(payload, payload.getLink(),payload.getAct1link(),payload.getAct2link(),AppConstant.NO,clickIndex,lastView_Click,100,0);
 
@@ -620,26 +626,19 @@ public class NotificationEventManager {
                             PendingIntent.FLAG_ONE_SHOT | PendingIntent.FLAG_IMMUTABLE);
                 }
 
-                Uri uri = Util.getSoundUri(DATB.appContext, DATB.soundID);
-
                 notificationBuilder = new NotificationCompat.Builder(DATB.appContext, channelId)
                         .setSmallIcon(getDefaultSmallIconId())
                         .setContentTitle(payload.getTitle())
                         .setContentText(payload.getMessage())
                         .setContentIntent(pendingIntent)
                         .setOngoing(Util.enableSticky(payload)) /*    Notification sticky   */
-                        .setVisibility(lockScreenVisibility)
                         .setAutoCancel(true);
                 try {
                     BigInteger accentColor = Util.getAccentColor();
                     if (accentColor != null)
                         notificationBuilder.setColor(accentColor.intValue());
                 } catch (Throwable t) {}
-                if (uri != null) {
-                    notificationBuilder.setSound(uri);
-                } else {
-                    notificationBuilder.setDefaults(NotificationCompat.DEFAULT_LIGHTS | NotificationCompat.DEFAULT_SOUND).setVibrate(new long[]{1000, 1000});
-                }
+
 
 
                 if (!(Build.VERSION.SDK_INT >= Build.VERSION_CODES.O)){
@@ -680,8 +679,7 @@ public class NotificationEventManager {
                 if (payload.getBadgecolor()!=null&&!payload.getBadgecolor().isEmpty()){
                     notificationBuilder.setColor(badgeColor);
                 }
-                if(payload.getLedColor()!=null && !payload.getLedColor().isEmpty())
-                    notificationBuilder.setColor(Color.parseColor(payload.getLedColor()));
+
                 if (notificationIcon != null)
                     notificationBuilder.setLargeIcon(notificationIcon);
                 else if (notificationBanner != null)
@@ -703,8 +701,6 @@ public class NotificationEventManager {
                             .bigLargeIcon(notificationIcon).setSummaryText(Util.makeBlackString(payload.getMessage())));
                 }
 
-                NotificationManager notificationManager =
-                        (NotificationManager) DATB.appContext.getSystemService(Context.NOTIFICATION_SERVICE);
                 int notificationId;
                 if (payload.getTag()!=null && !payload.getTag().isEmpty())
                     notificationId = Util.convertStringToDecimal(payload.getTag());
@@ -758,7 +754,6 @@ public class NotificationEventManager {
                     notificationBuilder.addAction(action2);
                 }
                 try {
-                    PreferenceUtil preferenceUtil = PreferenceUtil.getInstance(DATB.appContext);
                     if (payload.getMakeStickyNotification() != null && !payload.getMakeStickyNotification().isEmpty() && payload.getMakeStickyNotification().equals("1")) {
                         preferenceUtil.setStringData(AppConstant.TP_TYPE, AppConstant.TYPE_P);
                         Intent btn3 = NotificationPreview.dismissedNotification(payload, notificationId, 3);
@@ -782,42 +777,12 @@ public class NotificationEventManager {
                 }
 
 
-                assert notificationManager != null;
-                if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
-                    NotificationChannel channel;
-                    if (payload.getPriority()==0) {
-                        priority = NotificationManagerCompat.IMPORTANCE_HIGH;
-                        channel = new NotificationChannel(channelId,
-                                Util.getChannelName(DATB.appContext), priority);
-                    }else {
 
-                        priority = priorityForImportance(payload.getPriority());
-                        channel = new NotificationChannel(channelId,
-                                Util.getChannelName(DATB.appContext), priority);
-                    }
-                    if(DATB.soundID!=null) {
-                        priority = NotificationManagerCompat.IMPORTANCE_HIGH;
-                        channel = new NotificationChannel(channelId,
-                                Util.getChannelName(DATB.appContext), priority);
-                        if (uri != null)
-                            channel.setSound(uri, null);
-                        else
-                            channel.setSound(null, null);
-                    }
-                    else
-                    {
-                        channel.setSound(null, null);
-
-                    }
-
-                    notificationManager.createNotificationChannel(channel);
-                }
                 if (Build.VERSION.SDK_INT > Build.VERSION_CODES.LOLLIPOP_MR1) {
                     if (payload.getGroup() == 1) {
                         notificationManager.notify(SUMMARY_ID, summaryNotification);
                     }
                 }
-
                 notificationManager.notify(notificationId, notificationBuilder.build());
                 try {
 
@@ -873,7 +838,6 @@ public class NotificationEventManager {
 
     // multiple line title notification preview
      static void receivedNotification(final Payload payload){
-       // if(payload.getTitle()!= "" && !payload.getTitle().isEmpty()) {
             final Handler handler = new Handler(Looper.getMainLooper());
             final Runnable notificationRunnable = new Runnable() {
                 @SuppressLint("LaunchActivityFromNotification")
@@ -904,17 +868,18 @@ public class NotificationEventManager {
                     }
 
                     badgeCountUpdate(payload.getBadgeCount());
-                    String channelId = DATB.appContext.getString(R.string.default_notification_channel_id);
+                    // create channel and get channelId
+                    NotificationManager notificationManager =
+                            (NotificationManager) DATB.appContext.getSystemService(Context.NOTIFICATION_SERVICE);
+                    String channelId = DATBNotificationChannelHandler.createNotificationChannel(DATB.appContext, notificationManager, payload);
+
+
                     NotificationCompat.Builder notificationBuilder = null;
                     Notification summaryNotification = null;
                     int SUMMARY_ID = 0;
                     Intent intent = null;
-
                     badgeColor = getBadgeColor(payload.getBadgecolor());
-                    lockScreenVisibility = setLockScreenVisibility(payload.getLockScreenVisibility());
-
                     intent = notificationClick(payload, payload.getLink(), payload.getAct1link(), payload.getAct2link(), AppConstant.NO, clickIndex, lastView_Click, 100, 0);
-                   // Uri defaultSoundUri = RingtoneManager.getDefaultUri(RingtoneManager.TYPE_NOTIFICATION);
 
                     PendingIntent pendingIntent = null;
                     // support Android 12+
@@ -1007,7 +972,6 @@ public class NotificationEventManager {
                             }
                         }
                     }
-                    Uri uri = Util.getSoundUri(DATB.appContext, DATB.soundID);
 
                     notificationBuilder = new NotificationCompat.Builder(DATB.appContext, channelId)
                             .setSmallIcon(getDefaultSmallIconId())
@@ -1015,7 +979,6 @@ public class NotificationEventManager {
                             .setContentText(payload.getMessage())
                             .setContentIntent(pendingIntent)
                             .setOngoing(Util.enableSticky(payload)) /*    Notification sticky   */
-                            .setVisibility(lockScreenVisibility)
                             .setStyle(new NotificationCompat.DecoratedCustomViewStyle())
                             .setCustomContentView(collapsedView)
                             .setCustomBigContentView(expandedView)
@@ -1026,11 +989,7 @@ public class NotificationEventManager {
                         if (accentColor != null)
                             notificationBuilder.setColor(accentColor.intValue());
                     } catch (Throwable t) {}
-                    if (uri != null) {
-                        notificationBuilder.setSound(uri);
-                    } else {
-                        notificationBuilder.setDefaults(NotificationCompat.DEFAULT_LIGHTS | NotificationCompat.DEFAULT_SOUND).setVibrate(new long[]{1000, 1000});
-                    }
+
 
 
                     if (Build.VERSION.SDK_INT <= Build.VERSION_CODES.M) {
@@ -1098,11 +1057,7 @@ public class NotificationEventManager {
                     if (payload.getBadgecolor() != null && !payload.getBadgecolor().isEmpty()) {
                         notificationBuilder.setColor(badgeColor);
                     }
-                    if (payload.getLedColor() != null && !payload.getLedColor().isEmpty())
-                        notificationBuilder.setColor(Color.parseColor(payload.getLedColor()));
 
-                    NotificationManager notificationManager =
-                            (NotificationManager) DATB.appContext.getSystemService(Context.NOTIFICATION_SERVICE);
 
                     int notificationID;
                     if (payload.getTag() != null && !payload.getTag().isEmpty())
@@ -1166,38 +1121,6 @@ public class NotificationEventManager {
                     }catch (Exception e){
                         // Handle the exceptions here
                     }
-
-
-
-
-                    assert notificationManager != null;
-                    if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
-                        NotificationChannel channel;
-                        if (payload.getPriority() == 0) {
-                            priority = NotificationManagerCompat.IMPORTANCE_HIGH;
-                            channel = new NotificationChannel(channelId,
-                                    Util.getChannelName(DATB.appContext), priority);
-                        } else {
-
-                            priority = priorityForImportance(payload.getPriority());
-                            channel = new NotificationChannel(channelId,
-                                    Util.getChannelName(DATB.appContext), priority);
-                        }
-                        if (DATB.soundID != null) {
-                            priority = NotificationManagerCompat.IMPORTANCE_HIGH;
-                            channel = new NotificationChannel(channelId,
-                                    Util.getChannelName(DATB.appContext), priority);
-                            if (uri != null)
-                                channel.setSound(uri, null);
-                            else
-                                channel.setSound(null, null);
-                        } else {
-                            channel.setSound(null, null);
-
-                        }
-
-                        notificationManager.createNotificationChannel(channel);
-                    }
                     if (Build.VERSION.SDK_INT > Build.VERSION_CODES.LOLLIPOP_MR1) {
                         if (payload.getGroup() == 1) {
                             notificationManager.notify(SUMMARY_ID, summaryNotification);
@@ -1205,8 +1128,6 @@ public class NotificationEventManager {
                     }
                     notificationManager.notify(notificationID, notificationBuilder.build());
                     try {
-
-
                         if (lastView_Click.equalsIgnoreCase("1") || lastSeventhIndex.equalsIgnoreCase("1")) {
                             lastViewNotificationApi(payload, lastView_Click, lastSeventhIndex, lastNinthIndex);
                         }
@@ -1248,11 +1169,7 @@ public class NotificationEventManager {
                     }
                 }
             });
-//        }
-//        else
-//        {
-//            Util.setException(DATB.appContext,"Payload error  Payload title->"+payload.getTitle()+"->Campaign ID ->"+payload.getId()+"->Rid->"+payload.getRid(),"NotificationEvent Manager","receivedNotification");
-//        }
+
     }
 
 
@@ -1434,7 +1351,7 @@ public class NotificationEventManager {
             });
         } catch (Exception e) {
             DebugFileManager.createExternalStoragePublic(DATB.appContext,"impressionNotificationApi"+e.toString(),"[Log.V]->NotificationEventManager->");
-            Util.setException(DATB.appContext,e+"RID"+rid+"CID"+cid,AppConstant.APPName_2,"impressionNotification");
+            Util.handleExceptionOnce(DATB.appContext,e+"RID"+rid+"CID"+cid,AppConstant.APPName_2,"impressionNotification");
         }
 
     }
@@ -1466,7 +1383,7 @@ public class NotificationEventManager {
             });
         } catch (Exception e) {
             DebugFileManager.createExternalStoragePublic(DATB.appContext,"impressionNotificationApi"+e.toString(),"[Log.V]->NotificationEventManager->");
-            Util.setException(DATB.appContext,e+"RID"+payload.getRid()+"CID"+payload.getId(),AppConstant.APPName_2,"impressionNotification");
+            Util.handleExceptionOnce(DATB.appContext,e+"RID"+payload.getRid()+"CID"+payload.getId(),AppConstant.APPName_2,"impressionNotification");
         }
     }
      static String getPhone(String getActLink){
