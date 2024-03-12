@@ -1,0 +1,153 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:id="@+id/swipe_layout"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:background="@color/iz_news_hub_bg"
+    android:orientation="vertical">
+
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginStart="10dp"
+        android:layout_marginEnd="10dp"
+        android:layout_marginTop="15dp"
+        android:orientation="vertical">
+
+
+        <androidx.cardview.widget.CardView
+            android:layout_width="match_parent"
+            android:layout_height="200dp"
+            app:cardCornerRadius="16dp"
+            app:cardElevation="0dp">
+
+            <ImageView
+                android:id="@+id/nt_banner_image"
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                android:background="@color/iz_notificationBg"
+                android:contentDescription="@string/todo"
+                android:scaleType="fitXY" />
+        </androidx.cardview.widget.CardView>
+
+
+        <TextView
+            android:id="@+id/nt_title"
+            style="@style/TextAppearance.Compat.Notification.Title"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="10dp"
+            android:textAlignment="viewStart"
+            android:text="@string/title"
+            android:textColor="@color/iz_news_hub_text_color"
+            android:maxLines="3"
+            android:textSize="17dp" />
+
+
+    </LinearLayout>
+
+    <RelativeLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="0dp"
+        android:layout_marginStart="10dp">
+
+        <androidx.cardview.widget.CardView
+            android:id="@+id/circle_card"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_centerVertical="true"
+            app:cardCornerRadius="25dp"
+            app:cardPreventCornerOverlap="false">
+
+            <ImageView
+                android:id="@+id/circle_icon"
+                android:layout_width="17dp"
+                android:layout_height="17dp"
+                android:contentDescription="@string/todo"
+                android:scaleType="fitXY"
+                android:visibility="gone"
+                />
+
+        </androidx.cardview.widget.CardView>
+
+        <TextView
+            android:id="@+id/publisher_"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_toEndOf="@id/circle_card"
+            android:singleLine="true"
+            android:layout_marginStart="5dp"
+            android:layout_centerVertical="true"
+            android:text="Publisher"
+            android:textColor="@color/iz_news_hub_time_color"
+            android:textSize="13dp"
+            tools:ignore="RelativeOverlap" />
+
+        <TextView
+            android:id="@+id/news_hub_time"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_toEndOf="@+id/publisher_"
+            android:singleLine="true"
+            android:layout_marginStart="5dp"
+            android:layout_centerVertical="true"
+            android:text="@string/_1_hr_ago"
+            android:textColor="@color/iz_news_hub_time_color"
+            android:textSize="13dp"
+            tools:ignore="RelativeOverlap" />
+
+        <RelativeLayout
+            android:layout_width="125dp"
+            android:layout_height="wrap_content"
+            android:layout_alignParentEnd="true">
+
+            <ImageView
+                android:id="@+id/like_icon"
+                android:layout_width="40dp"
+                android:layout_height="40dp"
+                android:layout_centerVertical="true"
+                android:layout_centerHorizontal="true"
+                android:contentDescription="@string/todo"
+                android:padding="11dp"
+                android:visibility="gone"
+                android:scaleType="fitCenter" />
+
+            <ImageView
+                android:id="@+id/news_hub_share_icon"
+                android:layout_width="40dp"
+                android:layout_height="40dp"
+                android:layout_centerVertical="true"
+                android:layout_alignParentEnd="true"
+                android:contentDescription="@string/todo"
+                android:scaleType="fitCenter"
+                android:background="@drawable/iz_circle"
+                android:padding="11dp"
+                android:src="@drawable/ic_baseline_share_25" />
+
+            <!--            <ImageView-->
+            <!--                android:id="@+id/more_icon"-->
+            <!--                android:layout_width="40dp"-->
+            <!--                android:layout_height="40dp"-->
+            <!--                android:layout_alignParentEnd="true"-->
+            <!--                android:layout_centerVertical="true"-->
+            <!--                android:background="@drawable/circle"-->
+            <!--                android:contentDescription="@string/todo"-->
+            <!--                android:scaleType="fitCenter"-->
+            <!--                android:padding="11dp"-->
+            <!--                android:src="@drawable/baseline_more_vert_24" />-->
+
+        </RelativeLayout>
+
+    </RelativeLayout>
+
+    <View
+        android:id="@+id/news_hub_view"
+        android:layout_width="match_parent"
+        android:layout_height="0.4dp"
+        android:background="@color/dawn"/>
+
+</LinearLayout>

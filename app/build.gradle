@@ -2,7 +2,7 @@ apply plugin: 'com.android.application'
 
 android {
 
-    compileSdkVersion 33
+    compileSdk 34
     defaultConfig {
 
         targetSdkVersion 33
@@ -43,7 +43,10 @@ android {
 dependencies {
     implementation project(path: ':izooto')
     implementation 'androidx.appcompat:appcompat:1.6.1'
-    implementation "androidx.browser:browser:1.4.0"
+    implementation "androidx.browser:browser:1.8.0"
+    implementation "androidx.multidex:multidex:2.0.1"
+    implementation 'com.google.android.material:material:1.6.0'
+    compileOnly 'com.github.bumptech.glide:glide:4.16.0'
 
 
     implementation 'androidx.constraintlayout:constraintlayout:2.1.4'

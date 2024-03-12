@@ -11,4 +11,8 @@
     <string name="iz_title_name" translatable="false">Title</string>
     <string name="iz_cta_dismissed">Close</string>
     <string name="todo" translatable="false">TODO</string>
+    <string name="iz_no_new_update" translatable="false">You have no new updates.</string>
+    <string name="iz_footer_text" translatable="false">You\'re all caught up!</string>
+    <string name="_1_hr_ago" translatable="false">1 hrs ago</string>
+    <string name="title">Title</string>
 </resources>

@@ -356,6 +356,16 @@ public interface AppConstant {
     String CUSTOM_CHANNEL_CURRENT_DATE= "customChannelCurrentDate";
     String IZ_LIMIT_EXCEED_MSG = "Limit exceed; cannot create more channels";
     String IZ_NOTIFICATION_CHANNEL = "Notification Channel";
+    String pulseRid = "pulseRid";
+    String pulseCid = "pulseCid";
+
+    int CAMPAIGN_SI = 6;
+    int CAMPAIGN_SE = 7;
+    String PulseTemplate = "ot";
+    String IZ_SWIPE_GESTURE = "pulseSwipeDirection";
+    String IZ_OT = "exitIntentTemplateID";
+    String P_URL = "pUrl";
+    String PULSE_IMP = "pulseImp";
 
 
 }

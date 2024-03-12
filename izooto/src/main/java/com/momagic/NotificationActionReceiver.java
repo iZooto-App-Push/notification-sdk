@@ -195,7 +195,7 @@ public class NotificationActionReceiver extends BroadcastReceiver {
                         }
 
                     } catch (Exception ex) {
-                        Util.setException(DATB.appContext,ex.toString(),AppConstant.APPName_3,"Landing URL issues"+mUrl);
+                        Util.handleExceptionOnce(DATB.appContext,ex.toString(),AppConstant.APPName_3,"Landing URL issues"+mUrl);
                     }
                 }
             }
@@ -224,7 +224,7 @@ public class NotificationActionReceiver extends BroadcastReceiver {
                 context.startActivity(intentAppLaunch);
             }
         } catch (PackageManager.NameNotFoundException e) {
-            Util.setException(context,e.toString(),AppConstant.APPName_3,"launch App");
+            Util.handleExceptionOnce(context,e.toString(),AppConstant.APPName_3,"launch App");
 
         }
     }
@@ -283,7 +283,7 @@ public class NotificationActionReceiver extends BroadcastReceiver {
             }
         });
     } catch (Exception e) {
-        Util.setException(context, e.toString(), "lastClickAPI", "NotificationActionReceiver");
+        Util.handleExceptionOnce(context, e.toString(), "lastClickAPI", "NotificationActionReceiver");
     }
 
 }
@@ -337,9 +337,7 @@ public class NotificationActionReceiver extends BroadcastReceiver {
                     }
                 }
             } catch (Exception ex) {
-                DebugFileManager.createExternalStoragePublic(DATB.appContext,"getBundleData"+ex.toString(),"[Log.V]->");
-
-                Util.setException(context, ex.toString(), AppConstant.APPName_3, "getBundleData");
+                Util.handleExceptionOnce(context, ex.toString(), AppConstant.APPName_3, "getBundleData");
             }
         }
     }
@@ -426,6 +424,7 @@ public class NotificationActionReceiver extends BroadcastReceiver {
             mapData.put(AppConstant.IZ_NOTIFICATION_TITLE_KEY_NAME,notificationTitle);
             if (btnCount != 0)
                 mapData.put("btn","" + btnCount);
+
             DebugFileManager.createExternalStoragePublic(DATB.appContext,mapData.toString(),"clickData");
 
             RestClient.postRequest(clkURL, mapData,null, new RestClient.ResponseHandler() {
@@ -459,7 +458,7 @@ public class NotificationActionReceiver extends BroadcastReceiver {
                             Util.trackClickOffline(context, clkURL, AppConstant.IZ_NOTIFICATION_CLICK_OFFLINE, rid, cid, btnCount);
                         }
                     } catch (Exception e) {
-                        Util.setException(DATB.appContext,e.toString(),AppConstant.APPName_3,"notificationClickAPI->onFailure");
+                        Util.handleExceptionOnce(DATB.appContext,e.toString(),AppConstant.APPName_3,"notificationClickAPI->onFailure");
                     }
                 }
             });
@@ -476,7 +475,7 @@ public class NotificationActionReceiver extends BroadcastReceiver {
                         } else
                             Util.trackClickOffline(context, clkURL, AppConstant.IZ_NOTIFICATION_CLICK_OFFLINE, rid, cid, btnCount);
                     } catch (Exception e) {
-                        Util.setException(DATB.appContext,e.toString(),AppConstant.APPName_3,"notificationClickAPI");
+                        Util.handleExceptionOnce(DATB.appContext,e.toString(),AppConstant.APPName_3,"notificationClickAPI");
                     }
                 }
 
@@ -491,14 +490,14 @@ public class NotificationActionReceiver extends BroadcastReceiver {
 
                         }
                     } catch (Exception e) {
-                        Util.setException(DATB.appContext,e.toString(),AppConstant.APPName_3,"notificationClickAPI");
+                        Util.handleExceptionOnce(DATB.appContext,e.toString(),AppConstant.APPName_3,"notificationClickAPI");
                     }
                 }
             });
 
 
         } catch (Exception e) {
-            Util.setException(context, e.toString(), "notificationClickAPI", "NotificationActionReceiver");
+            Util.handleExceptionOnce(context, e.toString(), "notificationClickAPI", "NotificationActionReceiver");
         }
     }
     public static Map<String,String> jsonToMap(String t) throws JSONException {

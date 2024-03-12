@@ -13,6 +13,7 @@ import android.os.Handler;
 import android.os.Looper;
 import android.provider.Settings;
 import android.util.Log;
+import android.view.View;
 
 import androidx.annotation.RequiresApi;
 
@@ -33,9 +34,9 @@ import java.util.Map;
 import java.util.Objects;
 
 import static com.momagic.AppConstant.APPPID;
+import static com.momagic.AppConstant.APP_NAME_TAG;
 import static com.momagic.AppConstant.FCM_TOKEN_FROM_JSON;
 import static com.momagic.AppConstant.HUAWEI_TOKEN_FROM_JSON;
-import static com.momagic.AppConstant.TAG;
 import static com.momagic.AppConstant.XIAOMI_TOKEN_FROM_JSON;
 
 public class DATB {
@@ -55,6 +56,31 @@ public class DATB {
     public static int bannerImage;
     private static boolean initCompleted;
     static String TAG = "DATB";
+
+    //pulse
+
+    static String pUrl="";
+    static boolean swipeEdge;
+    static  boolean isLeft ;
+    static  boolean isRight;
+    static  String pulseRid ="";
+    static  String pulseCid = "";
+
+    static String pulseTemplate = "";
+
+    static boolean isEDGestureUiMode = false;
+    static  String userEvent = "5";
+    static boolean isXmlParse = false;
+    static int OT_ID =6;
+    static String swipeGesture = "left";
+    private static int pulseImp;
+    public static boolean isBackPressedEvent = false;
+
+    static boolean clickHome = false;
+    static ArrayList<Payload> payloadArrayList = new ArrayList<>();
+
+
+
 
     static boolean isInitCompleted() {
         return initCompleted;
@@ -107,31 +133,47 @@ public class DATB {
                                 try {
                                     final PreferenceUtil preferenceUtil = PreferenceUtil.getInstance(appContext);
                                     JSONObject jsonObject = new JSONObject(Objects.requireNonNull(Util.decrypt(AppConstant.SECRET_KEY, response)));
-                                    senderId = jsonObject.getString(AppConstant.SENDERID);
-                                    String appId = jsonObject.getString(AppConstant.APPID);
-                                    String apiKey = jsonObject.getString(AppConstant.APIKEY);
+                                    senderId = jsonObject.optString(AppConstant.SENDERID);
+                                    String appId = jsonObject.optString(AppConstant.APPID);
+                                    String apiKey = jsonObject.optString(AppConstant.APIKEY);
                                     String mKey = jsonObject.optString(AppConstant.MIAPIKEY);
                                     String mId = jsonObject.optString(AppConstant.MIAPPID);
-                                    mAppId = jsonObject.getString(AppConstant.APPPID);
+                                    mAppId = jsonObject.optString(AppConstant.APPPID);
+                                    DATB.pUrl =jsonObject.optString(AppConstant.P_URL);
+                                    DATB.pulseRid = jsonObject.optString(AppConstant.pulseRid);
+                                    DATB.pulseCid = jsonObject.optString(AppConstant.pulseCid);
+                                    DATB.swipeGesture = jsonObject.optString(AppConstant.IZ_SWIPE_GESTURE);
+                                    DATB.OT_ID = jsonObject.optInt(AppConstant.IZ_OT);
+                                    DATB.pulseImp = jsonObject.optInt(AppConstant.PULSE_IMP);
                                     preferenceUtil.setDataBID(AppConstant.APPPID, mAppId);
                                     trackAdvertisingId();
                                     if (!mKey.isEmpty() && !mId.isEmpty() && Build.MANUFACTURER.equalsIgnoreCase("Xiaomi")) {
                                         XiaomiSDKHandler xiaomiSDKHandler = new XiaomiSDKHandler(DATB.appContext, mId, mKey);
                                         xiaomiSDKHandler.onMIToken();
                                     }
-
                                     if (senderId != null && !senderId.isEmpty()) {
                                         init(context, apiKey, appId);
                                     } else {
                                         Lg.e(AppConstant.APP_NAME_TAG, appContext.getString(R.string.something_wrong_fcm_sender_id));
                                     }
-
                                     if (mAppId != null && preferenceUtil.getBoolean(AppConstant.IS_CONSENT_STORED)) {
                                         preferenceUtil.setIntData(AppConstant.CAN_STORED_QUEUE, 1);
                                     }
+                                    if(DATB.pUrl!=null && DATB.pUrl!="")
+                                    {
+                                        try {
+                                            Util.parseXml(contentListener -> {
+                                                payloadArrayList.addAll(contentListener);
+                                                contentListener.clear();
+                                            });
+
+                                        }catch (Exception e){
+                                            Util.handleExceptionOnce(context, e.toString(), "iZootoNavigationDrawer","onCreate");
+                                        }
+                                    }
 
 
-                                } catch (JSONException e) {
+                                } catch (Exception e) {
                                     if (context != null) {
                                         DebugFileManager.createExternalStoragePublic(context, e.toString(), "[Log.e]-->init");
 
@@ -1718,5 +1760,76 @@ public class DATB {
                 preferenceUtil.setStringData(AppConstant.iZ_STORE_CHANNEL_NAME, Util.getApplicationName(DATB.appContext) + " Notification");
             }
         }
+    }
+
+    /*
+     * Enable Pulse feature.
+     * Activity -> pass the current object.
+     * isBackIntent -> pass the true and add the method in onBackPressed method.
+     * isBackIntent-> pass the false then no working.
+     * Pulse open the by default left to right.
+     * other swipe gesture handle via .dat file response
+     * swipeGesture - left/right
+
+     */
+
+    public static void enablePulse(Activity context,boolean isBackIntent) {
+        try {
+            if (context != null && DATB.OT_ID==6) {
+                new Handler().postDelayed(() -> {
+                    PreferenceUtil preferenceUtil = PreferenceUtil.getInstance(context);
+                    String appId = preferenceUtil.getDataBID(APPPID);
+                    if (appId != null && !appId.isEmpty()) {
+                        DATBPulse pulse = new DATBPulse();
+                        pulse.setContents(payloadArrayList);
+                        View onTouchView = context.getWindow().getDecorView().getRootView();
+                        if(isBackIntent){
+                            DATB.swipeEdge = true;
+                            pulse.onCreateDrawer(context, pulse, android.R.id.content);
+                            if(DATB.pulseImp == 1) {
+                                Util.pulseImpression(context);
+                            }
+                        }
+                        onTouchView.setOnTouchListener(new DATBNewsHubOnSwipeListener(context) {
+                            @Override
+                            public void onSwipeRight() {
+                                if (DATB.swipeGesture.equalsIgnoreCase("left") && !isBackIntent) {
+                                    DATB.swipeEdge = true;
+                                    pulse.onCreateDrawer(context, pulse, android.R.id.content);
+                                    if(DATB.pulseImp == 1) {
+                                        Util.pulseImpression(context);
+                                    }
+                                }
+                            }
+                            @Override
+                            public void onSwipeLeft() {
+                                if (DATB.swipeGesture.equalsIgnoreCase("right") && !isBackIntent) {
+                                    DATB.swipeEdge = false;
+                                    pulse.onCreateDrawer(context, pulse, android.R.id.content);
+                                    if(DATB.pulseImp == 1) {
+                                        Util.pulseImpression(context);
+                                    }
+                                }
+                            }
+                        });
+                    } else {
+                        Util.handleExceptionOnce(context, "The iZooto not initialized properly!", APP_NAME_TAG, "enablePulse");
+                    }
+                }, 100);
+            } else {
+                Util.handleExceptionOnce(context, "Object is null or onsite template is not defined", APP_NAME_TAG, "enablePulse");
+
+            }
+        } catch (Exception e) {
+            Util.handleExceptionOnce(context, e.toString(), APP_NAME_TAG, "initializeSwipeGesture");
+        }
+    }
+
+    /*
+    remove the drawer
+    *  */
+    public static void closeDrawer() {
+        DATBPulse drawer = new DATBPulse();
+        drawer.closeDrawer();
     }
 }

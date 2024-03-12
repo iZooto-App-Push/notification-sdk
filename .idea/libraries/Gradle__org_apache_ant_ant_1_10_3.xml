@@ -1,5 +1,5 @@
 <component name="libraryTable">
-  <library name="Gradle: org.apache.ant:ant:1.10.3">
+  <library name="Gradle: org.apache.ant:ant:1.10.3" external-system-id="GRADLE">
     <CLASSES>
       <root url="jar://$USER_HOME$/.gradle/caches/modules-2/files-2.1/org.apache.ant/ant/1.10.3/88becdeb77cdd2457757b7268e1a10666c03d382/ant-1.10.3.jar!/" />
     </CLASSES>

@@ -138,7 +138,7 @@ public class DATBMessagingService extends FirebaseMessagingService {
                       {
                         if(!preferenceUtil.getBoolean("IsException")) {
                             preferenceUtil.setBooleanData("IsException",true);
-                            Util.setException(this, ex + "PayloadError" + data, "DATBMessagingService", "handleNow");
+                            Util.handleExceptionOnce(this, ex + "PayloadError" + data, "DATBMessagingService", "handleNow");
                         }
                           DebugFileManager.createExternalStoragePublic(this,data.toString(),"[Log.v]->");
 

@@ -24,6 +24,7 @@ import android.os.Build;
 import android.provider.Settings;
 import android.text.Html;
 import android.text.TextUtils;
+import android.text.format.DateUtils;
 import android.util.Log;
 
 import androidx.annotation.NonNull;
@@ -38,8 +39,14 @@ import androidx.core.view.ViewCompat;
 import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
+import org.xmlpull.v1.XmlPullParser;
+import org.xmlpull.v1.XmlPullParserException;
+import org.xmlpull.v1.XmlPullParserFactory;
 
+import java.io.IOException;
+import java.io.InputStreamReader;
 import java.math.BigInteger;
+import java.net.HttpURLConnection;
 import java.net.URL;
 import java.text.DateFormat;
 import java.text.SimpleDateFormat;
@@ -51,6 +58,7 @@ import java.util.List;
 import java.util.Locale;
 import java.util.Map;
 import java.util.Objects;
+import java.util.TimeZone;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
@@ -98,34 +106,34 @@ public class Util {
 
 
     private static Bitmap getBitMap(String src) {
-            int retry=0;
-            boolean isCheck=false;
-            do {
-                 if(isCheck)
-                 {
-                     sleepTime(2000);
+        int retry = 0;
+        boolean isCheck = false;
+        do {
+            if (isCheck) {
+                sleepTime(2000);
 
-                 }
-                try {
-                    return BitmapFactory.decodeStream(new URL(src).openConnection().getInputStream());
-                } catch (Throwable t) {
-                    retry++;
-                    isCheck=true;
-                    if(retry>=4) {
-                        DebugFileManager.createExternalStoragePublic(DATB.appContext,t.toString(),"[Log-> e]->getBitmapFromURL");
-                        return null;
-                    }
-
+            }
+            try {
+                return BitmapFactory.decodeStream(new URL(src).openConnection().getInputStream());
+            } catch (Throwable t) {
+                retry++;
+                isCheck = true;
+                if (retry >= 4) {
+                    DebugFileManager.createExternalStoragePublic(DATB.appContext, t.toString(), "[Log-> e]->getBitmapFromURL");
+                    return null;
                 }
-            }while(retry<4);
+
+            }
+        } while (retry < 4);
 
         return null;
     }
+
     public static Bitmap getBitmapFromURL(String url) {
         if (url == null)
             return null;
 
-        if(url != "" &&  !url.isEmpty()) {
+        if (url != "" && !url.isEmpty()) {
             String trimmedName = url.trim();
             trimmedName = trimmedName.replace("///", "/");
             trimmedName = trimmedName.replace("//", "/");
@@ -145,18 +153,17 @@ public class Util {
                 DebugFileManager.createExternalStoragePublic(DATB.appContext, url, "[Log-> e]->getBitmapFromURL");
                 return null;
             }
-        }
-        else
-        {
-            DebugFileManager.createExternalStoragePublic(DATB.appContext, "Image URL"+url, "[Log-> e]->getBitmapFromURL");
+        } else {
+            DebugFileManager.createExternalStoragePublic(DATB.appContext, "Image URL" + url, "[Log-> e]->getBitmapFromURL");
             return null;
         }
         return null;
 
     }
+
     public static String getAndroidId(Context mContext) {
         @SuppressLint("HardwareIds") String android_id = Settings.Secure.getString(mContext.getContentResolver(), Settings.Secure.ANDROID_ID);
-        Log.v("android_id",android_id);
+        Log.v("android_id", android_id);
         return android_id;
     }
 
@@ -427,15 +434,15 @@ public class Util {
                 Map<String, String> mapData = new HashMap<>();
                 mapData.put(AppConstant.PID, preferenceUtil.getDataBID(AppConstant.APPPID));
                 mapData.put(AppConstant.TOKEN, "" + preferenceUtil.getStringData(AppConstant.FCM_DEVICE_TOKEN));
-                mapData.put(AppConstant.HMS_TOKEN,""+preferenceUtil.getStringData(AppConstant.HMS_TOKEN));
-                mapData.put(AppConstant.XiaomiToken,""+preferenceUtil.getStringData(AppConstant.XiaomiToken));
+                mapData.put(AppConstant.HMS_TOKEN, "" + preferenceUtil.getStringData(AppConstant.HMS_TOKEN));
+                mapData.put(AppConstant.XiaomiToken, "" + preferenceUtil.getStringData(AppConstant.XiaomiToken));
                 mapData.put(AppConstant.ANDROID_ID, "" + Util.getAndroidId(context));
                 mapData.put(AppConstant.EXCEPTION_, "" + exception);
                 mapData.put(AppConstant.METHOD_NAME, "" + methodName);
                 mapData.put(AppConstant.ClASS_NAME, "" + className);
                 mapData.put(AppConstant.ANDROID_VERSION, "" + Build.VERSION.RELEASE);
                 mapData.put(AppConstant.DEVICE_NAME, "" + Util.getDeviceName());
-                mapData.put(AppConstant.SDK,AppConstant.SDK_VERSION);
+                mapData.put(AppConstant.SDK, AppConstant.SDK_VERSION);
 
                 RestClient.postRequest(RestClient.APP_EXCEPTION_URL, mapData, null, new RestClient.ResponseHandler() {
                     @Override
@@ -535,11 +542,11 @@ public class Util {
         String currentDate = sdf.format(new Date());
         return currentDate;
     }
+
     @RequiresApi(api = Build.VERSION_CODES.N)
-    static String getCurrentDate()
-    {
-         SimpleDateFormat sdf = new SimpleDateFormat("ddMMyyyy");
-        String currentData=sdf.format(new Date());
+    static String getCurrentDate() {
+        SimpleDateFormat sdf = new SimpleDateFormat("ddMMyyyy");
+        String currentData = sdf.format(new Date());
         return currentData;
     }
 
@@ -604,28 +611,29 @@ public class Util {
     static boolean ridExists(JSONArray jsonArray, String rid) {
         return jsonArray.toString().contains("\"rid\":\"" + rid + "\"");
     }
+
     @Nullable
     static BigInteger getAccentColor() {
         try {
-            if(DATB.appContext == null)
+            if (DATB.appContext == null)
                 return null;
             String defaultColor = getResourceString(DATB.appContext, AppConstant.NOTIFICATION_ACCENT_COLOR, null);
-            if(defaultColor.charAt(0)=='#'){
-                String default_Color="";
-                default_Color= defaultColor.replace("#","");
+            if (defaultColor.charAt(0) == '#') {
+                String default_Color = "";
+                default_Color = defaultColor.replace("#", "");
                 if (default_Color != null) {
                     return new BigInteger(default_Color, 16);
                 }
-            }
-            else
-            {
+            } else {
                 if (defaultColor != null) {
                     return new BigInteger(defaultColor, 16);
                 }
             }
-        } catch (Throwable t) {}
+        } catch (Throwable t) {
+        }
         return null;
     }
+
     static String getResourceString(@NonNull Context context, String key, String defaultStr) {
         Resources resources = context.getResources();
         int bodyResId = resources.getIdentifier(key, AppConstant.STRING_RESOURCE_NAME, context.getPackageName());
@@ -633,9 +641,11 @@ public class Util {
             return resources.getString(bodyResId);
         return defaultStr;
     }
+
     public static String getApplicationName(Context context) {
         return context.getApplicationInfo().loadLabel(context.getPackageManager()).toString();
     }
+
     static String getChannelName(Context context) {
         if (context != null) {
             String channelName = "";
@@ -649,7 +659,8 @@ public class Util {
         }
         return AppConstant.CHANNEL_NAME;
     }
-    protected static boolean notificationMode(){
+
+    protected static boolean notificationMode() {
         Locale locale = Locale.getDefault();
         return TextUtils.getLayoutDirectionFromLocale(locale) != ViewCompat.LAYOUT_DIRECTION_LTR;
     }
@@ -657,7 +668,7 @@ public class Util {
 
     /* check the expiry time to current time difference in seconds form */
     /* check the expiry time to current time difference in seconds form */
-    static String getTimerValue(String createdTime, String expTime){
+    static String getTimerValue(String createdTime, String expTime) {
         try {
             long timerValue = 0;
             long timerValue_In_Seconds = 0;
@@ -673,12 +684,11 @@ public class Util {
             if (timerValue_In_Seconds >= 1 && timerValue_In_Seconds < 3600) {
                 return String.valueOf(timerValue_In_Seconds);
             } else {
-                DebugFileManager.createExternalStoragePublic(DATB.appContext,AppConstant.IZ_TIMER_VALUE_MESSAGE,AppConstant.IZ_TIMER_MESSAGE);
+                DebugFileManager.createExternalStoragePublic(DATB.appContext, AppConstant.IZ_TIMER_VALUE_MESSAGE, AppConstant.IZ_TIMER_MESSAGE);
                 return "";
             }
-        }
-        catch (Exception e) {
-            DebugFileManager.createExternalStoragePublic(DATB.appContext,AppConstant.IZ_TIMER_VALUE_MESSAGE,AppConstant.IZ_TIMER_MESSAGE);
+        } catch (Exception e) {
+            DebugFileManager.createExternalStoragePublic(DATB.appContext, AppConstant.IZ_TIMER_VALUE_MESSAGE, AppConstant.IZ_TIMER_MESSAGE);
             return "";
         }
     }
@@ -689,7 +699,7 @@ public class Util {
     }
 
     // notifications sticky support
-    static boolean enableSticky(Payload payload){
+    static boolean enableSticky(Payload payload) {
         return payload.getMakeStickyNotification() != null &&
                 !payload.getMakeStickyNotification().isEmpty() && payload.getMakeStickyNotification().equals("1");
     }
@@ -700,8 +710,7 @@ public class Util {
             JSONArray jsonVibArray;
             if (patternObj instanceof String) {
                 jsonVibArray = new JSONArray((String) patternObj);
-            }
-            else {
+            } else {
                 jsonVibArray = (JSONArray) patternObj;
             }
             long[] longArray = new long[jsonVibArray.length()];
@@ -716,13 +725,167 @@ public class Util {
     }
 
     // To Handle Exception once
-    static void handleExceptionOnce(Context context, String exception, String className, String methodName){
+    static void handleExceptionOnce(Context context, String exception, String className, String methodName) {
         PreferenceUtil preferenceUtil = PreferenceUtil.getInstance(context);
-        if(!preferenceUtil.getBoolean(methodName)){
+        if (!preferenceUtil.getBoolean(methodName)) {
             setException(context, exception, className, methodName);
             preferenceUtil.setBooleanData(methodName, true);
         }
-        DebugFileManager.createExternalStoragePublic(context, exception + " " +methodName, "[Log.e]-> "+className);
+        DebugFileManager.createExternalStoragePublic(context, exception + " " + methodName, "[Log.e]-> " + className);
+    }
+
+    static void parseXml(RssContentCallbackListener callbackListener) {
+        ArrayList<Payload> contentList = new ArrayList<>();
+        PreferenceUtil preferenceUtil = PreferenceUtil.getInstance(DATB.appContext);
+
+        new Thread(() -> {
+            try {
+                URL url = new URL(DATB.pUrl);
+                XmlPullParser pullParser = XmlPullParserFactory.newInstance().newPullParser();
+                HttpURLConnection urlConnection = (HttpURLConnection) url.openConnection();
+                urlConnection.connect();
+                if (urlConnection.getResponseCode() == HttpURLConnection.HTTP_OK) {
+                    pullParser.setInput(new InputStreamReader(urlConnection.getInputStream()));
+                    int eventType = pullParser.getEventType();
+                    Payload payload = null;
+
+                    boolean isNull = true;
+                    while (eventType != XmlPullParser.END_DOCUMENT) {
+                        if (eventType == XmlPullParser.START_TAG) {
+                            String tagName = pullParser.getName();
+                            if (tagName.equals("title") && isNull) {
+                                isNull = false;
+                                String name = pullParser.nextText();
+                                preferenceUtil.setStringData("pubName", name);
+                                pullParser.require(XmlPullParser.END_TAG, null, "title");
+                            }
+                            if ("item".equals(tagName)) {
+                                payload = new Payload();
+                            } else if ("title".equals(tagName) && payload != null) {
+                                payload.setTitle(pullParser.nextText());
+                            } else if ("link".equals(tagName) && payload != null) {
+                                payload.setLink(pullParser.nextText());
+                            } else if ("description".equals(tagName) && payload != null) {
+                                payload.setDescription(pullParser.nextText());
+                            } else if ("pubDate".equals(tagName) && payload != null) {
+                                payload.setCreated_Time(pullParser.nextText());
+                            } else if ("image".equals(tagName) && payload != null) {
+                                payload.setBanner(pullParser.nextText());
+                            } else if ("media:content".equals(tagName) && payload != null) {
+                                String imageUrl = pullParser.getAttributeValue(null, "url");
+                                payload.setBanner(imageUrl);
+                            } else if ("category".equals(tagName) && payload != null) {
+                                String domain = pullParser.getAttributeValue(null, "domain");
+                                if ("foxnews.com/metadata/dc.source".equals(domain)) {
+                                    eventType = pullParser.next();
+                                    if (eventType == XmlPullParser.TEXT) {
+                                        String categoryValue = pullParser.getText();
+                                        payload.setCategory(categoryValue);
+                                    }
+
+                                }
+                            }
+                        } else if (eventType == XmlPullParser.END_TAG && "item".equals(pullParser.getName()) && payload != null) {
+                            contentList.add(payload);
+                            callbackListener.onCallback(contentList);
+                            contentList.clear();
+                            payload = null;
+                        }
+                        eventType = pullParser.next();
+                    }
+                } else {
+                    Log.e("http connection error", "bad request...");
+                }
+            } catch (XmlPullParserException | IOException e) {
+                Log.e("http connection error", "bad request" + e);
+            }
+        }).start();
+    }
+
+    protected static void pulseClickAPI(Context context, Payload userModal) {
+        try {
+            PreferenceUtil preferenceUtil = PreferenceUtil.getInstance(context);
+            HashMap<String, String> hashMap = new HashMap<>();
+            if (preferenceUtil != null) {
+                hashMap.put(AppConstant.PID, preferenceUtil.getDataBID(AppConstant.APPPID));
+                hashMap.put(AppConstant.ANDROID_ID, Util.getAndroidId(context));
+                hashMap.put(AppConstant.VER_, "" + AppConstant.SDK_VERSION);
+                hashMap.put("link", userModal.getLink());
+                hashMap.put("tt", String.valueOf(DATB.OT_ID)); // 5 means swipe left or right 6 means on backPressed
+                hashMap.put("ot", String.valueOf(DATB.OT_ID));
+                hashMap.put("cid", DATB.pulseCid);
+                hashMap.put("rid", DATB.pulseRid);
+            }
+            RestClient.postRequest(RestClient.iZ_PULSE_FEATURE_CLICK, hashMap, null, new RestClient.ResponseHandler() {
+                @Override
+                void onSuccess(String response) {
+                    super.onSuccess(response);
+                }
+
+                @Override
+                void onFailure(int statusCode, String response, Throwable throwable) {
+                    super.onFailure(statusCode, response, throwable);
+                }
+            });
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+    }
+
+    // pulse impression
+    protected static void pulseImpression(Context context) {
+        try {
+            PreferenceUtil preferenceUtil = PreferenceUtil.getInstance(context);
+            HashMap<String, String> hashMap = new HashMap<>();
+            if (preferenceUtil != null) {
+                hashMap.put(AppConstant.PID, preferenceUtil.getDataBID(AppConstant.APPPID));
+                hashMap.put(AppConstant.ANDROID_ID, Util.getAndroidId(context));
+                hashMap.put(AppConstant.VER_, "" + AppConstant.SDK_VERSION);
+                hashMap.put("tt", String.valueOf(DATB.OT_ID)); // 5 means swipe left or right 6 means on backPressed
+                hashMap.put("ot", String.valueOf(DATB.OT_ID));
+                hashMap.put("cid", DATB.pulseCid);
+                hashMap.put("rid", DATB.pulseRid);
+            }
+            RestClient.postRequest(RestClient.iZ_PULSE_FEATURE_IMPRESSION, hashMap, null, new RestClient.ResponseHandler() {
+                @Override
+                void onSuccess(String response) {
+                    super.onSuccess(response);
+                    Log.e("HashMap", hashMap.toString());
+                }
+
+                @Override
+                void onFailure(int statusCode, String response, Throwable throwable) {
+                    super.onFailure(statusCode, response, throwable);
+                }
+            });
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+    }
+
+    static String getTimeAgo(String timestamp) {
+        SimpleDateFormat dateFormat = new SimpleDateFormat("EEE, dd MMM yyyy HH:mm:ss Z", Locale.US);
+        dateFormat.setTimeZone(TimeZone.getTimeZone("GMT"));
+
+        try {
+            Date date = dateFormat.parse(timestamp);
+            if (date != null) {
+                long timeInMillis = date.getTime();
+                long now = System.currentTimeMillis();
+                CharSequence relativeTimeSpan = DateUtils.getRelativeTimeSpanString(timeInMillis, now, DateUtils.MINUTE_IN_MILLIS);
+                return relativeTimeSpan.toString()
+                        .replace(" minutes", "m")
+                        .replace(" minute", "m")
+                        .replace(" hours", "h")
+                        .replace(" hour", "h")
+                        .replace(" seconds", "s")
+                        .replace(" second", "s");
+            }
+        } catch (Exception e) {
+            e.printStackTrace();
+
+        }
+        return "";
     }
 }
 

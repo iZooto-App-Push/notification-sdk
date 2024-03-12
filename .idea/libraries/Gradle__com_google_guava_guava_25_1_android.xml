@@ -1,5 +1,5 @@
 <component name="libraryTable">
-  <library name="Gradle: com.google.guava:guava:25.1-android">
+  <library name="Gradle: com.google.guava:guava:25.1-android" external-system-id="GRADLE">
     <CLASSES>
       <root url="jar://$USER_HOME$/.gradle/caches/modules-2/files-2.1/com.google.guava/guava/25.1-android/bdaab946ca5ad20253502d873ba0c3313d141036/guava-25.1-android.jar!/" />
     </CLASSES>

@@ -109,6 +109,9 @@ public class Payload {
     //////////////////////////////////////////////
 
     private int cfg;
+
+    String description;
+    String category;
     public int getCfg() {
         return cfg;
     }
@@ -699,5 +702,20 @@ public class Payload {
 
     public void setBadge(int badge) {
         this.badge = badge;
+    }
+
+    public String getDescription() {
+        return description;
+    }
+
+    public void setDescription(String description) {
+        this.description = description;
+    }
+    public String getCategory() {
+        return category;
+    }
+
+    public void setCategory(String category) {
+        this.category = category;
     }
 }

@@ -1350,7 +1350,6 @@ public class NotificationEventManager {
                 }
             });
         } catch (Exception e) {
-            DebugFileManager.createExternalStoragePublic(DATB.appContext,"impressionNotificationApi"+e.toString(),"[Log.V]->NotificationEventManager->");
             Util.handleExceptionOnce(DATB.appContext,e+"RID"+rid+"CID"+cid,AppConstant.APPName_2,"impressionNotification");
         }
 
@@ -1382,7 +1381,6 @@ public class NotificationEventManager {
                 }
             });
         } catch (Exception e) {
-            DebugFileManager.createExternalStoragePublic(DATB.appContext,"impressionNotificationApi"+e.toString(),"[Log.V]->NotificationEventManager->");
             Util.handleExceptionOnce(DATB.appContext,e+"RID"+payload.getRid()+"CID"+payload.getId(),AppConstant.APPName_2,"impressionNotification");
         }
     }
@@ -1404,7 +1402,7 @@ public class NotificationEventManager {
                    iconColor = Color.parseColor(setColor);
                } catch (IllegalArgumentException ex) {
                    if (DATB.appContext != null) {
-                       Util.setException(DATB.appContext, ex.toString(), AppConstant.APPName_2, "getbadgecolor");
+                       Util.handleExceptionOnce(DATB.appContext, ex.toString(), AppConstant.APPName_2, "getbadgecolor");
                    }
                    iconColor = Color.TRANSPARENT;
                }
@@ -1415,7 +1413,7 @@ public class NotificationEventManager {
 
                    iconColor = Color.TRANSPARENT;
                    if (DATB.appContext != null) {
-                       Util.setException(DATB.appContext, ex.toString(), AppConstant.APPName_2, "getbadgecolor");
+                       Util.handleExceptionOnce(DATB.appContext, ex.toString(), AppConstant.APPName_2, "getbadgecolor");
                    }
                    ex.printStackTrace();
                }
@@ -1501,7 +1499,7 @@ static void lastViewNotification(String limURL, String rid, String cid, int i){
                         preferenceUtil.setStringData(AppConstant.IZ_NOTIFICATION_LAST_VIEW_OFFLINE, null);
                     }
                 } catch (Exception e) {
-                    Util.setException(DATB.appContext,e.toString(),AppConstant.APPName_2,"lastViewNotification");
+                    Util.handleExceptionOnce(DATB.appContext,e.toString(),AppConstant.APPName_2,"lastViewNotification");
                 }
             }
             @Override
@@ -1516,12 +1514,12 @@ static void lastViewNotification(String limURL, String rid, String cid, int i){
                     } else
                         Util.trackClickOffline(DATB.appContext, limURL, AppConstant.IZ_NOTIFICATION_LAST_VIEW_OFFLINE, rid, cid, 0);
                 } catch (Exception e) {
-                    Util.setException(DATB.appContext,e.toString(),AppConstant.APPName_2,"lastViewNotification");
+                    Util.handleExceptionOnce(DATB.appContext,e.toString(),AppConstant.APPName_2,"lastViewNotification");
                 }
             }
         });
     } catch (Exception e) {
-        Util.setException(DATB.appContext,e.toString(),AppConstant.APPName_2,"lastViewNotification");
+        Util.handleExceptionOnce(DATB.appContext,e.toString(),AppConstant.APPName_2,"lastViewNotification");
     }
 }
     /*
@@ -1551,9 +1549,8 @@ static void lastViewNotification(String limURL, String rid, String cid, int i){
                     }
                 }
             } catch (Exception e) {
-                DebugFileManager.createExternalStoragePublic(DATB.appContext,"Max Notification in tray"+e.toString(),"[Log.V]->Max Notification in tray>");
 
-                Util.setException(context, e.toString(), AppConstant.APPName_2, "MaxNotification in Tray");
+                Util.handleExceptionOnce(context, e.toString(), AppConstant.APPName_2, "MaxNotification in Tray");
             }
         }
     }
@@ -1611,7 +1608,7 @@ static void lastViewNotification(String limURL, String rid, String cid, int i){
                 });
 
             } catch (Exception ex) {
-                Util.setException(DATB.appContext, ex.toString(), AppConstant.APPName_2, "handleNotificationError");
+                Util.handleExceptionOnce(DATB.appContext, ex.toString(), AppConstant.APPName_2, "handleNotificationError");
             }
         }
     }

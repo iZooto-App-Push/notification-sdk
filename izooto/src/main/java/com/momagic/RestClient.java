@@ -46,7 +46,8 @@ public class RestClient {
       static final String MOMAGIC_USER_PROPERTY="https://irctc.truenotify.in/momagicflow/appup";
       static final String MOMAGIC_CLICK="https://irctc.truenotify.in/momagicflow/appclk";
       static  final String MOMAGIC_IMPRESSION="https://irctc.truenotify.in/momagicflow/appimpr";
-
+      static final String iZ_PULSE_FEATURE_CLICK = "https://osclk.izooto.com/osclk";
+      static final String iZ_PULSE_FEATURE_IMPRESSION = "https://osimp.izooto.com/osimp";
     private static int getThreadTimeout(int timeout) {
         return timeout + 5000;
     }
