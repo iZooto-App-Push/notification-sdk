@@ -38,15 +38,41 @@ import com.google.firebase.messaging.RemoteMessage;
 import org.json.JSONObject;
 import java.util.Map;
 import java.util.Objects;
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Executors;
+
 @SuppressLint("MissingFirebaseInstanceTokenRefresh")
 public class DATBMessagingService extends FirebaseMessagingService {
     private  Payload payload = null;
-    private final String Name="DATBMessagingService";
+    private final String DATB_TAG_NAME="DATBMessagingService";
+    private final String IZ_METHOD_NAME = "handleNow";
+    private final String IZ_METHOD_PUSH_NAME ="contentPush";
+    private  final String IZ_ERROR_NAME ="Payload Error";
+    private final ExecutorService executorService = Executors.newSingleThreadExecutor();
+
     @Override
     public void onMessageReceived(@NonNull RemoteMessage remoteMessage) {
         try {
+            Runnable runnable = new Runnable() {
+                @Override
+                public void run() {
+                    try {
+                        executeBackgroundTask(remoteMessage);
+                        Thread.sleep(2000);
+                    } catch (Exception e) {
+                        throw new RuntimeException(e);
+                    }
+                }
+            };
+            executorService.execute(runnable);
+        } catch (Exception ex){
+            Util.handleExceptionOnce(this, remoteMessage + ex.toString(), DATB_TAG_NAME, "onMessageReceived");
+        }
+    }
+    private void executeBackgroundTask(RemoteMessage remoteMessage) {
+        try {
             if (remoteMessage.getData().size() > 0) {
-                Log.v("Push Type","fcm");
+                Log.v("Push Type", "fcm");
                 PreferenceUtil preferenceUtil = PreferenceUtil.getInstance(this);
                 if (preferenceUtil.getEnableState(AppConstant.NOTIFICATION_ENABLE_DISABLE)) {
                     Map<String, String> data = remoteMessage.getData();
@@ -54,16 +80,13 @@ public class DATBMessagingService extends FirebaseMessagingService {
                 }
             }
             if (remoteMessage.getNotification() != null) {
-                sendNotification(remoteMessage);
-
+                if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
+                    sendNotification(remoteMessage);
+                }
             }
+        } catch (Exception ex) {
+            Util.handleExceptionOnce(this, remoteMessage + ex.toString(), DATB_TAG_NAME, "executeBackgroundTask");
         }
-        catch (Exception ex)
-        {
-            Log.e(AppConstant.FIREBASE_EXCEPTION,ex.toString());
-        }
-
-
     }
 
     private void sendNotification(RemoteMessage remoteMessage) {
@@ -120,14 +143,10 @@ public class DATBMessagingService extends FirebaseMessagingService {
                                  if(impIndex.equalsIgnoreCase("1"))
                                  {
                                      NotificationEventManager.impressionNotification(RestClient.IMPRESSION_URL, cid, rid, -1,AppConstant.PUSH_FCM);
-
                                  }
-
                              }
-
                              AdMediation.getMediationGPL(this, jsonObject, urlData);
                              preferenceUtil.setBooleanData(AppConstant.MEDIATION, false);
-
                          }
                          else
                          {
@@ -141,10 +160,7 @@ public class DATBMessagingService extends FirebaseMessagingService {
                             Util.handleExceptionOnce(this, ex + "PayloadError" + data, "DATBMessagingService", "handleNow");
                         }
                           DebugFileManager.createExternalStoragePublic(this,data.toString(),"[Log.v]->");
-
-
                       }
-
                    }
                    else {
                        try {
@@ -155,7 +171,6 @@ public class DATBMessagingService extends FirebaseMessagingService {
                              String cfgData=Util.getIntegerToBinary(cfg);
                                 if(cfgData!=null && !cfgData.isEmpty()) {
                                    String impIndex = String.valueOf(cfgData.charAt(cfgData.length() - 1));
-
                                    if(impIndex.equalsIgnoreCase("1"))
                                    {
                                        NotificationEventManager.impressionNotification(RestClient.IMPRESSION_URL, cid, rid, -1,AppConstant.PUSH_FCM);
@@ -173,7 +188,6 @@ public class DATBMessagingService extends FirebaseMessagingService {
                    }
                 }
                 else {
-
                     preferenceUtil.setBooleanData(AppConstant.MEDIATION, false);
                     JSONObject payloadObj = new JSONObject(data);
                     if (payloadObj.optLong(ShortpayloadConstant.CREATEDON) > PreferenceUtil.getInstance(this).getLongValue(AppConstant.DEVICE_REGISTRATION_TIMESTAMP)) {
@@ -237,33 +251,44 @@ public class DATBMessagingService extends FirebaseMessagingService {
                         payload.setOtherChannel(payloadObj.optString(ShortpayloadConstant.OTHER_CHANNEL));
                         payload.setSound(payloadObj.optString(ShortpayloadConstant.SOUND));
                         payload.setPriority(payloadObj.optInt(ShortpayloadConstant.PRIORITY));
+                        try {
+                            if (payload.getRid() != null && !payload.getRid().isEmpty()) {
+                                preferenceUtil.setIntData(ShortpayloadConstant.OFFLINE_CAMPAIGN, Util.getValidIdForCampaigns(payload));
+                            } else {
+                                DebugFileManager.createExternalStoragePublic(DATB.appContext, IZ_METHOD_PUSH_NAME, data.toString());
+                            }
+
+                        } catch (Exception e) {
+                            DebugFileManager.createExternalStoragePublic(DATB.appContext, IZ_METHOD_PUSH_NAME, e.toString());
+                        }
+                        if (DATB.appContext == null) {
+                            DATB.appContext = this;
+                        }
+
+                        final Handler mainHandler = new Handler(Looper.getMainLooper());
+                        final Runnable myRunnable = () -> {
+                            NotificationEventManager.handleImpressionAPI(payload, AppConstant.PUSH_FCM);
+                            DATB.processNotificationReceived(DATB.appContext, payload);
+                        };
+
+                        try {
+                            NotificationExecutorService notificationExecutorService = new NotificationExecutorService(this);
+                            notificationExecutorService.executeNotification(mainHandler, myRunnable, payload);
+
+                        } catch (Exception e) {
+                            Util.handleExceptionOnce(DATB.appContext, e.toString(), DATB_TAG_NAME, IZ_METHOD_NAME + "notificationExecutorService");
+                        }
+                        DebugFileManager.createExternalStoragePublic(DATB.appContext, data.toString(), " Log-> ");
 
 
                     } else {
-                        String updateDaily=NotificationEventManager.getDailyTime(this);
+                        String updateDaily = NotificationEventManager.getDailyTime(this);
                         if (!updateDaily.equalsIgnoreCase(Util.getTime())) {
                             preferenceUtil.setStringData(AppConstant.CURRENT_DATE_VIEW_DAILY, Util.getTime());
                             NotificationEventManager.handleNotificationError("Payload Error" + payloadObj.optString("t"), payloadObj.toString(), "DATBMESSAGINSERVEICES", "handleNow()");
                         }
-                        return;
                     }
-                    if (DATB.appContext == null)
-                        DATB.appContext = this;
-
-                    Handler mainHandler = new Handler(Looper.getMainLooper());
-                    Runnable myRunnable = new Runnable() {
-                        @Override
-                        public void run() {
-                            NotificationEventManager.handleImpressionAPI(payload,AppConstant.PUSH_FCM);
-                            DATB.processNotificationReceived(DATB.appContext, payload);
-
-                        }
-                    };
-
-                    mainHandler.post(myRunnable);
                 }
-                   DebugFileManager.createExternalStoragePublic(DATB.appContext,data.toString(),"[Log.v]->");
-
                } catch (Exception e) {
                    DebugFileManager.createExternalStoragePublic(DATB.appContext,data.toString(),"[Log.v]->");
             }

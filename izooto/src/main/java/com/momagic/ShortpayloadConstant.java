@@ -70,6 +70,7 @@ public interface ShortpayloadConstant {
     String SOUND= "s";//sound
     String LEDCOLOR="lc"; // led color
     String VISIBILITY = "v"; // visibility
+    String OFFLINE_CAMPAIGN ="o";
 
 
 

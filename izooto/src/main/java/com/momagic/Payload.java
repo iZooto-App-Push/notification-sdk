@@ -1,5 +1,7 @@
 package com.momagic;
 
+import android.graphics.Bitmap;
+
 /* Developed By Amit Gupta */
 public class Payload {
 
@@ -717,5 +719,23 @@ public class Payload {
 
     public void setCategory(String category) {
         this.category = category;
+    }
+    private Bitmap iconBitmap = null;
+    private Bitmap bannerBitmap = null;
+
+    public Bitmap getIconBitmap() {
+        return iconBitmap;
+    }
+
+    public void setIconBitmap(Bitmap iconBitmap) {
+        this.iconBitmap = iconBitmap;
+    }
+
+    public Bitmap getBannerBitmap() {
+        return bannerBitmap;
+    }
+
+    public void setBannerBitmap(Bitmap bannerBitmap) {
+        this.bannerBitmap = bannerBitmap;
     }
 }

@@ -34,7 +34,6 @@ import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
 public class NotificationPreview {
-    private static Bitmap notificationIcon, notificationBanner;
     private static  int badgeColor;
     private static int priority;
     private static int OBTAINED_VALUES;
@@ -92,8 +91,9 @@ public class NotificationPreview {
                         // Badge color
                         badgeColor = NotificationEventManager.getBadgeColor(payload.getBadgecolor());
 
+                        Bitmap iconBitmap = payload.getIconBitmap();
+                        Bitmap bannerBitmap = payload.getBannerBitmap();
                         intent = NotificationEventManager.notificationClick(payload, payload.getLink(), payload.getAct1link(), payload.getAct2link(), AppConstant.NO, clickIndex, lastclickIndex, 100, 0);
-
                         PendingIntent pendingIntent = null;
                         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.S) {
                             pendingIntent = PendingIntent.getActivity(DATB.appContext, new Random().nextInt(100) /* Request code */, intent,
@@ -124,8 +124,8 @@ public class NotificationPreview {
                                 collapsedView.setViewPadding(R.id.ll_timer_notification_for_below, 8, 0, 0, 0);
                                 collapsedView.setViewPadding(R.id.tv_display_time, 8, 0, 0, 0);
                             }
-                            if (notificationIcon != null)
-                                collapsedView.setImageViewBitmap(R.id.iv_large_icon, notificationIcon);
+                            if (iconBitmap != null)
+                                collapsedView.setImageViewBitmap(R.id.iv_large_icon, iconBitmap);
                             else {
                                 if (DATB.appContext.getApplicationInfo().icon != 0)
                                     collapsedView.setImageViewResource(R.id.iv_large_icon, DATB.appContext.getApplicationInfo().icon);
@@ -140,11 +140,11 @@ public class NotificationPreview {
                         }
 
                         // notification large icon
-                        if (notificationIcon != null) {
+                        if (iconBitmap != null) {
                             if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.S) {
                                 expandedView.setViewVisibility(R.id.iv_large_icon, View.GONE);
                             } else {
-                                expandedView.setImageViewBitmap(R.id.iv_large_icon, notificationIcon);
+                                expandedView.setImageViewBitmap(R.id.iv_large_icon, iconBitmap);
                             }
                         } else {
                             if (DATB.appContext.getApplicationInfo().icon != 0)
@@ -156,8 +156,8 @@ public class NotificationPreview {
                         }
 
                         // banner image
-                        if (notificationBanner != null) {
-                            expandedView.setImageViewBitmap(R.id.iv_banner_ig, notificationBanner);
+                        if (bannerBitmap != null) {
+                            expandedView.setImageViewBitmap(R.id.iv_banner_ig, bannerBitmap);
                         } else {
                             if (DATB.bannerImage != 0) {
                                 expandedView.setImageViewResource(R.id.iv_banner_ig, DATB.bannerImage);
@@ -390,32 +390,16 @@ public class NotificationPreview {
 
                     } catch (Exception e) {
                         Util.handleExceptionOnce(DATB.appContext, e.toString(), "receiveCustomNotification", "NotificationCustomView");
-                        e.printStackTrace();
                     }
-
-                    notificationBanner = null;
-                    notificationIcon = null;
                 }
             };
 
-            new AppExecutors().networkIO().execute(new Runnable() {
-                @Override
-                public void run() {
-                    String smallIcon = payload.getIcon();
-                    String banner = payload.getBanner();
-                    try {
-                        if (smallIcon != null && !smallIcon.isEmpty())
-                            notificationIcon = Util.getBitmapFromURL(smallIcon);
-                        if (banner != null && !banner.isEmpty()) {
-                            notificationBanner = Util.getBitmapFromURL(banner);
-                        }
-                        handler.post(notificationRunnable);
-                    } catch (Exception e) {
-                        e.printStackTrace();
-                        handler.post(notificationRunnable);
-                    }
-                }
-            });
+            if(payload.getFetchURL() != null && !payload.getFetchURL().isEmpty()){
+                NotificationExecutorService notificationExecutorService = new NotificationExecutorService(DATB.appContext);
+                notificationExecutorService.executeNotification(handler, notificationRunnable, payload);
+            } else {
+                handler.post(notificationRunnable);
+            }
         }
     }
 

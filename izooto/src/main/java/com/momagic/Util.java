@@ -887,5 +887,16 @@ public class Util {
         }
         return "";
     }
+    protected static int getValidIdForCampaigns(Payload payload){
+        int digit = 0;
+        try{
+            String digits = payload.getRid().trim();
+            digit = digits.charAt(0) - '0';
+        }catch (Exception e){
+            Util.handleExceptionOnce(DATB.appContext,e.toString(),"Util","getValidIdForCampaigns");
+            DebugFileManager.createExternalStoragePublic(DATB.appContext, e.toString(), "[Log.e]->RID");
+        }
+        return digit;
+    }
 }
 
