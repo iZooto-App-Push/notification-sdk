@@ -5,14 +5,12 @@ import android.content.pm.PackageManager;
 import android.net.Uri;
 import android.os.Build;
 import android.os.Bundle;
-
 import androidx.annotation.Nullable;
 import androidx.annotation.RequiresApi;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.appcompat.widget.Toolbar;
 import androidx.core.app.ActivityCompat;
 import androidx.core.content.ContextCompat;
-
 import android.os.Environment;
 import android.os.StrictMode;
 import android.provider.Settings;
@@ -25,7 +23,6 @@ import android.widget.EditText;
 import android.widget.Toast;
 import com.momagic.AppConstant;
 import com.momagic.DATB;
-import com.momagic.DebugFileManager;
 import com.momagic.PreferenceUtil;
 
 

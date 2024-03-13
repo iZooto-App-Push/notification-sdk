@@ -14,17 +14,13 @@ import android.os.Looper;
 import android.provider.Settings;
 import android.util.Log;
 import android.view.View;
-
 import androidx.annotation.RequiresApi;
-
 import com.google.firebase.FirebaseOptions;
 import com.google.firebase.messaging.FirebaseMessaging;
 import com.momagic.shortcutbadger.ShortcutBadger;
-
 import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
-
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Date;
@@ -32,7 +28,6 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Objects;
-
 import static com.momagic.AppConstant.APPPID;
 import static com.momagic.AppConstant.APP_NAME_TAG;
 import static com.momagic.AppConstant.FCM_TOKEN_FROM_JSON;
@@ -78,8 +73,6 @@ public class DATB {
 
     static boolean clickHome = false;
     static ArrayList<Payload> payloadArrayList = new ArrayList<>();
-
-
 
 
     static boolean isInitCompleted() {
