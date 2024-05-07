@@ -23,7 +23,6 @@ public class NotificationPermission extends Activity {
         if (ContextCompat.checkSelfPermission(this, permission) == PackageManager.PERMISSION_DENIED) {
             ActivityCompat.requestPermissions(this, new String[]{permission}, requestCode);
         } else {
-
             finish();
         }
     }
@@ -34,124 +33,23 @@ public class NotificationPermission extends Activity {
 
             if (grantResults.length > 0) {
                 if (grantResults[0] == PackageManager.PERMISSION_GRANTED) {
-                   permissionAllow(this);
+                    if (DATB.senderId != null && !DATB.senderId.isEmpty()) {
+                        DATB.init(DATB.appContext, DATB.senderId);
+                    } else {
+                        Lg.e(AppConstant.APP_NAME_TAG, DATB.appContext.getString(R.string.something_wrong_fcm_sender_id));
+                    }
                     finish();
                 } else if (ActivityCompat.shouldShowRequestPermissionRationale(this, Manifest.permission.POST_NOTIFICATIONS)) {
-                    permissionDisallow(this);
-                        finish();
-                    } else {
-                        finish();
-                    }
-
+                    finish();
+                } else {
+                    finish();
                 }
+
+            }
             overridePendingTransition(R.anim.datb_notification_permission_fade_in, R.anim.datb_notification_permission_fade_out);
         }
     }
 
-
-   public static void permissionAllow(Context context) {
-
-        if (context != null) {
-            final PreferenceUtil preferenceUtil = PreferenceUtil.getInstance(context);
-            try {
-
-                if (!preferenceUtil.getDataBID(AppConstant.APPPID).isEmpty() && preferenceUtil.getIntData(AppConstant.CAN_STORED_QUEUE) > 0) {
-                    if (!preferenceUtil.getStringData(AppConstant.FCM_DEVICE_TOKEN).isEmpty() || !preferenceUtil.getStringData(AppConstant.HMS_TOKEN).isEmpty() || !preferenceUtil.getStringData(AppConstant.XiaomiToken).isEmpty()) {
-                        Map<String, String> mapData = new HashMap<>();
-                        mapData.put(AppConstant.PID, preferenceUtil.getDataBID(AppConstant.APPPID));
-                        mapData.put(AppConstant.ANDROID_ID, "" + Util.getAndroidId(context));
-                        mapData.put(AppConstant.BTYPE_, "" + AppConstant.BTYPE);
-                        mapData.put(AppConstant.DTYPE_, "" + AppConstant.DTYPE);
-                        mapData.put(AppConstant.QSDK_VERSION, "" + AppConstant.SDK_VERSION);
-                        mapData.put(AppConstant.PTE_, "" + AppConstant.PTE);
-                        mapData.put(AppConstant.OS, "" + AppConstant.SDKOS);
-                        mapData.put(AppConstant.PT_, "" + AppConstant.PT);
-                        mapData.put(AppConstant.KEY_HMS, "" + preferenceUtil.getStringData(AppConstant.HMS_TOKEN));
-                        mapData.put(AppConstant.TIMEZONE, "" + System.currentTimeMillis());
-                        mapData.put(AppConstant.GE_, "" + AppConstant.GE);
-                        mapData.put(AppConstant.OPTIN_, "" + AppConstant.OPT_IN);
-                        mapData.put(AppConstant.NDC_, "" + AppConstant.NDC);
-                        mapData.put(AppConstant.SDC_, "" + AppConstant.SDC);
-                        mapData.put(AppConstant.ALLOWED_, "" + AppConstant.ALLOWED);
-                        RestClient.postRequest(RestClient.NOTIFICATION_PERMISSION_ALLOW_URL, mapData, null, new RestClient.ResponseHandler() {
-                            @Override
-                            void onSuccess(final String response) {
-                                super.onSuccess(response);
-                                preferenceUtil.setStringData(AppConstant.NOTIFICATION_PROMPT_ALLOW, null);
-                            }
-
-                            @Override
-                            void onFailure(int statusCode, String response, Throwable throwable) {
-                                super.onFailure(statusCode, response, throwable);
-                                preferenceUtil.setStringData(AppConstant.NOTIFICATION_PROMPT_ALLOW,mapData.toString());
-
-                            }
-                        });
-
-                    }
-                }
-
-            } catch (Exception ex) {
-                if(context!=null) {
-                    Util.setException(context, ex.toString(), AppConstant.APP_NAME_TAG, "permissionAllow");
-                    DebugFileManager.createExternalStoragePublic(context, "permissionAllow" + ex, "[Log.e]->Exception->");
-                }
-            }
-        }
-
-    }
-
-
-    public static void permissionDisallow(Context context) {
-
-        if (context != null) {
-            final PreferenceUtil preferenceUtil = PreferenceUtil.getInstance(context);
-            try {
-                if (!preferenceUtil.getDataBID(AppConstant.APPPID).isEmpty() && preferenceUtil.getIntData(AppConstant.CAN_STORED_QUEUE) > 0) {
-                    if (!preferenceUtil.getStringData(AppConstant.FCM_DEVICE_TOKEN).isEmpty() || !preferenceUtil.getStringData(AppConstant.HMS_TOKEN).isEmpty() || !preferenceUtil.getStringData(AppConstant.XiaomiToken).isEmpty()) {
-                        Map<String, String> mapData = new HashMap<>();
-                        mapData.put(AppConstant.PID, preferenceUtil.getDataBID(AppConstant.APPPID));
-                        mapData.put(AppConstant.ANDROID_ID, "" + Util.getAndroidId(context));
-                        mapData.put(AppConstant.BTYPE_, "" + AppConstant.BTYPE);
-                        mapData.put(AppConstant.DTYPE_, "" + AppConstant.DTYPE);
-                        mapData.put(AppConstant.QSDK_VERSION, "" + AppConstant.SDK_VERSION);
-                        mapData.put(AppConstant.PTE_, "" + AppConstant.PTE);
-                        mapData.put(AppConstant.OS, "" + AppConstant.SDKOS);
-                        mapData.put(AppConstant.PT_, "" + AppConstant.PT);
-                        mapData.put(AppConstant.KEY_HMS, "" + preferenceUtil.getStringData(AppConstant.HMS_TOKEN));
-                        mapData.put(AppConstant.TIMEZONE, "" + System.currentTimeMillis());
-                        mapData.put(AppConstant.GE_, "" + AppConstant.GE);
-                        mapData.put(AppConstant.OPTIN_, "" + AppConstant.OPT_IN);
-                        mapData.put(AppConstant.NDC_, "" + AppConstant.NDC);
-                        mapData.put(AppConstant.SDC_, "" + AppConstant.SDC);
-                        mapData.put(AppConstant.DENIED_, "" + AppConstant.DENIED);
-                        RestClient.postRequest(RestClient.NOTIFICATION_PERMISSION_DISALLOW_URL, mapData, null, new RestClient.ResponseHandler() {
-                            @Override
-                            void onSuccess(final String response) {
-                                super.onSuccess(response);
-                                preferenceUtil.setStringData(AppConstant.NOTIFICATION_PROMPT_DISALLOW,null);
-                            }
-
-                            @Override
-                            void onFailure(int statusCode, String response, Throwable throwable) {
-                                super.onFailure(statusCode, response, throwable);
-                                preferenceUtil.setStringData(AppConstant.NOTIFICATION_PROMPT_DISALLOW, mapData.toString());
-
-                            }
-                        });
-                    }
-                }
-
-            } catch (Exception ex) {
-                if (context != null) {
-                    Util.handleExceptionOnce(context, ex.toString(), AppConstant.APP_NAME_TAG, "permissionDisallow");
-                    DebugFileManager.createExternalStoragePublic(context, "permissionDisallow" + ex, "[Log.e]->Exception->");
-                }
-            }
-        }
-    }
 }
-
-
 
 

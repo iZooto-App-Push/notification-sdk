@@ -221,9 +221,8 @@ public class DATBNotificationChannelHandler {
                     notificationManager.deleteNotificationChannel(String.valueOf(jsonArray.get(i)));
                 }
 
-            } catch (JSONException e) {
+            } catch (Exception e) {
                 Util.handleExceptionOnce(context, e.toString(), "deleteNotificationChannel()", IZ_CLASS_NAME);
-                e.printStackTrace();
             }
         }
 
@@ -246,9 +245,8 @@ public class DATBNotificationChannelHandler {
                     notificationManager.deleteNotificationChannelGroup(String.valueOf(jsonArray.get(i)));
                 }
 
-            } catch (JSONException e) {
+            } catch (Exception e) {
                 Util.handleExceptionOnce(context, e.toString(), "deleteNotificationChannelGroup()", IZ_CLASS_NAME);
-                e.printStackTrace();
             }
         }
 

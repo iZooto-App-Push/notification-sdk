@@ -45,14 +45,7 @@ public class ActivityLifecycleListener implements Application.ActivityLifecycleC
 
     @Override
     public void onActivityStopped(@NonNull Activity activity) {
-//        ComponentName componentName = new ComponentName(
-//                activity,
-//                DATBMessagingService.class);
-//
-//        activity.getPackageManager().setComponentEnabledSetting(
-//                componentName,
-//                PackageManager.COMPONENT_ENABLED_STATE_ENABLED,
-//                PackageManager.DONT_KILL_APP);
+
     }
 
     @Override

@@ -19,7 +19,6 @@ public class PreferenceUtil {
         return mContext;
     }
 
-    @TargetApi(Build.VERSION_CODES.KITKAT)
     public static void logoutUser(Context context) {
         SharedPreferences appInstallInfoSharedPref = context.getSharedPreferences(SHARED_PREF_NAME,
                 Context.MODE_PRIVATE);

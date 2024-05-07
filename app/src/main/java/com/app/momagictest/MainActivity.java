@@ -45,7 +45,6 @@ public class MainActivity extends AppCompatActivity {
         setSupportActionBar(toolbar);
         //askForPermission(android.Manifest.permission.WRITE_EXTERNAL_STORAGE,WRITE_EXST);
        // askForReadPermission(Manifest.permission.READ_EXTERNAL_STORAGE,READ_EXST);
-        DATB.enablePulse(MainActivity.this,false);
         Button sendDebugFile = findViewById(R.id.sendDebugFile);
         Button sendToken = findViewById(R.id.sendToken);
         sendToken.setOnClickListener(new View.OnClickListener() {
@@ -249,11 +248,9 @@ public class MainActivity extends AppCompatActivity {
 
             DATB.isBackPressedEvent = true;
 
-            DATB.enablePulse(this, true);
 
         } else {
 
-            DATB.closeDrawer();
 
             backPressedOnce = true;
         }

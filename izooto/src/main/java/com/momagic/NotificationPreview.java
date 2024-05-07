@@ -2,21 +2,15 @@ package com.momagic;
 
 import android.annotation.SuppressLint;
 import android.app.Notification;
-import android.app.NotificationChannel;
 import android.app.NotificationManager;
 import android.app.PendingIntent;
 import android.content.Context;
 import android.content.Intent;
 import android.graphics.Bitmap;
-import android.graphics.Color;
-import android.media.AudioAttributes;
-import android.media.RingtoneManager;
-import android.net.Uri;
 import android.os.Build;
 import android.os.Handler;
 import android.os.Looper;
 import android.os.SystemClock;
-import android.util.Base64;
 import android.util.Log;
 import android.view.Gravity;
 import android.view.View;
@@ -24,17 +18,14 @@ import android.widget.RemoteViews;
 
 import androidx.annotation.RequiresApi;
 import androidx.core.app.NotificationCompat;
-import androidx.core.app.NotificationManagerCompat;
 
-import java.io.UnsupportedEncodingException;
 import java.math.BigInteger;
 import java.util.Objects;
-import java.util.Random;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
 public class NotificationPreview {
-    private static  int badgeColor;
+    private static int badgeColor;
     private static int priority;
     private static int OBTAINED_VALUES;
     private static long MILLIS = 1000;
@@ -66,8 +57,7 @@ public class NotificationPreview {
                             lastViewIndex = String.valueOf(data.charAt(data.length() - 3));
                             lastSeventhIndex = String.valueOf(data.charAt(data.length() - 7));
                             lastNinthIndex = String.valueOf(data.charAt(data.length() - 9));
-                        }
-                        else {
+                        } else {
                             clickIndex = "0";
                             lastclickIndex = "0";
                             lastViewIndex = "0";
@@ -96,11 +86,10 @@ public class NotificationPreview {
                         intent = NotificationEventManager.notificationClick(payload, payload.getLink(), payload.getAct1link(), payload.getAct2link(), AppConstant.NO, clickIndex, lastclickIndex, 100, 0);
                         PendingIntent pendingIntent = null;
                         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.S) {
-                            pendingIntent = PendingIntent.getActivity(DATB.appContext, new Random().nextInt(100) /* Request code */, intent,
+                            pendingIntent = PendingIntent.getActivity(DATB.appContext, (int) System.currentTimeMillis() /* Request code */, intent,
                                     PendingIntent.FLAG_ONE_SHOT | PendingIntent.FLAG_IMMUTABLE);
-                        }
-                        else {
-                            pendingIntent = PendingIntent.getBroadcast(DATB.appContext, new Random().nextInt(100) /* Request code */, intent,
+                        } else {
+                            pendingIntent = PendingIntent.getBroadcast(DATB.appContext, (int) System.currentTimeMillis() /* Request code */, intent,
                                     PendingIntent.FLAG_ONE_SHOT | PendingIntent.FLAG_IMMUTABLE);
                         }
 
@@ -116,10 +105,10 @@ public class NotificationPreview {
                             collapsedView.setTextViewText(R.id.tv_display_time, "" + Util.getTimeWithoutDate().toLowerCase());
                             collapsedView.setViewPadding(R.id.rlp, 20, 20, 20, 0);
                             collapsedView.setViewPadding(R.id.llp, 20, 0, 20, 0);
-                            if (Util.notificationMode()){
+                            if (Util.notificationMode()) {
                                 collapsedView.setViewPadding(R.id.tv_message_temp, 0, 0, 0, 0);
                                 collapsedView.setViewPadding(R.id.tv_display_time, 0, 0, 0, 0);
-                            }else {
+                            } else {
                                 collapsedView.setViewPadding(R.id.tv_message_temp, 8, 0, 0, 0);
                                 collapsedView.setViewPadding(R.id.ll_timer_notification_for_below, 8, 0, 0, 0);
                                 collapsedView.setViewPadding(R.id.tv_display_time, 8, 0, 0, 0);
@@ -187,8 +176,8 @@ public class NotificationPreview {
                         /* show the timer notification functionality */
                         if (payload.getExpiryTimerValue() != null && !payload.getExpiryTimerValue().isEmpty()) {
                             try {
-                                if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O){
-                                    if(!Util.getTimerValue(payload.getCreated_Time(), payload.getExpiryTimerValue()).equals("")) {
+                                if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
+                                    if (!Util.getTimerValue(payload.getCreated_Time(), payload.getExpiryTimerValue()).equals("")) {
                                         if (isPatternMatched(payload.getExpiryTimerValue())) {
                                             OBTAINED_VALUES = Integer.parseInt(Util.getTimerValue(payload.getCreated_Time(), payload.getExpiryTimerValue()));
                                             TOTAL_MILLIS = OBTAINED_VALUES * MILLIS;
@@ -198,7 +187,7 @@ public class NotificationPreview {
                                                 collapsedView.setViewVisibility(R.id.ll_timer_notification_for_below, View.GONE);
                                                 collapsedView.setViewVisibility(R.id.ll_timer_notification_, View.VISIBLE);
                                                 collapsedView.setViewVisibility(R.id.tv_ll, View.VISIBLE);
-                                                expandedView.setViewPadding(R.id.ll_timer_notification, 0,15,0,0);
+                                                expandedView.setViewPadding(R.id.ll_timer_notification, 0, 15, 0, 0);
                                                 if (Util.notificationMode()) {
                                                     collapsedView.setViewPadding(R.id.tv_message_temp, 10, 0, 0, 0);
                                                     collapsedView.setInt(R.id.tv_message_temp, "setGravity", Gravity.START);
@@ -216,26 +205,26 @@ public class NotificationPreview {
                                                 collapsedView.setChronometer(R.id.tv_notification_timer_for_below, EQUALS_TIMES, ("%tH:%tM:%tS"), true);
                                             }
                                             expandedView.setViewVisibility(R.id.ll_timer_notification, View.VISIBLE);
-                                            if(Build.VERSION.SDK_INT >= Build.VERSION_CODES.S){
-                                                expandedView.setViewPadding(R.id.ll_timer_notification, 0,20,0,0);
+                                            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.S) {
+                                                expandedView.setViewPadding(R.id.ll_timer_notification, 0, 20, 0, 0);
                                             }
 
                                             expandedView.setChronometerCountDown(R.id.tv_notification_timer, true);
                                             expandedView.setChronometer(R.id.tv_notification_timer, EQUALS_TIMES, ("%tH:%tM:%tS"), true);
                                         }
-                                    }
-                                    else {
+                                    } else {
                                         notificationBuilder.setTimeoutAfter(0);
                                         collapsedView.setViewVisibility(R.id.ll_timer_notification_, View.GONE);
                                         expandedView.setViewVisibility(R.id.ll_timer_notification, View.GONE);
                                     }
-                                }else {
+                                } else {
                                     expandedView.setViewVisibility(R.id.ll_timer_notification, View.GONE);
                                     collapsedView.setViewVisibility(R.id.ll_timer_notification_, View.GONE);
                                     collapsedView.setViewVisibility(R.id.ll_timer_notification_for_below, View.GONE);
                                 }
+
                             } catch (Exception e) {
-                                Log.e("Tpn", Objects.requireNonNull(e.getMessage()));
+                                Util.handleExceptionOnce(DATB.appContext, e.toString(), "NotificationPreview", "getExpiryTimerValue");
                             }
                         } else {
                             notificationBuilder.setTimeoutAfter(0);
@@ -252,16 +241,16 @@ public class NotificationPreview {
                         }
 
                         /* make sticky notification */
-                        if (payload.getMakeStickyNotification() != null && !payload.getMakeStickyNotification().isEmpty() && payload.getMakeStickyNotification().equals("1")){
+                        if (payload.getMakeStickyNotification() != null && !payload.getMakeStickyNotification().isEmpty() && payload.getMakeStickyNotification().equals("1")) {
                             try {
                                 if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
                                     notificationBuilder.setOngoing(Util.enableSticky(payload));
                                     if (payload.getExpiryTimerValue() != null && !payload.getExpiryTimerValue().isEmpty()) {
                                         collapsedView.setViewVisibility(R.id.tv_dismissed_, View.GONE);
                                         collapsedView.setViewVisibility(R.id.tv_close_icon, View.GONE);
-                                        preferenceUtil.setStringData(AppConstant.TP_TYPE,AppConstant.TYPE_TP);
+                                        preferenceUtil.setStringData(AppConstant.TP_TYPE, AppConstant.TYPE_TP);
                                     } else {
-                                        preferenceUtil.setStringData(AppConstant.TP_TYPE,AppConstant.TYPE_P);
+                                        preferenceUtil.setStringData(AppConstant.TP_TYPE, AppConstant.TYPE_P);
                                         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.S) {
                                             if (Util.notificationMode()) {
                                                 collapsedView.setViewPadding(R.id.tv_message_temp, 50, 0, 0, 0);
@@ -281,7 +270,7 @@ public class NotificationPreview {
                                         }
                                     }
                                     expandedView.setViewVisibility(R.id.tv_dismissed, View.VISIBLE);
-                                    Intent cancelIntent = dismissedNotification(payload, notificationId,3);
+                                    Intent cancelIntent = dismissedNotification(payload, notificationId, 3);
                                     if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.S) {
                                         cancelIntent.setPackage(Util.getPackageName(DATB.appContext));
                                         pendingIntent = PendingIntent.getBroadcast(DATB.appContext, notificationId, cancelIntent, PendingIntent.FLAG_UPDATE_CURRENT | PendingIntent.FLAG_IMMUTABLE);
@@ -291,27 +280,39 @@ public class NotificationPreview {
                                     expandedView.setOnClickPendingIntent(R.id.tv_dismissed, pendingIntent);
                                     collapsedView.setOnClickPendingIntent(R.id.tv_dismissed_, pendingIntent);
                                     collapsedView.setOnClickPendingIntent(R.id.tv_close_icon, pendingIntent);
-                                }else {
+                                } else {
                                     expandedView.setViewVisibility(R.id.tv_dismissed, View.GONE);
                                     collapsedView.setViewVisibility(R.id.tv_dismissed_, View.GONE);
                                     collapsedView.setViewVisibility(R.id.tv_close_icon, View.GONE);
                                     notificationBuilder.setOngoing(false);
                                 }
-                            }catch (Exception e){
-                                Log.e("pv", Objects.requireNonNull(e.getMessage()));
+                            } catch (Exception e) {
+                                Util.handleExceptionOnce(DATB.appContext, e.toString(), "NotificationPreview", "getMakeStickyNotification");
                             }
-                        }else {
+                        } else {
                             expandedView.setViewVisibility(R.id.tv_dismissed, View.GONE);
                             collapsedView.setViewVisibility(R.id.tv_dismissed_, View.GONE);
                             collapsedView.setViewVisibility(R.id.tv_close_icon, View.GONE);
                             notificationBuilder.setOngoing(false);
                         }
 
+
+                        /* Required interaction notification */
+                        try {
+                            if (Util.getTimerValue(payload.getCreated_Time(), payload.getExpiryTimerValue()).isEmpty()) {
+                                notificationBuilder.setTimeoutAfter(Util.getRequiredInteraction(payload));
+                            }
+                        } catch (Exception e) {
+                            Util.handleExceptionOnce(DATB.appContext, e.toString(), "NotificationPreview", "getRequiredInteraction");
+                        }
+
                         try {
                             BigInteger accentColor = Util.getAccentColor();
                             if (accentColor != null)
                                 notificationBuilder.setColor(accentColor.intValue());
-                        } catch (Throwable ignored) {}
+                        } catch (Exception e) {
+                            Util.handleExceptionOnce(DATB.appContext, e.toString(), "NotificationPreview", "getAccentColor");
+                        }
 
                         if (Build.VERSION.SDK_INT <= Build.VERSION_CODES.M) {
                             notificationBuilder.setCustomHeadsUpContentView(collapsedView);
@@ -339,10 +340,10 @@ public class NotificationPreview {
                             Intent btn1 = cnotificationClick(payload, payload.getAct1link(), payload.getLink(), payload.getAct2link(), phone, clickIndex, lastclickIndex, notificationId, 1);
                             if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.S) {
                                 btn1.setPackage(Util.getPackageName(DATB.appContext));
-                                pendingIntent = PendingIntent.getActivity(DATB.appContext, new Random().nextInt(100), btn1, PendingIntent.FLAG_UPDATE_CURRENT | PendingIntent.FLAG_IMMUTABLE);
+                                pendingIntent = PendingIntent.getActivity(DATB.appContext, (int) System.currentTimeMillis(), btn1, PendingIntent.FLAG_UPDATE_CURRENT | PendingIntent.FLAG_IMMUTABLE);
 
                             } else {
-                                pendingIntent = PendingIntent.getBroadcast(DATB.appContext, new Random().nextInt(100), btn1, PendingIntent.FLAG_UPDATE_CURRENT | PendingIntent.FLAG_IMMUTABLE);
+                                pendingIntent = PendingIntent.getBroadcast(DATB.appContext, (int) System.currentTimeMillis(), btn1, PendingIntent.FLAG_UPDATE_CURRENT | PendingIntent.FLAG_IMMUTABLE);
                             }
                             expandedView.setOnClickPendingIntent(R.id.tv_btn1, pendingIntent);
                         }
@@ -361,10 +362,10 @@ public class NotificationPreview {
 
                             if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.S) {
                                 btn2.setPackage(Util.getPackageName(DATB.appContext));
-                                pendingIntent = PendingIntent.getActivity(DATB.appContext, new Random().nextInt(100), btn2, PendingIntent.FLAG_UPDATE_CURRENT | PendingIntent.FLAG_IMMUTABLE);
+                                pendingIntent = PendingIntent.getActivity(DATB.appContext, (int) System.currentTimeMillis(), btn2, PendingIntent.FLAG_UPDATE_CURRENT | PendingIntent.FLAG_IMMUTABLE);
 
                             } else {
-                                pendingIntent = PendingIntent.getBroadcast(DATB.appContext, new Random().nextInt(100), btn2, PendingIntent.FLAG_UPDATE_CURRENT | PendingIntent.FLAG_IMMUTABLE);
+                                pendingIntent = PendingIntent.getBroadcast(DATB.appContext, (int) System.currentTimeMillis(), btn2, PendingIntent.FLAG_UPDATE_CURRENT | PendingIntent.FLAG_IMMUTABLE);
                             }
                             expandedView.setOnClickPendingIntent(R.id.tv_btn2, pendingIntent);
                         }
@@ -383,18 +384,17 @@ public class NotificationPreview {
 
                         DATB.notificationView(payload);
 
-
                         //Set Max notification in tray
                         if (payload.getMaxNotification() != 0)
                             NotificationEventManager.getMaximumNotificationInTray(DATB.appContext, payload.getMaxNotification());
 
                     } catch (Exception e) {
-                        Util.handleExceptionOnce(DATB.appContext, e.toString(), "receiveCustomNotification", "NotificationCustomView");
+                        Util.handleExceptionOnce(DATB.appContext, e.toString(), "NotificationPreview", "receiveCustomNotification");
                     }
                 }
             };
 
-            if(payload.getFetchURL() != null && !payload.getFetchURL().isEmpty()){
+            if (payload.getFetchURL() != null && !payload.getFetchURL().isEmpty()) {
                 NotificationExecutorService notificationExecutorService = new NotificationExecutorService(DATB.appContext);
                 notificationExecutorService.executeNotification(handler, notificationRunnable, payload);
             } else {
@@ -405,66 +405,59 @@ public class NotificationPreview {
 
     // Share button intent
     public static PendingIntent shareNotification(String url) {
-        if(url!=null && !url.isEmpty()) {
+        if (url != null && !url.isEmpty()) {
             Intent sendIntent = new Intent();
             sendIntent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TASK);
             sendIntent.setAction(Intent.ACTION_SEND);
             sendIntent.putExtra(Intent.EXTRA_TEXT, url);
             sendIntent.setType("text/plain");
-            return PendingIntent.getActivity(DATB.appContext, new Random().nextInt(100), sendIntent, PendingIntent.FLAG_IMMUTABLE |PendingIntent.FLAG_UPDATE_CURRENT);
-        }
-        else {
+            return PendingIntent.getActivity(DATB.appContext, (int) System.currentTimeMillis(), sendIntent, PendingIntent.FLAG_IMMUTABLE | PendingIntent.FLAG_UPDATE_CURRENT);
+
+        } else {
             Intent sendIntent = new Intent();
             sendIntent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TASK);
             sendIntent.setAction(Intent.ACTION_SEND);
             sendIntent.putExtra(Intent.EXTRA_TEXT, "no url found here");
             sendIntent.setType("text/plain");
-            return PendingIntent.getActivity(DATB.appContext, new Random().nextInt(100), sendIntent, PendingIntent.FLAG_IMMUTABLE | PendingIntent.FLAG_UPDATE_CURRENT);
+            return PendingIntent.getActivity(DATB.appContext, (int) System.currentTimeMillis(), sendIntent, PendingIntent.FLAG_IMMUTABLE | PendingIntent.FLAG_UPDATE_CURRENT);
         }
     }
 
     // Notification click intent
-    static Intent cnotificationClick(Payload payload, String getLink ,String getLink1, String getLink2, String phone, String finalClickIndex, String lastClick, int notificationId, int button){
+    static Intent cnotificationClick(Payload payload, String getLink, String getLink1, String getLink2, String phone, String finalClickIndex, String lastClick, int notificationId, int button) {
         String link = getLink;
         String link1 = getLink1;
         String link2 = getLink2;
         if (payload.getFetchURL() == null || payload.getFetchURL().isEmpty()) {
-            if (link.contains(AppConstant.ANDROID_TOKEN) || link.contains(AppConstant.DEVICE_ID) || link.contains(AppConstant.R_XIAOMI_TOKEN)|| link.contains(AppConstant.R_HMS_TOKEN) || link.contains(AppConstant.R_FCM_TOKEN)) {
-                if(Build.MANUFACTURER.equalsIgnoreCase("Huawei")) {
-                    link = link.replace(AppConstant.ANDROID_TOKEN, PreferenceUtil.getInstance(DATB.appContext).getStringData(AppConstant.HMS_TOKEN)).replace(AppConstant.DEVICE_ID, Util.getAndroidId(DATB.appContext)).replace(AppConstant.R_XIAOMI_TOKEN, PreferenceUtil.getInstance(DATB.appContext).getStringData(AppConstant.XiaomiToken)).replace(AppConstant.R_HMS_TOKEN, PreferenceUtil.getInstance(DATB.appContext).getStringData(AppConstant.HMS_TOKEN)).replace(AppConstant.R_FCM_TOKEN, PreferenceUtil.getInstance(DATB.appContext).getStringData(AppConstant.FCM_DEVICE_TOKEN));
+            if (payload.getFetchURL() == null || payload.getFetchURL().isEmpty()) {
+                if (link.contains(AppConstant.ANDROID_TOKEN) || link.contains(AppConstant.DEVICE_ID) || link.contains(AppConstant.UUID) || link.contains(AppConstant.R_FCM_TOKEN)) {
+                    if (PreferenceUtil.getInstance(DATB.appContext).getStringData(AppConstant.FCM_DEVICE_TOKEN) != null ) {
+                        link = link.replace(AppConstant.ANDROID_TOKEN, PreferenceUtil.getInstance(DATB.appContext).getStringData(AppConstant.FCM_DEVICE_TOKEN)).replace(AppConstant.DEVICE_ID, Util.getAndroidId(DATB.appContext)).replace(AppConstant.UUID, Util.getAndroidId(DATB.appContext)).replace(AppConstant.R_FCM_TOKEN, PreferenceUtil.getInstance(DATB.appContext).getStringData(AppConstant.FCM_DEVICE_TOKEN));
+                    }
                 }
-                if(PreferenceUtil.getInstance(DATB.appContext).getStringData(AppConstant.FCM_DEVICE_TOKEN)!=null || PreferenceUtil.getInstance(DATB.appContext).getStringData(AppConstant.XiaomiToken)!=null) {
-                    link = link.replace(AppConstant.ANDROID_TOKEN, PreferenceUtil.getInstance(DATB.appContext).getStringData(AppConstant.FCM_DEVICE_TOKEN)).replace(AppConstant.DEVICE_ID, Util.getAndroidId(DATB.appContext)).replace(AppConstant.R_XIAOMI_TOKEN, PreferenceUtil.getInstance(DATB.appContext).getStringData(AppConstant.XiaomiToken)).replace(AppConstant.R_HMS_TOKEN, PreferenceUtil.getInstance(DATB.appContext).getStringData(AppConstant.HMS_TOKEN)).replace(AppConstant.R_FCM_TOKEN, PreferenceUtil.getInstance(DATB.appContext).getStringData(AppConstant.FCM_DEVICE_TOKEN));
-                }
-            }
+                if (link1.contains(AppConstant.ANDROID_TOKEN) || link1.contains(AppConstant.DEVICE_ID) || link1.contains(AppConstant.UUID) || link1.contains(AppConstant.R_FCM_TOKEN)) {
 
-            if (link1.contains(AppConstant.ANDROID_TOKEN) || link1.contains(AppConstant.DEVICE_ID) || link1.contains(AppConstant.R_XIAOMI_TOKEN)|| link1.contains(AppConstant.R_HMS_TOKEN) || link1.contains(AppConstant.R_FCM_TOKEN)) {
-                if(Build.MANUFACTURER.equalsIgnoreCase("Huawei")) {
-                    link1 = link1.replace(AppConstant.ANDROID_TOKEN, PreferenceUtil.getInstance(DATB.appContext).getStringData(AppConstant.HMS_TOKEN)).replace(AppConstant.DEVICE_ID, Util.getAndroidId(DATB.appContext)).replace(AppConstant.R_XIAOMI_TOKEN, PreferenceUtil.getInstance(DATB.appContext).getStringData(AppConstant.XiaomiToken)).replace(AppConstant.R_HMS_TOKEN, PreferenceUtil.getInstance(DATB.appContext).getStringData(AppConstant.HMS_TOKEN)).replace(AppConstant.R_FCM_TOKEN, PreferenceUtil.getInstance(DATB.appContext).getStringData(AppConstant.FCM_DEVICE_TOKEN));
+                    if (PreferenceUtil.getInstance(DATB.appContext).getStringData(AppConstant.FCM_DEVICE_TOKEN) != null ) {
+                        link1 = link1.replace(AppConstant.ANDROID_TOKEN, PreferenceUtil.getInstance(DATB.appContext).getStringData(AppConstant.FCM_DEVICE_TOKEN)).replace(AppConstant.DEVICE_ID, Util.getAndroidId(DATB.appContext)).replace(AppConstant.UUID, Util.getAndroidId(DATB.appContext)).replace(AppConstant.R_FCM_TOKEN, PreferenceUtil.getInstance(DATB.appContext).getStringData(AppConstant.FCM_DEVICE_TOKEN));
+                    }
                 }
-                if(PreferenceUtil.getInstance(DATB.appContext).getStringData(AppConstant.FCM_DEVICE_TOKEN)!=null || PreferenceUtil.getInstance(DATB.appContext).getStringData(AppConstant.XiaomiToken)!=null) {
-                    link1 = link1.replace(AppConstant.ANDROID_TOKEN, PreferenceUtil.getInstance(DATB.appContext).getStringData(AppConstant.FCM_DEVICE_TOKEN)).replace(AppConstant.DEVICE_ID, Util.getAndroidId(DATB.appContext)).replace(AppConstant.R_XIAOMI_TOKEN, PreferenceUtil.getInstance(DATB.appContext).getStringData(AppConstant.XiaomiToken)).replace(AppConstant.R_HMS_TOKEN, PreferenceUtil.getInstance(DATB.appContext).getStringData(AppConstant.HMS_TOKEN)).replace(AppConstant.R_FCM_TOKEN, PreferenceUtil.getInstance(DATB.appContext).getStringData(AppConstant.FCM_DEVICE_TOKEN));
-                }
-            }
-            if (link2.contains(AppConstant.ANDROID_TOKEN) || link2.contains(AppConstant.DEVICE_ID) || link2.contains(AppConstant.R_XIAOMI_TOKEN)|| link2.contains(AppConstant.R_HMS_TOKEN) || link2.contains(AppConstant.R_FCM_TOKEN)) {
-                if(Build.MANUFACTURER.equalsIgnoreCase("Huawei")) {
-                    link2 = link2.replace(AppConstant.ANDROID_TOKEN, PreferenceUtil.getInstance(DATB.appContext).getStringData(AppConstant.HMS_TOKEN)).replace(AppConstant.DEVICE_ID, Util.getAndroidId(DATB.appContext)).replace(AppConstant.R_XIAOMI_TOKEN, PreferenceUtil.getInstance(DATB.appContext).getStringData(AppConstant.XiaomiToken)).replace(AppConstant.R_HMS_TOKEN, PreferenceUtil.getInstance(DATB.appContext).getStringData(AppConstant.HMS_TOKEN)).replace(AppConstant.R_FCM_TOKEN, PreferenceUtil.getInstance(DATB.appContext).getStringData(AppConstant.FCM_DEVICE_TOKEN));
-                }
-                if(PreferenceUtil.getInstance(DATB.appContext).getStringData(AppConstant.FCM_DEVICE_TOKEN)!=null || PreferenceUtil.getInstance(DATB.appContext).getStringData(AppConstant.XiaomiToken)!=null) {
-                    link2 = link2.replace(AppConstant.ANDROID_TOKEN, PreferenceUtil.getInstance(DATB.appContext).getStringData(AppConstant.FCM_DEVICE_TOKEN)).replace(AppConstant.DEVICE_ID, Util.getAndroidId(DATB.appContext)).replace(AppConstant.R_XIAOMI_TOKEN, PreferenceUtil.getInstance(DATB.appContext).getStringData(AppConstant.XiaomiToken)).replace(AppConstant.R_HMS_TOKEN, PreferenceUtil.getInstance(DATB.appContext).getStringData(AppConstant.HMS_TOKEN)).replace(AppConstant.R_FCM_TOKEN, PreferenceUtil.getInstance(DATB.appContext).getStringData(AppConstant.FCM_DEVICE_TOKEN));
+                if (link2.contains(AppConstant.ANDROID_TOKEN) || link2.contains(AppConstant.DEVICE_ID) || link2.contains(AppConstant.UUID) || link2.contains(AppConstant.R_FCM_TOKEN)) {
+
+                    if (PreferenceUtil.getInstance(DATB.appContext).getStringData(AppConstant.FCM_DEVICE_TOKEN) != null) {
+                        link2 = link2.replace(AppConstant.ANDROID_TOKEN, PreferenceUtil.getInstance(DATB.appContext).getStringData(AppConstant.FCM_DEVICE_TOKEN)).replace(AppConstant.DEVICE_ID, Util.getAndroidId(DATB.appContext)).replace(AppConstant.UUID, Util.getAndroidId(DATB.appContext)).replace(AppConstant.R_FCM_TOKEN, PreferenceUtil.getInstance(DATB.appContext).getStringData(AppConstant.FCM_DEVICE_TOKEN));
+                    }
                 }
             }
         }
 
-        Intent intent=null;
-        if(Build.VERSION.SDK_INT>=Build.VERSION_CODES.S) {
+        Intent intent = null;
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.S) {
             intent = new Intent(DATB.appContext, TargetActivity.class);
-        }
-        else {
+        } else {
             intent = new Intent(DATB.appContext, NotificationActionReceiver.class);
         }
-        if(link==null)
-            link ="";
+        if (link == null)
+            link = "";
 
         intent.putExtra(AppConstant.KEY_WEB_URL, link);
         intent.putExtra(AppConstant.KEY_NOTIFICITON_ID, notificationId);
@@ -483,27 +476,25 @@ public class NotificationPreview {
         intent.putExtra(AppConstant.ACT2URL, link2);
         intent.putExtra(AppConstant.CLICKINDEX, finalClickIndex);
         intent.putExtra(AppConstant.LASTCLICKINDEX, lastClick);
-        intent.putExtra(AppConstant.PUSH,payload.getPush_type());
+        intent.putExtra(AppConstant.PUSH, payload.getPush_type());
         intent.putExtra(AppConstant.CFGFORDOMAIN, payload.getCfg());
-        intent.putExtra(AppConstant.IZ_NOTIFICATION_TITLE_KEY_NAME,payload.getTitle());
+        intent.putExtra(AppConstant.IZ_NOTIFICATION_TITLE_KEY_NAME, payload.getTitle());
         return intent;
     }
 
     // Notification dismiss button intent
-    static Intent dismissedNotification(Payload payload ,int notificationId, int button){
+    static Intent dismissedNotification(Payload payload, int notificationId, int button) {
         Intent intent = null;
-        if(Build.VERSION.SDK_INT >= Build.VERSION_CODES.S) {
-            if(button == 3){
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.S) {
+            if (button == 3) {
                 intent = new Intent(DATB.appContext, NotificationDismissedReceiver.class);
-            }
-            else {
+            } else {
                 intent = new Intent(DATB.appContext, TargetActivity.class);
             }
-        }
-        else {
-            if(button == 3){
+        } else {
+            if (button == 3) {
                 intent = new Intent(DATB.appContext, NotificationDismissedReceiver.class);
-            }else {
+            } else {
                 intent = new Intent(DATB.appContext, NotificationActionReceiver.class);
             }
         }
@@ -524,10 +515,11 @@ public class NotificationPreview {
         intent.putExtra(AppConstant.ACT2URL, payload.getAct2link());
         intent.putExtra(AppConstant.CLICKINDEX, "0");
         intent.putExtra(AppConstant.LASTCLICKINDEX, "0");
-        intent.putExtra(AppConstant.PUSH,payload.getPush_type());
+        intent.putExtra(AppConstant.PUSH, payload.getPush_type());
         intent.putExtra(AppConstant.CFGFORDOMAIN, payload.getCfg());
         return intent;
     }
+
 
     // notification default icon
     private static int getDefaultSmallIconId() {
@@ -547,5 +539,4 @@ public class NotificationPreview {
         Matcher totalNumber = length.matcher(patterns);
         return totalNumber.find();
     }
-
 }

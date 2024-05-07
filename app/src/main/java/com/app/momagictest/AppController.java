@@ -17,6 +17,7 @@ public class AppController extends Application implements TokenReceivedListener,
     public void onCreate() {
         super.onCreate();
         DATB.initialize(this)
+                .setTokenReceivedListener(this)
                 .setNotificationReceiveListener(this)
                 .build();
         DATB.promptForPushNotifications();

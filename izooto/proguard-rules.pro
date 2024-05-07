@@ -19,9 +19,19 @@
 # If you keep the line number information, uncomment this to
 # hide the original source file name.
 #-renamesourcefileattribute SourceFile
+
 -ignorewarnings
-
--keep class com.momagic.XiaomiPushReceiver{*;}
--dontwarn com.xiaomi.push.**
-
+-keepattributes LineNumberTable,SourceFile
+-renamesourcefileattribute SourceFile
+-keep public class com.momagic.DATB{*;}
+-keep public class com.momagic.DATB$Builder{*;}
+-keep public class com.momagic.PushTemplate{*;}
+-keep public class com.momagic.PreferenceUtil{*;}
+-keep public class com.momagic.AppConstant{*;}
+-keep public class com.momagic.NotificationWebViewListener{*;}
+-keep public class com.momagic.NotificationHelperListener{*;}
+-keep public class com.momagic.TokenReceivedListener{*;}
+-keep public class com.momagic.Payload{*;}
+-repackageclasses 'com.momagic'
+-useuniqueclassmembernames
 

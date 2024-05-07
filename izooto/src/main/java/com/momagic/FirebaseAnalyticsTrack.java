@@ -39,8 +39,7 @@ public class FirebaseAnalyticsTrack {
             try {
                 FirebaseAnalyticsClass = Class.forName("com.google.firebase.analytics.FirebaseAnalytics");
                 return true;
-            } catch (ClassNotFoundException e) {
-               // Util.setException(DATB.appContext, e.toString(), "FirebaseAnalyticsClass", "canFirebase");
+            } catch (Exception e) {
                 return false;
             }
         }
@@ -67,8 +66,8 @@ public class FirebaseAnalyticsTrack {
 
                 }
 
-            } catch (Throwable t) {
-                Util.setException(mContext, t.toString(), "FirebaseAnalyticsClass", "receiveEvent");
+            } catch (Exception t) {
+                Util.handleExceptionOnce(mContext, t.toString(), "FirebaseAnalyticsClass", "receiveEvent");
 
             }
         }
@@ -101,8 +100,8 @@ public class FirebaseAnalyticsTrack {
                     }
 
                 }
-            } catch (Throwable t) {
-                Util.setException(mContext, t.toString(), "FirebaseAnalyticsClass", "influence");
+            } catch (Exception t) {
+                Util.handleExceptionOnce(mContext, t.toString(), "FirebaseAnalyticsClass", "influence");
             }
         }
     }
@@ -129,8 +128,8 @@ public class FirebaseAnalyticsTrack {
 
                 }
 
-            } catch (Throwable t) {
-                Util.setException(mContext, t.toString(), "FirebaseAnalyticsClass", "openTrackEvent");
+            } catch (Exception t) {
+                Util.handleExceptionOnce(mContext, t.toString(), "FirebaseAnalyticsClass", "openTrackEvent");
 
             }
         }
@@ -196,8 +195,7 @@ public class FirebaseAnalyticsTrack {
     private static Method trackEvent(Class mClass) {
             try {
                 return mClass.getMethod(AppConstant.LOG_EVENT, String.class, Bundle.class);
-            } catch (NoSuchMethodException e) {
-                e.printStackTrace();
+            } catch (Exception e) {
                 return null;
             }
 
@@ -206,8 +204,7 @@ public class FirebaseAnalyticsTrack {
     private static Method getInstance(Class mClass) {
         try {
             return mClass.getMethod(AppConstant.GET_FIREBASE_INSTANCE, Context.class);
-        } catch (NoSuchMethodException e) {
-            e.printStackTrace();
+        } catch (Exception e) {
             return null;
         }
     }
@@ -292,8 +289,7 @@ public class FirebaseAnalyticsTrack {
         Date convertedDate = new Date();
         try {
             convertedDate = format.parse(currentTime);
-        } catch (ParseException e) {
-            // TODO Auto-generated catch block
+        } catch (Exception e) {
             e.printStackTrace();
         }
         return convertedDate ;

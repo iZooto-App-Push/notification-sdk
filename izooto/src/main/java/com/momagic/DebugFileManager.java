@@ -2,34 +2,32 @@ package com.momagic;
 
 import android.content.Context;
 import android.content.Intent;
+import android.content.pm.PackageManager;
 import android.net.Uri;
 import android.os.Build;
 import android.os.Environment;
 import android.util.Log;
+
 import androidx.annotation.RequiresApi;
+import androidx.core.content.ContextCompat;
 import androidx.core.content.FileProvider;
+
 import java.io.File;
 import java.io.FileWriter;
 
 public class DebugFileManager {
 
-
-
-
-
-    @RequiresApi(api = Build.VERSION_CODES.KITKAT)
     static void createExternalStoragePublic(Context context, String data, String requestName) {
         try {
             File outputDirectory = CheckDirectory_ExitsORNot(AppConstant.DIRECTORY_NAME);
 
-            GenerateTimeStampAppData(context, outputDirectory, "pid.debug", data, requestName);
+            GenerateTimeStampAppData(context, outputDirectory, data, requestName);
 
         } catch (Exception e) {
-            // Log.w("ExternalStorage", "Error writing " );
+            Log.i(AppConstant.APP_NAME_TAG, e.toString());
         }
     }
 
-    @RequiresApi(api = Build.VERSION_CODES.KITKAT)
     static void createPublicDirectory(Context context) {
         // File outputDirectory=null;
         try {
@@ -52,8 +50,8 @@ public class DebugFileManager {
 
                 }
             }
-        } catch (Exception ex) {
-            Log.e("Error", ex.toString());
+        } catch (Exception e) {
+            Log.i(AppConstant.APP_NAME_TAG, e.toString());
         }
 
     }
@@ -93,26 +91,24 @@ public class DebugFileManager {
 
                 } else {
                     PreferenceUtil.getInstance(context).setBooleanData(AppConstant.FILE_EXIST, false);
-
-
                 }
 
             }
-        } catch (Exception ex) {
-            Log.e("Error", ex.toString());
+        } catch (Exception e) {
+            Log.i(AppConstant.APP_NAME_TAG, e.toString());
         }
     }
 
-    static void GenerateTimeStampAppData(Context context, File outputDirectory, String fileName, String data, String requestName) {
+    private static void GenerateTimeStampAppData(Context context, File outputDirectory, String data, String requestName) {
 
         if (outputDirectory != null) {
-            File file = new File(outputDirectory, fileName);
+            File file = new File(outputDirectory, "pid.debug");
             PreferenceUtil preferenceUtil = PreferenceUtil.getInstance(context);
 
             try {
                 FileWriter writer = new FileWriter(file, true);
-                writer.append(requestName +"\n");
-                writer.append(data +"\n");
+                writer.append(requestName).append("\n");
+                writer.append(data).append("\n");
                 writer.flush();
                 writer.close();
                 if (requestName.equalsIgnoreCase("RegisterToken")) {
@@ -120,12 +116,13 @@ public class DebugFileManager {
                 }
             } catch (Exception e) {
                 preferenceUtil.setBooleanData(AppConstant.FILE_EXIST, false);
-
+                Log.d(AppConstant.APP_NAME_TAG, e.toString());
             }
+
         }
     }
 
-    public static File CheckDirectory_ExitsORNot(String inWhichFolder) {
+    private static File CheckDirectory_ExitsORNot(String inWhichFolder) {
 
         File outputDirectory = null;
         String externalStorageState = Environment.getExternalStorageState();
@@ -134,7 +131,7 @@ public class DebugFileManager {
             File fileDirectory = Environment.getExternalStoragePublicDirectory(inWhichFolder);
             if (fileDirectory.exists() && fileDirectory.isDirectory()) {
 
-                outputDirectory =fileDirectory;// new File(fileDirectory, Util.getPackageName(DATB.appContext));
+                outputDirectory = fileDirectory;// new File(fileDirectory, Util.getPackageName(DATB.appContext));
                 return outputDirectory;
 
             } else {
@@ -147,7 +144,7 @@ public class DebugFileManager {
         return outputDirectory;
     }
 
-    public static void shareDebuginfo(Context context, String name, String email) {
+    static void shareDebuginfo(Context context, String name, String email) {
 
 
         String externalStorageState = Environment.getExternalStorageState();
@@ -167,11 +164,9 @@ public class DebugFileManager {
                     String to[] = {"amit@datability.co"};
                     emailIntent.putExtra(Intent.EXTRA_EMAIL, to);
                     emailIntent.putExtra(android.content.Intent.EXTRA_STREAM, uri);
-                    emailIntent.putExtra(Intent.EXTRA_SUBJECT, "Token->" + PreferenceUtil.getInstance(context).getStringData(AppConstant.FCM_DEVICE_TOKEN)+"Mi Token ->"+PreferenceUtil.getInstance(context).getStringData(AppConstant.XiaomiToken));
+                    emailIntent.putExtra(Intent.EXTRA_SUBJECT, "Token->" + PreferenceUtil.getInstance(context).getStringData(AppConstant.FCM_DEVICE_TOKEN));
                     context.startActivity(Intent.createChooser(emailIntent, "Send email..."));
-                }
-                else
-                {
+                } else {
                     String path = String.valueOf(Environment.getExternalStoragePublicDirectory(AppConstant.DIRECTORY_NAME + "/pid.debug"));
                     File file = new File(path);
 
@@ -187,23 +182,7 @@ public class DebugFileManager {
                     String to[] = {"amit@datability.co"};
                     emailIntent.putExtra(Intent.EXTRA_EMAIL, to);
                     emailIntent.putExtra(android.content.Intent.EXTRA_STREAM, pngUri);
-
-                    if(Build.MANUFACTURER.equalsIgnoreCase("Xiaomi")) {
-                        if(PreferenceUtil.getInstance(context).getStringData(AppConstant.XiaomiToken)!=null)
-                        emailIntent.putExtra(Intent.EXTRA_SUBJECT,  "MI Token ->" + PreferenceUtil.getInstance(context).getStringData(AppConstant.XiaomiToken) + "");
-                        else
-                            emailIntent.putExtra(Intent.EXTRA_SUBJECT,  "FCM Token ->" + PreferenceUtil.getInstance(context).getStringData(AppConstant.FCM_DEVICE_TOKEN) + "");
-
-                    }
-                    if(Build.MANUFACTURER.equalsIgnoreCase("Huawei"))
-                    {
-                        emailIntent.putExtra(Intent.EXTRA_SUBJECT,  "HMS Token ->" + PreferenceUtil.getInstance(context).getStringData(AppConstant.HMS_TOKEN) + "");
-                    }
-                    else
-                    {
-                        emailIntent.putExtra(Intent.EXTRA_SUBJECT,  "FCM Token ->" + PreferenceUtil.getInstance(context).getStringData(AppConstant.FCM_DEVICE_TOKEN) + "");
-
-                    }
+                    emailIntent.putExtra(Intent.EXTRA_SUBJECT, "FCM Token ->" + PreferenceUtil.getInstance(context).getStringData(AppConstant.FCM_DEVICE_TOKEN) + "");
                     context.startActivity(Intent.createChooser(emailIntent, "Send email..."));
 
                 }
@@ -212,7 +191,6 @@ public class DebugFileManager {
             }
 
         }
-
 
     }
 }

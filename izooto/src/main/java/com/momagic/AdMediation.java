@@ -4,7 +4,6 @@ import android.content.Context;
 import android.os.Build;
 import android.util.Log;
 
-import androidx.annotation.RequiresApi;
 import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
@@ -50,81 +49,81 @@ public class AdMediation {
                 if (jsonArray.length() > 0) {
                     for (int i = 0; i < jsonArray.length(); i++) {
                         JSONObject payloadObj = jsonArray.getJSONObject(i);
-                        if (jsonObject.optLong(ShortpayloadConstant.CREATEDON) > PreferenceUtil.getInstance(context).getLongValue(AppConstant.DEVICE_REGISTRATION_TIMESTAMP)) {
+                        if (jsonObject.optLong(ShortPayloadConstant.CREATED_ON) > PreferenceUtil.getInstance(context).getLongValue(AppConstant.DEVICE_REGISTRATION_TIMESTAMP)) {
                             payload = new Payload();
-                            payload.setAd_type(jsonObject.optString(ShortpayloadConstant.AD_TYPE));
-                            payload.setAdID(payloadObj.optString(ShortpayloadConstant.AD_ID));
-                            payload.setReceived_bid(payloadObj.optString(ShortpayloadConstant.RECEIVED_BID).replace("['", "").replace("']", ""));
-                            payload.setFetchURL(payloadObj.optString(ShortpayloadConstant.FETCHURL));
-                            payload.setKey(jsonObject.optString(ShortpayloadConstant.KEY));
-                            if(jsonObject.has(ShortpayloadConstant.ID))
-                                payload.setId(jsonObject.optString(ShortpayloadConstant.ID).replace("['", "").replace("']", ""));
+                            payload.setAd_type(jsonObject.optString(ShortPayloadConstant.AD_TYPE));
+                            payload.setAdID(payloadObj.optString(ShortPayloadConstant.AD_ID));
+                            payload.setReceived_bid(payloadObj.optString(ShortPayloadConstant.RECEIVED_BID).replace("['", "").replace("']", ""));
+                            payload.setFetchURL(payloadObj.optString(ShortPayloadConstant.FETCH_URL));
+                            payload.setKey(jsonObject.optString(ShortPayloadConstant.KEY));
+                            if(jsonObject.has(ShortPayloadConstant.ID))
+                                payload.setId(jsonObject.optString(ShortPayloadConstant.ID).replace("['", "").replace("']", ""));
                             else
-                                payload.setId(payloadObj.optString(ShortpayloadConstant.ID).replace("['", "").replace("']", ""));
+                                payload.setId(payloadObj.optString(ShortPayloadConstant.ID).replace("['", "").replace("']", ""));
 
                             payload.setStartTime(start);
-                            payload.setRid(jsonObject.optString(ShortpayloadConstant.RID));
-                            payload.setLink(payloadObj.optString(ShortpayloadConstant.LINK).replace("['", "").replace("']", ""));
-                            payload.setTitle(payloadObj.optString(ShortpayloadConstant.TITLE).replace("['", "").replace("']", ""));
-                            payload.setMessage(payloadObj.optString(ShortpayloadConstant.NMESSAGE).replace("['", "").replace("']", ""));
-                            payload.setIcon(payloadObj.optString(ShortpayloadConstant.ICON).replace("['", "").replace("']", ""));
-                            payload.setReqInt(payloadObj.optInt(ShortpayloadConstant.REQINT));
-                            payload.setTag(payloadObj.optString(ShortpayloadConstant.TAG));
-                            payload.setBanner(payloadObj.optString(ShortpayloadConstant.BANNER).replace("['", "").replace("']", ""));
-                            payload.setBadgeicon(payloadObj.optString(ShortpayloadConstant.BADGE_ICON).replace("['", "").replace("']", ""));
-                            payload.setBadgecolor(payloadObj.optString(ShortpayloadConstant.BADGE_COLOR).replace("['", "").replace("']", ""));
-                            payload.setSubTitle(payloadObj.optString(ShortpayloadConstant.SUBTITLE).replace("['", "").replace("']", ""));
-                            payload.setGroup(payloadObj.optInt(ShortpayloadConstant.GROUP));
-                            payload.setBadgeCount(payloadObj.optInt(ShortpayloadConstant.BADGE_COUNT));
+                            payload.setRid(jsonObject.optString(ShortPayloadConstant.RID));
+                            payload.setLink(payloadObj.optString(ShortPayloadConstant.LINK).replace("['", "").replace("']", ""));
+                            payload.setTitle(payloadObj.optString(ShortPayloadConstant.TITLE).replace("['", "").replace("']", ""));
+                            payload.setMessage(payloadObj.optString(ShortPayloadConstant.NMESSAGE).replace("['", "").replace("']", ""));
+                            payload.setIcon(payloadObj.optString(ShortPayloadConstant.ICON).replace("['", "").replace("']", ""));
+                            payload.setReqInt(payloadObj.optInt(ShortPayloadConstant.REQINT));
+                            payload.setTag(payloadObj.optString(ShortPayloadConstant.TAG));
+                            payload.setBanner(payloadObj.optString(ShortPayloadConstant.BANNER).replace("['", "").replace("']", ""));
+                            payload.setBadgeicon(payloadObj.optString(ShortPayloadConstant.BADGE_ICON).replace("['", "").replace("']", ""));
+                            payload.setBadgecolor(payloadObj.optString(ShortPayloadConstant.BADGE_COLOR).replace("['", "").replace("']", ""));
+                            payload.setSubTitle(payloadObj.optString(ShortPayloadConstant.SUBTITLE).replace("['", "").replace("']", ""));
+                            payload.setGroup(payloadObj.optInt(ShortPayloadConstant.GROUP));
+                            payload.setBadgeCount(payloadObj.optInt(ShortPayloadConstant.BADGE_COUNT));
                             if (jsonObject.has("b")) {
-                                payload.setAct_num(jsonObject.optInt(ShortpayloadConstant.ACTNUM));
-                                payload.setAct1name(jsonObject.optString(ShortpayloadConstant.ACT1NAME).replace("['", "").replace("']", ""));
-                                payload.setAct2name(jsonObject.optString(ShortpayloadConstant.ACT2NAME).replace("['", "").replace("']", ""));
+                                payload.setAct_num(jsonObject.optInt(ShortPayloadConstant.ACTNUM));
+                                payload.setAct1name(jsonObject.optString(ShortPayloadConstant.ACT1NAME).replace("['", "").replace("']", ""));
+                                payload.setAct2name(jsonObject.optString(ShortPayloadConstant.ACT2NAME).replace("['", "").replace("']", ""));
 
                             } else {
-                                payload.setAct_num(jsonObject.optInt(ShortpayloadConstant.ACTNUM));
-                                payload.setAct1name(payloadObj.optString(ShortpayloadConstant.ACT1NAME).replace("['", "").replace("']", ""));
-                                payload.setAct2name(payloadObj.optString(ShortpayloadConstant.ACT2NAME).replace("['", "").replace("']", ""));
+                                payload.setAct_num(jsonObject.optInt(ShortPayloadConstant.ACTNUM));
+                                payload.setAct1name(payloadObj.optString(ShortPayloadConstant.ACT1NAME).replace("['", "").replace("']", ""));
+                                payload.setAct2name(payloadObj.optString(ShortPayloadConstant.ACT2NAME).replace("['", "").replace("']", ""));
 
                             }
 
                             // Button 1
-                            payload.setAct1link(payloadObj.optString(ShortpayloadConstant.ACT1LINK).replace("['", "").replace("']", ""));
-                            payload.setAct1icon(payloadObj.optString(ShortpayloadConstant.ACT1ICON).replace("['", "").replace("']", ""));
-                            payload.setAct1ID(payloadObj.optString(ShortpayloadConstant.ACT1ID));
+                            payload.setAct1link(payloadObj.optString(ShortPayloadConstant.ACT1LINK).replace("['", "").replace("']", ""));
+                            payload.setAct1icon(payloadObj.optString(ShortPayloadConstant.ACT1ICON).replace("['", "").replace("']", ""));
+                            payload.setAct1ID(payloadObj.optString(ShortPayloadConstant.ACT1ID));
                             // Button 2
-                            payload.setAct2link(payloadObj.optString(ShortpayloadConstant.ACT2LINK).replace("['", "").replace("']", ""));
-                            payload.setAct2icon(payloadObj.optString(ShortpayloadConstant.ACT2ICON));
-                            payload.setAct2ID(payloadObj.optString(ShortpayloadConstant.ACT2ID));
-                            payload.setInapp(payloadObj.optInt(ShortpayloadConstant.INAPP));
-                            payload.setTrayicon(payloadObj.optString(ShortpayloadConstant.TARYICON));
-                            payload.setSmallIconAccentColor(payloadObj.optString(ShortpayloadConstant.ICONCOLOR));
-                            payload.setSound(payloadObj.optString(ShortpayloadConstant.SOUND));
-                            payload.setLedColor(payloadObj.optString(ShortpayloadConstant.LEDCOLOR));
-                            payload.setLockScreenVisibility(payloadObj.optInt(ShortpayloadConstant.VISIBILITY));
-                            payload.setGroupKey(payloadObj.optString(ShortpayloadConstant.GKEY));
-                            payload.setGroupMessage(payloadObj.optString(ShortpayloadConstant.GMESSAGE));
-                            payload.setFromProjectNumber(payloadObj.optString(ShortpayloadConstant.PROJECTNUMBER));
-                            payload.setCollapseId(payloadObj.optString(ShortpayloadConstant.COLLAPSEID));
-                            payload.setPriority(payloadObj.optInt(ShortpayloadConstant.PRIORITY));
-                            payload.setRawPayload(payloadObj.optString(ShortpayloadConstant.RAWDATA));
-                            payload.setAp(payloadObj.optString(ShortpayloadConstant.ADDITIONALPARAM));
-                            payload.setCfg(jsonObject.optInt(ShortpayloadConstant.CFG));
-                            payload.setCpc(payloadObj.optString(ShortpayloadConstant.CPC).replace("['", "").replace("']", ""));
-                            payload.setRc(payloadObj.optString(ShortpayloadConstant.RC));
-                            payload.setRv(payloadObj.optString(ShortpayloadConstant.RV));
-                            payload.setPassive_flag(payloadObj.optString(ShortpayloadConstant.Passive_Flag));
-                            payload.setCpm(payloadObj.optString(ShortpayloadConstant.CPM).replace("['", "").replace("']", ""));
-                            payload.setCtr(payloadObj.optString(ShortpayloadConstant.CTR).replace("['", "").replace("']", ""));
-                            payload.setFallBackDomain(jsonObject.optString(ShortpayloadConstant.FALL_BACK_DOMAIN));
-                            payload.setFallBackSubDomain(jsonObject.optString(ShortpayloadConstant.FALLBACK_SUB_DOMAIN));
-                            payload.setFallBackPath(jsonObject.optString(ShortpayloadConstant.FAll_BACK_PATH));
-                            payload.setTime_out(jsonObject.optInt(ShortpayloadConstant.TIME_OUT));
-                            payload.setAdTimeOut(payloadObj.optInt(ShortpayloadConstant.AD_TIME_OUT));
-                            payload.setCreated_Time(jsonObject.optString(ShortpayloadConstant.CREATEDON));
+                            payload.setAct2link(payloadObj.optString(ShortPayloadConstant.ACT2LINK).replace("['", "").replace("']", ""));
+                            payload.setAct2icon(payloadObj.optString(ShortPayloadConstant.ACT2ICON));
+                            payload.setAct2ID(payloadObj.optString(ShortPayloadConstant.ACT2ID));
+                            payload.setInapp(payloadObj.optInt(ShortPayloadConstant.INAPP));
+                            payload.setTrayicon(payloadObj.optString(ShortPayloadConstant.TARYICON));
+                            payload.setSmallIconAccentColor(payloadObj.optString(ShortPayloadConstant.ICONCOLOR));
+                            payload.setSound(payloadObj.optString(ShortPayloadConstant.SOUND));
+                            payload.setLedColor(payloadObj.optString(ShortPayloadConstant.LEDCOLOR));
+                            payload.setLockScreenVisibility(payloadObj.optInt(ShortPayloadConstant.VISIBILITY));
+                            payload.setGroupKey(payloadObj.optString(ShortPayloadConstant.GKEY));
+                            payload.setGroupMessage(payloadObj.optString(ShortPayloadConstant.GMESSAGE));
+                            payload.setFromProjectNumber(payloadObj.optString(ShortPayloadConstant.PROJECTNUMBER));
+                            payload.setCollapseId(payloadObj.optString(ShortPayloadConstant.COLLAPSEID));
+                            payload.setPriority(payloadObj.optInt(ShortPayloadConstant.PRIORITY));
+                            payload.setRawPayload(payloadObj.optString(ShortPayloadConstant.RAWDATA));
+                            payload.setAp(payloadObj.optString(ShortPayloadConstant.ADDITIONALPARAM));
+                            payload.setCfg(jsonObject.optInt(ShortPayloadConstant.CFG));
+                            payload.setCpc(payloadObj.optString(ShortPayloadConstant.CPC).replace("['", "").replace("']", ""));
+                            payload.setRc(payloadObj.optString(ShortPayloadConstant.RC));
+                            payload.setRv(payloadObj.optString(ShortPayloadConstant.RV));
+                            payload.setPassive_flag(payloadObj.optString(ShortPayloadConstant.Passive_Flag));
+                            payload.setCpm(payloadObj.optString(ShortPayloadConstant.CPM).replace("['", "").replace("']", ""));
+                            payload.setCtr(payloadObj.optString(ShortPayloadConstant.CTR).replace("['", "").replace("']", ""));
+                            payload.setFallBackDomain(jsonObject.optString(ShortPayloadConstant.FALL_BACK_DOMAIN));
+                            payload.setFallBackSubDomain(jsonObject.optString(ShortPayloadConstant.FALLBACK_SUB_DOMAIN));
+                            payload.setFallBackPath(jsonObject.optString(ShortPayloadConstant.FAll_BACK_PATH));
+                            payload.setTime_out(jsonObject.optInt(ShortPayloadConstant.TIME_OUT));
+                            payload.setAdTimeOut(payloadObj.optInt(ShortPayloadConstant.AD_TIME_OUT));
+                            payload.setCreated_Time(jsonObject.optString(ShortPayloadConstant.CREATED_ON));
                             payload.setPush_type(pushType);
-                            payload.setDefaultNotificationPreview(jsonObject.optInt(ShortpayloadConstant.TEXTOVERLAY));
-                            payload.setMakeStickyNotification(jsonObject.optString(ShortpayloadConstant.MAKE_STICKY_NOTIFICATION));  // Add sticky value
+                            payload.setDefaultNotificationPreview(jsonObject.optInt(ShortPayloadConstant.TEXTOVERLAY));
+                            payload.setMakeStickyNotification(jsonObject.optString(ShortPayloadConstant.MAKE_STICKY_NOTIFICATION));  // Add sticky value
 
 
                             if (payload.getPassive_flag().equalsIgnoreCase("1") && jsonObject.optString(AppConstant.AD_TYPE).equalsIgnoreCase("6")) {
@@ -181,7 +180,7 @@ public class AdMediation {
         {
             try {
                 if (payloadObj != null && url != null && !url.isEmpty()) {
-                    if (payloadObj.optLong(ShortpayloadConstant.CREATEDON) > PreferenceUtil.getInstance(context).getLongValue(AppConstant.DEVICE_REGISTRATION_TIMESTAMP)) {
+                    if (payloadObj.optLong(ShortPayloadConstant.CREATED_ON) > PreferenceUtil.getInstance(context).getLongValue(AppConstant.DEVICE_REGISTRATION_TIMESTAMP)) {
                         payload = new Payload();
                         globalPayload(url,payload,payloadObj);
                     } else {
@@ -230,104 +229,104 @@ public class AdMediation {
                                     getMediationData(DATB.appContext,jsonObject,payload.getPush_type(),globalPayloadObject.toString());
                                     return;
                                 }
-                                if(globalPayloadObject.has(ShortpayloadConstant.CREATEDON)) {
-                                    payload.setCreated_Time(globalPayloadObject.optString(ShortpayloadConstant.CREATEDON));
+                                if(globalPayloadObject.has(ShortPayloadConstant.CREATED_ON)) {
+                                    payload.setCreated_Time(globalPayloadObject.optString(ShortPayloadConstant.CREATED_ON));
                                 }else {
-                                    payload.setCreated_Time(jsonObject.optString(ShortpayloadConstant.CREATEDON));
+                                    payload.setCreated_Time(jsonObject.optString(ShortPayloadConstant.CREATED_ON));
                                 }
-                                if(globalPayloadObject.has(ShortpayloadConstant.KEY)) {
-                                    payload.setKey(globalPayloadObject.optString(ShortpayloadConstant.KEY));
+                                if(globalPayloadObject.has(ShortPayloadConstant.KEY)) {
+                                    payload.setKey(globalPayloadObject.optString(ShortPayloadConstant.KEY));
                                 }else {
-                                    payload.setKey(jsonObject.optString(ShortpayloadConstant.KEY));
+                                    payload.setKey(jsonObject.optString(ShortPayloadConstant.KEY));
                                 }
-                                if(globalPayloadObject.has(ShortpayloadConstant.ID)) {
-                                    payload.setId(globalPayloadObject.optString(ShortpayloadConstant.ID));
+                                if(globalPayloadObject.has(ShortPayloadConstant.ID)) {
+                                    payload.setId(globalPayloadObject.optString(ShortPayloadConstant.ID));
                                 }else {
-                                    payload.setId(jsonObject.optString(ShortpayloadConstant.ID));
+                                    payload.setId(jsonObject.optString(ShortPayloadConstant.ID));
                                 }
-                                if(globalPayloadObject.has(ShortpayloadConstant.RID))
+                                if(globalPayloadObject.has(ShortPayloadConstant.RID))
                                 {
-                                    payload.setRid(globalPayloadObject.optString(ShortpayloadConstant.RID));
+                                    payload.setRid(globalPayloadObject.optString(ShortPayloadConstant.RID));
 
                                 }else
                                 {
-                                    payload.setRid(jsonObject.optString(ShortpayloadConstant.RID));
+                                    payload.setRid(jsonObject.optString(ShortPayloadConstant.RID));
                                 }
-                                payload.setFetchURL(jsonObject.optString(ShortpayloadConstant.FETCHURL));
-                                payload.setLink(jsonObject.optString(ShortpayloadConstant.LINK));
-                                payload.setTitle(jsonObject.optString(ShortpayloadConstant.TITLE));
-                                payload.setMessage(jsonObject.optString(ShortpayloadConstant.NMESSAGE));
-                                payload.setIcon(jsonObject.optString(ShortpayloadConstant.ICON));
-                                if(globalPayloadObject.has(ShortpayloadConstant.REQINT))
+                                payload.setFetchURL(jsonObject.optString(ShortPayloadConstant.FETCH_URL));
+                                payload.setLink(jsonObject.optString(ShortPayloadConstant.LINK));
+                                payload.setTitle(jsonObject.optString(ShortPayloadConstant.TITLE));
+                                payload.setMessage(jsonObject.optString(ShortPayloadConstant.NMESSAGE));
+                                payload.setIcon(jsonObject.optString(ShortPayloadConstant.ICON));
+                                if(globalPayloadObject.has(ShortPayloadConstant.REQINT))
                                 {
-                                    payload.setReqInt(globalPayloadObject.optInt(ShortpayloadConstant.REQINT));
+                                    payload.setReqInt(globalPayloadObject.optInt(ShortPayloadConstant.REQINT));
                                 }else
                                 {
-                                    payload.setReqInt(jsonObject.optInt(ShortpayloadConstant.REQINT));
+                                    payload.setReqInt(jsonObject.optInt(ShortPayloadConstant.REQINT));
                                 }
-                                if(globalPayloadObject.has(ShortpayloadConstant.TAG))
+                                if(globalPayloadObject.has(ShortPayloadConstant.TAG))
                                 {
-                                    payload.setTag(globalPayloadObject.optString(ShortpayloadConstant.TAG));
+                                    payload.setTag(globalPayloadObject.optString(ShortPayloadConstant.TAG));
                                 }else
                                 {
-                                    payload.setTag(jsonObject.optString(ShortpayloadConstant.TAG));
+                                    payload.setTag(jsonObject.optString(ShortPayloadConstant.TAG));
                                 }
-                                if(globalPayloadObject.has(ShortpayloadConstant.ACT1NAME))
+                                if(globalPayloadObject.has(ShortPayloadConstant.ACT1NAME))
                                 {
-                                    payload.setAct1name(globalPayloadObject.optString(ShortpayloadConstant.ACT1NAME));
+                                    payload.setAct1name(globalPayloadObject.optString(ShortPayloadConstant.ACT1NAME));
 
                                 }else
                                 {
-                                    payload.setAct1name(jsonObject.optString(ShortpayloadConstant.ACT1NAME));
+                                    payload.setAct1name(jsonObject.optString(ShortPayloadConstant.ACT1NAME));
                                 }
-                                if(globalPayloadObject.has(ShortpayloadConstant.ACT1LINK))
+                                if(globalPayloadObject.has(ShortPayloadConstant.ACT1LINK))
                                 {
-                                    payload.setAct1link(globalPayloadObject.optString(ShortpayloadConstant.ACT1LINK));
+                                    payload.setAct1link(globalPayloadObject.optString(ShortPayloadConstant.ACT1LINK));
                                 }
                                 else {
-                                    payload.setAct1link(jsonObject.optString(ShortpayloadConstant.ACT1LINK));
+                                    payload.setAct1link(jsonObject.optString(ShortPayloadConstant.ACT1LINK));
                                 }
-                                payload.setBanner(jsonObject.optString(ShortpayloadConstant.BANNER));
-                                payload.setAct_num(jsonObject.optInt(ShortpayloadConstant.ACTNUM));
-                                payload.setBadgeicon(jsonObject.optString(ShortpayloadConstant.BADGE_ICON));
-                                payload.setBadgecolor(jsonObject.optString(ShortpayloadConstant.BADGE_COLOR));
-                                payload.setSubTitle(jsonObject.optString(ShortpayloadConstant.SUBTITLE));
-                                payload.setGroup(jsonObject.optInt(ShortpayloadConstant.GROUP));
-                                payload.setBadgeCount(jsonObject.optInt(ShortpayloadConstant.BADGE_COUNT));
+                                payload.setBanner(jsonObject.optString(ShortPayloadConstant.BANNER));
+                                payload.setAct_num(jsonObject.optInt(ShortPayloadConstant.ACTNUM));
+                                payload.setBadgeicon(jsonObject.optString(ShortPayloadConstant.BADGE_ICON));
+                                payload.setBadgecolor(jsonObject.optString(ShortPayloadConstant.BADGE_COLOR));
+                                payload.setSubTitle(jsonObject.optString(ShortPayloadConstant.SUBTITLE));
+                                payload.setGroup(jsonObject.optInt(ShortPayloadConstant.GROUP));
+                                payload.setBadgeCount(jsonObject.optInt(ShortPayloadConstant.BADGE_COUNT));
                                 // Button 1
-                                payload.setAct1icon(jsonObject.optString(ShortpayloadConstant.ACT1ICON));
-                                payload.setAct1ID(jsonObject.optString(ShortpayloadConstant.ACT1ID));
+                                payload.setAct1icon(jsonObject.optString(ShortPayloadConstant.ACT1ICON));
+                                payload.setAct1ID(jsonObject.optString(ShortPayloadConstant.ACT1ID));
                                 // Button 2
-                                payload.setAct2name(jsonObject.optString(ShortpayloadConstant.ACT2NAME));
-                                payload.setAct2link(jsonObject.optString(ShortpayloadConstant.ACT2LINK));
-                                payload.setAct2icon(jsonObject.optString(ShortpayloadConstant.ACT2ICON));
-                                payload.setAct2ID(jsonObject.optString(ShortpayloadConstant.ACT2ID));
-                                payload.setInapp(jsonObject.optInt(ShortpayloadConstant.INAPP));
-                                payload.setTrayicon(jsonObject.optString(ShortpayloadConstant.TARYICON));
-                                payload.setSmallIconAccentColor(jsonObject.optString(ShortpayloadConstant.ICONCOLOR));
-                                payload.setSound(jsonObject.optString(ShortpayloadConstant.SOUND));
-                                payload.setLedColor(jsonObject.optString(ShortpayloadConstant.LEDCOLOR));
-                                payload.setLockScreenVisibility(jsonObject.optInt(ShortpayloadConstant.VISIBILITY));
-                                payload.setGroupKey(jsonObject.optString(ShortpayloadConstant.GKEY));
-                                payload.setGroupMessage(jsonObject.optString(ShortpayloadConstant.GMESSAGE));
-                                payload.setFromProjectNumber(jsonObject.optString(ShortpayloadConstant.PROJECTNUMBER));
-                                payload.setCollapseId(jsonObject.optString(ShortpayloadConstant.COLLAPSEID));
-                                payload.setPriority(jsonObject.optInt(ShortpayloadConstant.PRIORITY));
-                                payload.setRawPayload(jsonObject.optString(ShortpayloadConstant.RAWDATA));
-                                payload.setAp(jsonObject.optString(ShortpayloadConstant.ADDITIONALPARAM));
-                                if(globalPayloadObject.has(ShortpayloadConstant.CFG)) {
-                                    payload.setCfg(globalPayloadObject.optInt(ShortpayloadConstant.CFG));
+                                payload.setAct2name(jsonObject.optString(ShortPayloadConstant.ACT2NAME));
+                                payload.setAct2link(jsonObject.optString(ShortPayloadConstant.ACT2LINK));
+                                payload.setAct2icon(jsonObject.optString(ShortPayloadConstant.ACT2ICON));
+                                payload.setAct2ID(jsonObject.optString(ShortPayloadConstant.ACT2ID));
+                                payload.setInapp(jsonObject.optInt(ShortPayloadConstant.INAPP));
+                                payload.setTrayicon(jsonObject.optString(ShortPayloadConstant.TARYICON));
+                                payload.setSmallIconAccentColor(jsonObject.optString(ShortPayloadConstant.ICONCOLOR));
+                                payload.setSound(jsonObject.optString(ShortPayloadConstant.SOUND));
+                                payload.setLedColor(jsonObject.optString(ShortPayloadConstant.LEDCOLOR));
+                                payload.setLockScreenVisibility(jsonObject.optInt(ShortPayloadConstant.VISIBILITY));
+                                payload.setGroupKey(jsonObject.optString(ShortPayloadConstant.GKEY));
+                                payload.setGroupMessage(jsonObject.optString(ShortPayloadConstant.GMESSAGE));
+                                payload.setFromProjectNumber(jsonObject.optString(ShortPayloadConstant.PROJECTNUMBER));
+                                payload.setCollapseId(jsonObject.optString(ShortPayloadConstant.COLLAPSEID));
+                                payload.setPriority(jsonObject.optInt(ShortPayloadConstant.PRIORITY));
+                                payload.setRawPayload(jsonObject.optString(ShortPayloadConstant.RAWDATA));
+                                payload.setAp(jsonObject.optString(ShortPayloadConstant.ADDITIONALPARAM));
+                                if(globalPayloadObject.has(ShortPayloadConstant.CFG)) {
+                                    payload.setCfg(globalPayloadObject.optInt(ShortPayloadConstant.CFG));
                                 }else
                                 {
-                                    payload.setCfg(jsonObject.optInt(ShortpayloadConstant.CFG));
+                                    payload.setCfg(jsonObject.optInt(ShortPayloadConstant.CFG));
                                 }
                                 payload.setPush_type(AppConstant.PUSH_FCM);
                                 payload.setPublic_global_key(url);
-                                payload.setSound(jsonObject.optString(ShortpayloadConstant.SOUND));
-                                payload.setMaxNotification(jsonObject.optInt(ShortpayloadConstant.MAX_NOTIFICATION));
-                                payload.setFallBackDomain(jsonObject.optString(ShortpayloadConstant.FALL_BACK_DOMAIN));
-                                payload.setFallBackSubDomain(jsonObject.optString(ShortpayloadConstant.FALLBACK_SUB_DOMAIN));
-                                payload.setFallBackPath(jsonObject.optString(ShortpayloadConstant.FAll_BACK_PATH));
+                                payload.setSound(jsonObject.optString(ShortPayloadConstant.SOUND));
+                                payload.setMaxNotification(jsonObject.optInt(ShortPayloadConstant.MAX_NOTIFICATION));
+                                payload.setFallBackDomain(jsonObject.optString(ShortPayloadConstant.FALL_BACK_DOMAIN));
+                                payload.setFallBackSubDomain(jsonObject.optString(ShortPayloadConstant.FALLBACK_SUB_DOMAIN));
+                                payload.setFallBackPath(jsonObject.optString(ShortPayloadConstant.FAll_BACK_PATH));
                                 DebugFileManager.createExternalStoragePublic(DATB.appContext,response,"gpl_payload");
 
                                 if (payload.getTitle() != null && !payload.getTitle().isEmpty()) {
@@ -369,111 +368,111 @@ public class AdMediation {
                         String jsonData = getObjectData.optString("PayloadData");
                         JSONObject jsonObject = new JSONObject(jsonData.replace("\n",""));
                         if (jsonObject != null) {
-                            payload.setCreated_Time(globalPayloadObject.optString(ShortpayloadConstant.CREATEDON));
-                            if(globalPayloadObject.has(ShortpayloadConstant.CREATEDON)) {
-                                payload.setCreated_Time(globalPayloadObject.optString(ShortpayloadConstant.CREATEDON));
+                            payload.setCreated_Time(globalPayloadObject.optString(ShortPayloadConstant.CREATED_ON));
+                            if(globalPayloadObject.has(ShortPayloadConstant.CREATED_ON)) {
+                                payload.setCreated_Time(globalPayloadObject.optString(ShortPayloadConstant.CREATED_ON));
                             }else {
-                                payload.setCreated_Time(jsonObject.optString(ShortpayloadConstant.CREATEDON));
+                                payload.setCreated_Time(jsonObject.optString(ShortPayloadConstant.CREATED_ON));
                             }
-                            if(globalPayloadObject.has(ShortpayloadConstant.KEY)) {
-                                payload.setKey(globalPayloadObject.optString(ShortpayloadConstant.KEY));
+                            if(globalPayloadObject.has(ShortPayloadConstant.KEY)) {
+                                payload.setKey(globalPayloadObject.optString(ShortPayloadConstant.KEY));
                             }else {
-                                payload.setKey(jsonObject.optString(ShortpayloadConstant.KEY));
+                                payload.setKey(jsonObject.optString(ShortPayloadConstant.KEY));
                             }
-                            if(globalPayloadObject.has(ShortpayloadConstant.ID)) {
-                                payload.setId(globalPayloadObject.optString(ShortpayloadConstant.ID));
+                            if(globalPayloadObject.has(ShortPayloadConstant.ID)) {
+                                payload.setId(globalPayloadObject.optString(ShortPayloadConstant.ID));
                             }else {
-                                payload.setId(jsonObject.optString(ShortpayloadConstant.ID));
+                                payload.setId(jsonObject.optString(ShortPayloadConstant.ID));
                             }
-                            if(globalPayloadObject.has(ShortpayloadConstant.RID))
+                            if(globalPayloadObject.has(ShortPayloadConstant.RID))
                             {
-                                payload.setRid(globalPayloadObject.optString(ShortpayloadConstant.RID));
+                                payload.setRid(globalPayloadObject.optString(ShortPayloadConstant.RID));
 
                             }else
                             {
-                                payload.setRid(jsonObject.optString(ShortpayloadConstant.RID));
+                                payload.setRid(jsonObject.optString(ShortPayloadConstant.RID));
                             }
 
-                            payload.setFetchURL(jsonObject.optString(ShortpayloadConstant.FETCHURL));
+                            payload.setFetchURL(jsonObject.optString(ShortPayloadConstant.FETCH_URL));
 
-                            payload.setLink(jsonObject.optString(ShortpayloadConstant.LINK));
-                            payload.setTitle(jsonObject.optString(ShortpayloadConstant.TITLE));
-                            payload.setMessage(jsonObject.optString(ShortpayloadConstant.NMESSAGE));
-                            payload.setIcon(jsonObject.optString(ShortpayloadConstant.ICON));
-                            if(globalPayloadObject.has(ShortpayloadConstant.REQINT))
+                            payload.setLink(jsonObject.optString(ShortPayloadConstant.LINK));
+                            payload.setTitle(jsonObject.optString(ShortPayloadConstant.TITLE));
+                            payload.setMessage(jsonObject.optString(ShortPayloadConstant.NMESSAGE));
+                            payload.setIcon(jsonObject.optString(ShortPayloadConstant.ICON));
+                            if(globalPayloadObject.has(ShortPayloadConstant.REQINT))
                             {
-                                payload.setReqInt(globalPayloadObject.optInt(ShortpayloadConstant.REQINT));
+                                payload.setReqInt(globalPayloadObject.optInt(ShortPayloadConstant.REQINT));
                             }else
                             {
-                                payload.setReqInt(jsonObject.optInt(ShortpayloadConstant.REQINT));
+                                payload.setReqInt(jsonObject.optInt(ShortPayloadConstant.REQINT));
                             }
-                            if(globalPayloadObject.has(ShortpayloadConstant.TAG))
+                            if(globalPayloadObject.has(ShortPayloadConstant.TAG))
                             {
-                                payload.setTag(globalPayloadObject.optString(ShortpayloadConstant.TAG));
+                                payload.setTag(globalPayloadObject.optString(ShortPayloadConstant.TAG));
                             }else
                             {
-                                payload.setTag(jsonObject.optString(ShortpayloadConstant.TAG));
+                                payload.setTag(jsonObject.optString(ShortPayloadConstant.TAG));
                             }
-                            if(globalPayloadObject.has(ShortpayloadConstant.ACT1NAME))
+                            if(globalPayloadObject.has(ShortPayloadConstant.ACT1NAME))
                             {
-                                payload.setAct1name(globalPayloadObject.optString(ShortpayloadConstant.ACT1NAME));
+                                payload.setAct1name(globalPayloadObject.optString(ShortPayloadConstant.ACT1NAME));
 
                             }else
                             {
-                                payload.setAct1name(jsonObject.optString(ShortpayloadConstant.ACT1NAME));
+                                payload.setAct1name(jsonObject.optString(ShortPayloadConstant.ACT1NAME));
                             }
-                            if(globalPayloadObject.has(ShortpayloadConstant.ACT1LINK))
+                            if(globalPayloadObject.has(ShortPayloadConstant.ACT1LINK))
                             {
-                                payload.setAct1link(globalPayloadObject.optString(ShortpayloadConstant.ACT1LINK));
+                                payload.setAct1link(globalPayloadObject.optString(ShortPayloadConstant.ACT1LINK));
 
                             }
                             else
                             {
-                                payload.setAct1link(jsonObject.optString(ShortpayloadConstant.ACT1LINK));
+                                payload.setAct1link(jsonObject.optString(ShortPayloadConstant.ACT1LINK));
 
                             }
-                            payload.setBanner(jsonObject.optString(ShortpayloadConstant.BANNER));
-                            payload.setAct_num(jsonObject.optInt(ShortpayloadConstant.ACTNUM));
-                            payload.setBadgeicon(jsonObject.optString(ShortpayloadConstant.BADGE_ICON));
-                            payload.setBadgecolor(jsonObject.optString(ShortpayloadConstant.BADGE_COLOR));
-                            payload.setSubTitle(jsonObject.optString(ShortpayloadConstant.SUBTITLE));
-                            payload.setGroup(jsonObject.optInt(ShortpayloadConstant.GROUP));
-                            payload.setBadgeCount(jsonObject.optInt(ShortpayloadConstant.BADGE_COUNT));
+                            payload.setBanner(jsonObject.optString(ShortPayloadConstant.BANNER));
+                            payload.setAct_num(jsonObject.optInt(ShortPayloadConstant.ACTNUM));
+                            payload.setBadgeicon(jsonObject.optString(ShortPayloadConstant.BADGE_ICON));
+                            payload.setBadgecolor(jsonObject.optString(ShortPayloadConstant.BADGE_COLOR));
+                            payload.setSubTitle(jsonObject.optString(ShortPayloadConstant.SUBTITLE));
+                            payload.setGroup(jsonObject.optInt(ShortPayloadConstant.GROUP));
+                            payload.setBadgeCount(jsonObject.optInt(ShortPayloadConstant.BADGE_COUNT));
                             // Button 1
-                            payload.setAct1icon(jsonObject.optString(ShortpayloadConstant.ACT1ICON));
-                            payload.setAct1ID(jsonObject.optString(ShortpayloadConstant.ACT1ID));
+                            payload.setAct1icon(jsonObject.optString(ShortPayloadConstant.ACT1ICON));
+                            payload.setAct1ID(jsonObject.optString(ShortPayloadConstant.ACT1ID));
                             // Button 2
-                            payload.setAct2name(jsonObject.optString(ShortpayloadConstant.ACT2NAME));
-                            payload.setAct2link(jsonObject.optString(ShortpayloadConstant.ACT2LINK));
-                            payload.setAct2icon(jsonObject.optString(ShortpayloadConstant.ACT2ICON));
-                            payload.setAct2ID(jsonObject.optString(ShortpayloadConstant.ACT2ID));
+                            payload.setAct2name(jsonObject.optString(ShortPayloadConstant.ACT2NAME));
+                            payload.setAct2link(jsonObject.optString(ShortPayloadConstant.ACT2LINK));
+                            payload.setAct2icon(jsonObject.optString(ShortPayloadConstant.ACT2ICON));
+                            payload.setAct2ID(jsonObject.optString(ShortPayloadConstant.ACT2ID));
 
-                            payload.setInapp(jsonObject.optInt(ShortpayloadConstant.INAPP));
-                            payload.setTrayicon(jsonObject.optString(ShortpayloadConstant.TARYICON));
-                            payload.setSmallIconAccentColor(jsonObject.optString(ShortpayloadConstant.ICONCOLOR));
-                            payload.setSound(jsonObject.optString(ShortpayloadConstant.SOUND));
-                            payload.setLedColor(jsonObject.optString(ShortpayloadConstant.LEDCOLOR));
-                            payload.setLockScreenVisibility(jsonObject.optInt(ShortpayloadConstant.VISIBILITY));
-                            payload.setGroupKey(jsonObject.optString(ShortpayloadConstant.GKEY));
-                            payload.setGroupMessage(jsonObject.optString(ShortpayloadConstant.GMESSAGE));
-                            payload.setFromProjectNumber(jsonObject.optString(ShortpayloadConstant.PROJECTNUMBER));
-                            payload.setCollapseId(jsonObject.optString(ShortpayloadConstant.COLLAPSEID));
-                            payload.setPriority(jsonObject.optInt(ShortpayloadConstant.PRIORITY));
-                            payload.setRawPayload(jsonObject.optString(ShortpayloadConstant.RAWDATA));
-                            payload.setAp(jsonObject.optString(ShortpayloadConstant.ADDITIONALPARAM));
-                            if(globalPayloadObject.has(ShortpayloadConstant.CFG)) {
-                                payload.setCfg(globalPayloadObject.optInt(ShortpayloadConstant.CFG));
+                            payload.setInapp(jsonObject.optInt(ShortPayloadConstant.INAPP));
+                            payload.setTrayicon(jsonObject.optString(ShortPayloadConstant.TARYICON));
+                            payload.setSmallIconAccentColor(jsonObject.optString(ShortPayloadConstant.ICONCOLOR));
+                            payload.setSound(jsonObject.optString(ShortPayloadConstant.SOUND));
+                            payload.setLedColor(jsonObject.optString(ShortPayloadConstant.LEDCOLOR));
+                            payload.setLockScreenVisibility(jsonObject.optInt(ShortPayloadConstant.VISIBILITY));
+                            payload.setGroupKey(jsonObject.optString(ShortPayloadConstant.GKEY));
+                            payload.setGroupMessage(jsonObject.optString(ShortPayloadConstant.GMESSAGE));
+                            payload.setFromProjectNumber(jsonObject.optString(ShortPayloadConstant.PROJECTNUMBER));
+                            payload.setCollapseId(jsonObject.optString(ShortPayloadConstant.COLLAPSEID));
+                            payload.setPriority(jsonObject.optInt(ShortPayloadConstant.PRIORITY));
+                            payload.setRawPayload(jsonObject.optString(ShortPayloadConstant.RAWDATA));
+                            payload.setAp(jsonObject.optString(ShortPayloadConstant.ADDITIONALPARAM));
+                            if(globalPayloadObject.has(ShortPayloadConstant.CFG)) {
+                                payload.setCfg(globalPayloadObject.optInt(ShortPayloadConstant.CFG));
                             }else
                             {
-                                payload.setCfg(jsonObject.optInt(ShortpayloadConstant.CFG));
+                                payload.setCfg(jsonObject.optInt(ShortPayloadConstant.CFG));
                             }
                             payload.setPush_type(AppConstant.PUSH_FCM);
                             payload.setPublic_global_key(url);
-                            payload.setSound(jsonObject.optString(ShortpayloadConstant.NOTIFICATION_SOUND));
-                            payload.setMaxNotification(jsonObject.optInt(ShortpayloadConstant.MAX_NOTIFICATION));
-                            payload.setFallBackDomain(jsonObject.optString(ShortpayloadConstant.FALL_BACK_DOMAIN));
-                            payload.setFallBackSubDomain(jsonObject.optString(ShortpayloadConstant.FALLBACK_SUB_DOMAIN));
-                            payload.setFallBackPath(jsonObject.optString(ShortpayloadConstant.FAll_BACK_PATH));
+                            payload.setSound(jsonObject.optString(ShortPayloadConstant.NOTIFICATION_SOUND));
+                            payload.setMaxNotification(jsonObject.optInt(ShortPayloadConstant.MAX_NOTIFICATION));
+                            payload.setFallBackDomain(jsonObject.optString(ShortPayloadConstant.FALL_BACK_DOMAIN));
+                            payload.setFallBackSubDomain(jsonObject.optString(ShortPayloadConstant.FALLBACK_SUB_DOMAIN));
+                            payload.setFallBackPath(jsonObject.optString(ShortPayloadConstant.FAll_BACK_PATH));
                             Log.v(AppConstant.NOTIFICATION_MESSAGE, "YES");
                             if (payload.getTitle() != null && !payload.getTitle().isEmpty()) {
                                 DATB.processNotificationReceived(DATB.appContext,payload);
@@ -1091,12 +1090,12 @@ public class AdMediation {
                 {
                     JSONObject jsonObject=new JSONObject(response);
                     if(jsonObject!=null){
-                        payload.setTitle(jsonObject.optString(ShortpayloadConstant.TITLE));
-                        payload.setMessage(jsonObject.optString(ShortpayloadConstant.NMESSAGE));
-                        payload.setLink(jsonObject.optString(ShortpayloadConstant.LINK));
-                        payload.setIcon(jsonObject.optString(ShortpayloadConstant.ICON));
-                        payload.setBanner(jsonObject.optString(ShortpayloadConstant.BANNER));
-                        payload.setAct1link(jsonObject.optString(ShortpayloadConstant.ACT1LINK));
+                        payload.setTitle(jsonObject.optString(ShortPayloadConstant.TITLE));
+                        payload.setMessage(jsonObject.optString(ShortPayloadConstant.NMESSAGE));
+                        payload.setLink(jsonObject.optString(ShortPayloadConstant.LINK));
+                        payload.setIcon(jsonObject.optString(ShortPayloadConstant.ICON));
+                        payload.setBanner(jsonObject.optString(ShortPayloadConstant.BANNER));
+                        payload.setAct1link(jsonObject.optString(ShortPayloadConstant.ACT1LINK));
                         payload.setRid(payload.getRid());
                         NotificationEventManager.notificationPreview(DATB.appContext,payload);
                         ShowCLCIKAndImpressionData(payload);

@@ -3,6 +3,9 @@ package com.momagic;
 
 import android.annotation.SuppressLint;
 import android.app.ActivityManager;
+import android.app.Notification;
+import android.app.NotificationChannel;
+import android.app.NotificationManager;
 import android.content.ContentResolver;
 import android.content.Context;
 import android.content.pm.ApplicationInfo;
@@ -35,6 +38,7 @@ import androidx.core.content.ContextCompat;
 import androidx.core.text.HtmlCompat;
 import androidx.core.view.ViewCompat;
 
+import com.google.firebase.FirebaseOptions;
 
 import org.json.JSONArray;
 import org.json.JSONException;
@@ -48,7 +52,6 @@ import java.io.InputStreamReader;
 import java.math.BigInteger;
 import java.net.HttpURLConnection;
 import java.net.URL;
-import java.text.DateFormat;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Date;
@@ -57,7 +60,6 @@ import java.util.Iterator;
 import java.util.List;
 import java.util.Locale;
 import java.util.Map;
-import java.util.Objects;
 import java.util.TimeZone;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
@@ -65,9 +67,11 @@ import java.util.regex.Pattern;
 import javax.crypto.Cipher;
 import javax.crypto.spec.IvParameterSpec;
 import javax.crypto.spec.SecretKeySpec;
+
 public class Util {
     private static String CIPHER_NAME = "AES/CBC/PKCS5PADDING";
     private static int CIPHER_KEY_LEN = 16;
+    private static final long TIME_OUT = 20 * 1000L;
 
     public static String decrypt(String key, String data) {
         try {
@@ -98,67 +102,41 @@ public class Util {
 
             return new String(original);
 
-        } catch (Exception ex) {
-            ex.printStackTrace();
+        } catch (Exception e) {
+            Util.handleExceptionOnce(DATB.appContext, e.toString(), "Util", "decrypt");
         }
         return null;
     }
 
 
     private static Bitmap getBitMap(String src) {
-        int retry = 0;
-        boolean isCheck = false;
-        do {
-            if (isCheck) {
-                sleepTime(2000);
-
-            }
-            try {
-                return BitmapFactory.decodeStream(new URL(src).openConnection().getInputStream());
-            } catch (Throwable t) {
-                retry++;
-                isCheck = true;
-                if (retry >= 4) {
-                    DebugFileManager.createExternalStoragePublic(DATB.appContext, t.toString(), "[Log-> e]->getBitmapFromURL");
-                    return null;
-                }
-
-            }
-        } while (retry < 4);
-
-        return null;
+        try {
+            return BitmapFactory.decodeStream(new URL(src).openConnection().getInputStream());
+        } catch (Exception e) {
+            Util.handleExceptionOnce(DATB.appContext, e.toString(), "Util", "getBitMap");
+            return null;
+        }
     }
 
     public static Bitmap getBitmapFromURL(String url) {
         if (url == null)
             return null;
 
-        if (url != "" && !url.isEmpty()) {
+        if (!url.isEmpty()) {
+
             String trimmedName = url.trim();
             trimmedName = trimmedName.replace("///", "/");
             trimmedName = trimmedName.replace("//", "/");
             trimmedName = trimmedName.replace("http:/", "https://");
             trimmedName = trimmedName.replace("https:/", "https://");
-            if (trimmedName.contains(".jpeg") || trimmedName.contains(".jpg") || trimmedName.contains(".png") || trimmedName.contains(".webp") || trimmedName.contains(".JPG") || trimmedName.contains(".PNG") || trimmedName.contains(".JPEG") || trimmedName.contains(".WEBP")) {
-                if (trimmedName.startsWith("http://") || trimmedName.startsWith("https://")) {
-                    Bitmap bmp = getBitMap(trimmedName);
-                    if (bmp != null) {
-                        return bmp;
-                    } else {
-                        DebugFileManager.createExternalStoragePublic(DATB.appContext, url, "[Log-> e]->getBitmapFromURL");
-
-                    }
-                }
+            if (trimmedName.startsWith("http://") || trimmedName.startsWith("https://")) {
+                return getBitMap(trimmedName);
             } else {
-                DebugFileManager.createExternalStoragePublic(DATB.appContext, url, "[Log-> e]->getBitmapFromURL");
+                DebugFileManager.createExternalStoragePublic(DATB.appContext, "Image URL" + url, "[Log-> e]->getBitmapFromURL");
                 return null;
             }
-        } else {
-            DebugFileManager.createExternalStoragePublic(DATB.appContext, "Image URL" + url, "[Log-> e]->getBitmapFromURL");
-            return null;
         }
         return null;
-
     }
 
     public static String getAndroidId(Context mContext) {
@@ -198,16 +176,17 @@ public class Util {
         try {
             return com.google.firebase.messaging.FirebaseMessaging.class != null;
         } catch (Throwable e) {
-            return false;
+            Util.handleExceptionOnce(DATB.appContext, e.toString(), "Util", "hasFCMLibrary");
         }
+        return false;
     }
 
-    public boolean isInitializationValid() {
+    boolean isInitializationValid() {
         checkForFcmDependency();
         return true;
     }
 
-    boolean checkForFcmDependency() {
+    private boolean checkForFcmDependency() {
         if (!hasFCMLibrary()) {
             Lg.d(AppConstant.APP_NAME_TAG, AppConstant.CHECKFCMLIBRARY);
             return false;
@@ -216,7 +195,7 @@ public class Util {
 
     }
 
-    public static String trimString(String optString) {
+    static String trimString(String optString) {
         if (optString.length() > 32) {
             int length = optString.length() - 32;
             return optString.substring(0, length);
@@ -224,26 +203,24 @@ public class Util {
         return null;
     }
 
-    public static Drawable getApplicationIcon(Context context) {
+    static Drawable getApplicationIcon(Context context) {
         ApplicationInfo ai;
         Drawable icon = null;
         try {
             ai = context.getPackageManager().getApplicationInfo(context.getPackageName(), PackageManager.GET_META_DATA);
         } catch (PackageManager.NameNotFoundException e) {
             ai = null;
-            //e.printStackTrace();
+            Util.handleExceptionOnce(context, e.toString(), "Util", "getApplicationIcon");
         }
 
         if (ai != null) {
             icon = context.getPackageManager().getApplicationIcon(ai);
         }
-
-
         return icon;
     }
 
 
-    public static boolean CheckValidationString(String optString) {
+    static boolean CheckValidationString(String optString) {
         if (optString.length() > 32) {
             return true;
         } else {
@@ -251,8 +228,7 @@ public class Util {
         }
     }
 
-    public static String getDeviceLanguage() {
-        //return Locale.getDefault().getDisplayLanguage();
+    static String getDeviceLanguage() {
         Locale locale;
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.N) {
             locale = DATB.appContext.getResources().getConfiguration().getLocales().get(0);
@@ -263,28 +239,28 @@ public class Util {
 
     }
 
-    public static String getIntegerToBinary(int number) {
+    static String getIntegerToBinary(int number) {
         return String.format("%16s", Integer.toBinaryString(number)).replace(' ', '0');
 
     }
 
-    public static boolean checkNotificationEnable() {
+    static boolean checkNotificationEnable() {
         return NotificationManagerCompat.from(DATB.appContext).areNotificationsEnabled();
 
     }
 
-    public static String getPackageName(Context context) {
+    static String getPackageName(Context context) {
         ApplicationInfo ai;
         try {
             ai = context.getPackageManager().getApplicationInfo(context.getPackageName(), PackageManager.GET_META_DATA);
         } catch (PackageManager.NameNotFoundException e) {
             ai = null;
-            //e.printStackTrace();
+            Util.handleExceptionOnce(context, e.toString(), "Util", "getPackageName");
         }
         return context.getPackageName();
     }
 
-    public static boolean isMatchedString(String s) {
+    static boolean isMatchedString(String s) {
         try {
             Pattern pattern = Pattern.compile("[a-zA-Z0-9-_.~%]{1,900}");
             Matcher matcher = pattern.matcher(s);
@@ -294,7 +270,7 @@ public class Util {
         }
     }
 
-    public static int convertStringToDecimal(String number) {
+    static int convertStringToDecimal(String number) {
         char[] numChar = number.toCharArray();
         int intValue = 0;
         int decimal = 1;
@@ -313,7 +289,7 @@ public class Util {
     }
 
     @RequiresApi(api = Build.VERSION_CODES.LOLLIPOP)
-    public static String getDeviceLanguageTag() {
+    static String getDeviceLanguageTag() {
         if (DATB.appContext != null) {
             Locale locale;
             if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.N) {
@@ -328,13 +304,13 @@ public class Util {
 
     }
 
-    public static String getTime() {
+    static String getTime() {
         SimpleDateFormat sdf = new SimpleDateFormat("yyyy.MM.dd");
         String currentDate = sdf.format(new Date());
         return currentDate;
     }
 
-    public static CharSequence makeBoldString(CharSequence title) {
+    static CharSequence makeBoldString(CharSequence title) {
         if (Build.VERSION.SDK_INT >= 24) {
             title = Html.fromHtml("<font color=\"" + ContextCompat.getColor(DATB.appContext, R.color.iz_black) + "\"><b>" + title + "</b></font>", HtmlCompat.FROM_HTML_MODE_LEGACY);// for 24 api and more
         } else {
@@ -343,7 +319,7 @@ public class Util {
         return title;
     }
 
-    public static CharSequence makeBlackString(CharSequence title) {
+    static CharSequence makeBlackString(CharSequence title) {
         if (Build.VERSION.SDK_INT >= 24) {
             title = Html.fromHtml("<font color=\"" + ContextCompat.getColor(DATB.appContext, R.color.iz_black) + "\">" + title + "</font>", HtmlCompat.FROM_HTML_MODE_LEGACY); // for 24 api and more
         } else {
@@ -352,7 +328,7 @@ public class Util {
         return title;
     }
 
-    public static Bitmap makeCornerRounded(Bitmap image) {
+    static Bitmap makeCornerRounded(Bitmap image) {
         Bitmap imageRounded = Bitmap.createBitmap(image.getWidth(), image.getHeight(), image.getConfig());
         Canvas canvas = new Canvas(imageRounded);
         Paint mpaint = new Paint();
@@ -362,14 +338,15 @@ public class Util {
         return imageRounded;
     }
 
-    public static void sleepTime(int time) {
+    static void sleepTime(int time) {
         try {
             Thread.sleep(time);
         } catch (InterruptedException e) {
+            Util.handleExceptionOnce(DATB.appContext, e.toString(), "Util", "sleepTime");
         }
     }
 
-    public static String dayDifference(String currentDate, String previousDate) {
+    static String dayDifference(String currentDate, String previousDate) {
         if (previousDate.isEmpty())
             return "";
         String dayDifference = "";
@@ -382,13 +359,13 @@ public class Util {
             long difference = date1.getTime() - date2.getTime();
             long differenceDates = difference / (24 * 60 * 60 * 1000);
             dayDifference = Long.toString(differenceDates);
-        } catch (Exception exception) {
-            exception.printStackTrace();
+        } catch (Exception e) {
+            Util.handleExceptionOnce(DATB.appContext, e.toString(), "Util", "dayDifference");
         }
         return dayDifference;
     }
 
-    public static int getBinaryToDecimal(int cfg) {
+    static int getBinaryToDecimal(int cfg) {
         String fourthDg, fifthDg, sixthDg;
 
         String data = Util.getIntegerToBinary(cfg);
@@ -425,7 +402,7 @@ public class Util {
         return null;
     }
 
-    public static void setException(Context context, String exception, String className, String methodName) {
+    static void setException(Context context, String exception, String className, String methodName) {
         if (context == null)
             return;
         try {
@@ -434,8 +411,6 @@ public class Util {
                 Map<String, String> mapData = new HashMap<>();
                 mapData.put(AppConstant.PID, preferenceUtil.getDataBID(AppConstant.APPPID));
                 mapData.put(AppConstant.TOKEN, "" + preferenceUtil.getStringData(AppConstant.FCM_DEVICE_TOKEN));
-                mapData.put(AppConstant.HMS_TOKEN, "" + preferenceUtil.getStringData(AppConstant.HMS_TOKEN));
-                mapData.put(AppConstant.XiaomiToken, "" + preferenceUtil.getStringData(AppConstant.XiaomiToken));
                 mapData.put(AppConstant.ANDROID_ID, "" + Util.getAndroidId(context));
                 mapData.put(AppConstant.EXCEPTION_, "" + exception);
                 mapData.put(AppConstant.METHOD_NAME, "" + methodName);
@@ -443,7 +418,6 @@ public class Util {
                 mapData.put(AppConstant.ANDROID_VERSION, "" + Build.VERSION.RELEASE);
                 mapData.put(AppConstant.DEVICE_NAME, "" + Util.getDeviceName());
                 mapData.put(AppConstant.SDK, AppConstant.SDK_VERSION);
-
                 RestClient.postRequest(RestClient.APP_EXCEPTION_URL, mapData, null, new RestClient.ResponseHandler() {
                     @Override
                     void onSuccess(final String response) {
@@ -457,11 +431,11 @@ public class Util {
                 });
             }
         } catch (Exception e) {
-            Log.e("Exception ex -- ", e.toString());
+            Util.handleExceptionOnce(context, e.toString(), "Util", "setException");
         }
     }
 
-    public static boolean isNetworkAvailable(Context mContext) {
+    static boolean isNetworkAvailable(Context mContext) {
         ConnectivityManager connectivity = (ConnectivityManager) mContext.getSystemService(Context.CONNECTIVITY_SERVICE);
         if (connectivity == null) {
             return false;
@@ -478,7 +452,7 @@ public class Util {
         return false;
     }
 
-    public static HashMap<String, Object> toMap(JSONObject jsonobj) throws JSONException {
+    static HashMap<String, Object> toMap(JSONObject jsonobj) throws JSONException {
         HashMap<String, Object> map = new HashMap<String, Object>();
         Iterator<String> keys = jsonobj.keys();
         while (keys.hasNext()) {
@@ -494,7 +468,7 @@ public class Util {
         return map;
     }
 
-    public static List<Object> toList(JSONArray array) throws JSONException {
+    static List<Object> toList(JSONArray array) throws JSONException {
         List<Object> list = new ArrayList<Object>();
         for (int i = 0; i < array.length(); i++) {
             Object value = array.get(i);
@@ -517,12 +491,13 @@ public class Util {
         try {
             pkgInfo = pm.getPackageInfo(pkgName, 0);
             return pkgInfo.versionName;
-        } catch (PackageManager.NameNotFoundException e) {
+        } catch (Exception e) {
+            Util.handleExceptionOnce(context, e.toString(), "Util", "getAppVersion");
             return "App Version  is not Found";
         }
     }
 
-    public static boolean isAppInForeground(Context context) {
+    static boolean isAppInForeground(Context context) {
         List<ActivityManager.RunningTaskInfo> task =
                 ((ActivityManager) context.getSystemService(Context.ACTIVITY_SERVICE))
                         .getRunningTasks(1);
@@ -582,7 +557,7 @@ public class Util {
 
             preferenceUtil.setStringData(constantValue, jsonArray.toString());
         } catch (Exception e) {
-            Util.setException(context, e.toString(), "trackClickOffline()", "Util");
+            Util.handleExceptionOnce(context, e.toString(), "Util", "trackClickOffline");
         }
 
     }
@@ -604,7 +579,7 @@ public class Util {
             jsonArray.put(payloadJSON);
             preferenceUtil.setStringData(AppConstant.STORE_MEDIATION_RECORDS, jsonArray.toString());
         } catch (Exception e) {
-            Util.setException(context, e.toString(), "trackMediation_Impression_Click", "Util");
+            Util.handleExceptionOnce(context, e.toString(), "Util", "trackMediation_Impression_Click");
         }
     }
 
@@ -629,7 +604,9 @@ public class Util {
                     return new BigInteger(defaultColor, 16);
                 }
             }
-        } catch (Throwable t) {
+        } catch (Exception e) {
+            Util.handleExceptionOnce(DATB.appContext, e.toString(), "Util", "getAccentColor");
+
         }
         return null;
     }
@@ -642,7 +619,7 @@ public class Util {
         return defaultStr;
     }
 
-    public static String getApplicationName(Context context) {
+    static String getApplicationName(Context context) {
         return context.getApplicationInfo().loadLabel(context.getPackageManager()).toString();
     }
 
@@ -667,7 +644,6 @@ public class Util {
 
 
     /* check the expiry time to current time difference in seconds form */
-    /* check the expiry time to current time difference in seconds form */
     static String getTimerValue(String createdTime, String expTime) {
         try {
             long timerValue = 0;
@@ -688,7 +664,7 @@ public class Util {
                 return "";
             }
         } catch (Exception e) {
-            DebugFileManager.createExternalStoragePublic(DATB.appContext, AppConstant.IZ_TIMER_VALUE_MESSAGE, AppConstant.IZ_TIMER_MESSAGE);
+            Util.handleExceptionOnce(DATB.appContext, e.toString(), "Util", "getTimerValue");
             return "";
         }
     }
@@ -718,8 +694,8 @@ public class Util {
                 longArray[i] = jsonVibArray.optLong(i);
             }
             return longArray;
-        } catch (JSONException e) {
-            e.printStackTrace();
+        } catch (Exception e) {
+            Util.handleExceptionOnce(DATB.appContext, e.toString(), "Util", "parseVibrationPattern");
         }
         return null;
     }
@@ -734,134 +710,10 @@ public class Util {
         DebugFileManager.createExternalStoragePublic(context, exception + " " + methodName, "[Log.e]-> " + className);
     }
 
-    static void parseXml(RssContentCallbackListener callbackListener) {
-        ArrayList<Payload> contentList = new ArrayList<>();
-        PreferenceUtil preferenceUtil = PreferenceUtil.getInstance(DATB.appContext);
 
-        new Thread(() -> {
-            try {
-                URL url = new URL(DATB.pUrl);
-                XmlPullParser pullParser = XmlPullParserFactory.newInstance().newPullParser();
-                HttpURLConnection urlConnection = (HttpURLConnection) url.openConnection();
-                urlConnection.connect();
-                if (urlConnection.getResponseCode() == HttpURLConnection.HTTP_OK) {
-                    pullParser.setInput(new InputStreamReader(urlConnection.getInputStream()));
-                    int eventType = pullParser.getEventType();
-                    Payload payload = null;
-
-                    boolean isNull = true;
-                    while (eventType != XmlPullParser.END_DOCUMENT) {
-                        if (eventType == XmlPullParser.START_TAG) {
-                            String tagName = pullParser.getName();
-                            if (tagName.equals("title") && isNull) {
-                                isNull = false;
-                                String name = pullParser.nextText();
-                                preferenceUtil.setStringData("pubName", name);
-                                pullParser.require(XmlPullParser.END_TAG, null, "title");
-                            }
-                            if ("item".equals(tagName)) {
-                                payload = new Payload();
-                            } else if ("title".equals(tagName) && payload != null) {
-                                payload.setTitle(pullParser.nextText());
-                            } else if ("link".equals(tagName) && payload != null) {
-                                payload.setLink(pullParser.nextText());
-                            } else if ("description".equals(tagName) && payload != null) {
-                                payload.setDescription(pullParser.nextText());
-                            } else if ("pubDate".equals(tagName) && payload != null) {
-                                payload.setCreated_Time(pullParser.nextText());
-                            } else if ("image".equals(tagName) && payload != null) {
-                                payload.setBanner(pullParser.nextText());
-                            } else if ("media:content".equals(tagName) && payload != null) {
-                                String imageUrl = pullParser.getAttributeValue(null, "url");
-                                payload.setBanner(imageUrl);
-                            } else if ("category".equals(tagName) && payload != null) {
-                                String domain = pullParser.getAttributeValue(null, "domain");
-                                if ("foxnews.com/metadata/dc.source".equals(domain)) {
-                                    eventType = pullParser.next();
-                                    if (eventType == XmlPullParser.TEXT) {
-                                        String categoryValue = pullParser.getText();
-                                        payload.setCategory(categoryValue);
-                                    }
-
-                                }
-                            }
-                        } else if (eventType == XmlPullParser.END_TAG && "item".equals(pullParser.getName()) && payload != null) {
-                            contentList.add(payload);
-                            callbackListener.onCallback(contentList);
-                            contentList.clear();
-                            payload = null;
-                        }
-                        eventType = pullParser.next();
-                    }
-                } else {
-                    Log.e("http connection error", "bad request...");
-                }
-            } catch (XmlPullParserException | IOException e) {
-                Log.e("http connection error", "bad request" + e);
-            }
-        }).start();
-    }
-
-    protected static void pulseClickAPI(Context context, Payload userModal) {
-        try {
-            PreferenceUtil preferenceUtil = PreferenceUtil.getInstance(context);
-            HashMap<String, String> hashMap = new HashMap<>();
-            if (preferenceUtil != null) {
-                hashMap.put(AppConstant.PID, preferenceUtil.getDataBID(AppConstant.APPPID));
-                hashMap.put(AppConstant.ANDROID_ID, Util.getAndroidId(context));
-                hashMap.put(AppConstant.VER_, "" + AppConstant.SDK_VERSION);
-                hashMap.put("link", userModal.getLink());
-                hashMap.put("tt", String.valueOf(DATB.OT_ID)); // 5 means swipe left or right 6 means on backPressed
-                hashMap.put("ot", String.valueOf(DATB.OT_ID));
-                hashMap.put("cid", DATB.pulseCid);
-                hashMap.put("rid", DATB.pulseRid);
-            }
-            RestClient.postRequest(RestClient.iZ_PULSE_FEATURE_CLICK, hashMap, null, new RestClient.ResponseHandler() {
-                @Override
-                void onSuccess(String response) {
-                    super.onSuccess(response);
-                }
-
-                @Override
-                void onFailure(int statusCode, String response, Throwable throwable) {
-                    super.onFailure(statusCode, response, throwable);
-                }
-            });
-        } catch (Exception e) {
-            e.printStackTrace();
-        }
-    }
 
     // pulse impression
-    protected static void pulseImpression(Context context) {
-        try {
-            PreferenceUtil preferenceUtil = PreferenceUtil.getInstance(context);
-            HashMap<String, String> hashMap = new HashMap<>();
-            if (preferenceUtil != null) {
-                hashMap.put(AppConstant.PID, preferenceUtil.getDataBID(AppConstant.APPPID));
-                hashMap.put(AppConstant.ANDROID_ID, Util.getAndroidId(context));
-                hashMap.put(AppConstant.VER_, "" + AppConstant.SDK_VERSION);
-                hashMap.put("tt", String.valueOf(DATB.OT_ID)); // 5 means swipe left or right 6 means on backPressed
-                hashMap.put("ot", String.valueOf(DATB.OT_ID));
-                hashMap.put("cid", DATB.pulseCid);
-                hashMap.put("rid", DATB.pulseRid);
-            }
-            RestClient.postRequest(RestClient.iZ_PULSE_FEATURE_IMPRESSION, hashMap, null, new RestClient.ResponseHandler() {
-                @Override
-                void onSuccess(String response) {
-                    super.onSuccess(response);
-                    Log.e("HashMap", hashMap.toString());
-                }
 
-                @Override
-                void onFailure(int statusCode, String response, Throwable throwable) {
-                    super.onFailure(statusCode, response, throwable);
-                }
-            });
-        } catch (Exception e) {
-            e.printStackTrace();
-        }
-    }
 
     static String getTimeAgo(String timestamp) {
         SimpleDateFormat dateFormat = new SimpleDateFormat("EEE, dd MMM yyyy HH:mm:ss Z", Locale.US);
@@ -882,21 +734,93 @@ public class Util {
                         .replace(" second", "s");
             }
         } catch (Exception e) {
-            e.printStackTrace();
-
+            Util.handleExceptionOnce(DATB.appContext, e.toString(), "Util", "getTimeAgo");
         }
         return "";
     }
-    protected static int getValidIdForCampaigns(Payload payload){
+
+    protected static int getValidIdForCampaigns(Payload payload) {
         int digit = 0;
-        try{
+        try {
             String digits = payload.getRid().trim();
             digit = digits.charAt(0) - '0';
-        }catch (Exception e){
-            Util.handleExceptionOnce(DATB.appContext,e.toString(),"Util","getValidIdForCampaigns");
-            DebugFileManager.createExternalStoragePublic(DATB.appContext, e.toString(), "[Log.e]->RID");
+        } catch (Exception e) {
+            Util.handleExceptionOnce(DATB.appContext, e.toString(), "Util", "getValidIdForCampaigns");
         }
         return digit;
     }
-}
 
+    // To get default sender_id
+    static String getSenderId() {
+        try {
+            FirebaseOptions firebaseOptions = FirebaseOptions.fromResource(DATB.appContext);
+            if (firebaseOptions != null) {
+                String senderId = firebaseOptions.getGcmSenderId();
+                if (senderId != null) {
+                    return senderId;
+                }
+            } else {
+                Util.handleExceptionOnce(DATB.appContext, "Firebase options is null", "FCMTokenGenerator", "getSenderId()");
+            }
+        } catch (Exception ex) {
+            Util.handleExceptionOnce(DATB.appContext, ex.toString(), "FCMTokenGenerator", "getSenderId()");
+
+        }
+        Log.v(AppConstant.APP_NAME_TAG, "Sender ID should not be null");
+        return "";
+    }
+
+    /*  Required interaction */
+    static long getRequiredInteraction(Payload payload) {
+        long getRequiredInteraction = 0L;
+        try {
+            if (Util.verifyRequiredInteraction(payload)) {
+                getRequiredInteraction = TIME_OUT;
+            } else {
+                getRequiredInteraction = System.currentTimeMillis();
+            }
+        } catch (Exception e) {
+            Util.handleExceptionOnce(DATB.appContext, e.toString(), "Util", "getRequiredInteraction");
+        }
+        return getRequiredInteraction;
+    }
+
+    private static boolean verifyRequiredInteraction(Payload payload) {
+        boolean verifyRequiredInteraction = false;
+        try {
+            verifyRequiredInteraction = payload.getMakeStickyNotification() != null && !payload.getMakeStickyNotification().isEmpty() && payload.getMakeStickyNotification().equals("2");
+        } catch (Exception e) {
+            Util.handleExceptionOnce(DATB.appContext, e.toString(), "Util", "verifyRequiredInteraction");
+        }
+        return verifyRequiredInteraction;
+    }
+    static boolean areNotificationsEnabled(Context context, String channelId) {
+        try {
+            boolean notificationsEnabled = NotificationManagerCompat.from(context).areNotificationsEnabled();
+            if (!notificationsEnabled) {
+                return false;
+            }
+            // Channels were introduced in O
+            if (channelId != null && Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
+                if (getNotificationManager(context) != null) {
+                    NotificationChannel channel = getNotificationManager(context).getNotificationChannel(channelId);
+                    return channel == null || channel.getImportance() != NotificationManager.IMPORTANCE_NONE;
+                }
+            }
+        } catch (Throwable t) {
+            Util.handleExceptionOnce(context, t.toString(), "Util", "areNotificationsEnabled");
+        }
+        return true;
+    }
+    static NotificationManager getNotificationManager(Context context) {
+        return (NotificationManager) context.getSystemService(Context.NOTIFICATION_SERVICE);
+    }
+
+    static String getChannelId() {
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
+            return new Notification().getChannelId();
+        }
+        return null;
+    }
+
+}
